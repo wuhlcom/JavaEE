@@ -8,18 +8,18 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "t_user")
+@Table(name="t_user")
 public class UserInfo {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 	@NotNull
 	private String name;
-
+	
 	private String password;
-
+	
 	private String salt;
-
+	
 	private String role;
 
 	public int getId() {
