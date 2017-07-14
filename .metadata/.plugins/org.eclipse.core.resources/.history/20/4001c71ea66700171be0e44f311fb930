@@ -1,0 +1,13 @@
+package com.ann.test;
+
+/*
+ * 忽略警告
+ */
+
+public class Test {
+	@SuppressWarnings("deprecation")
+	public void sing(){
+		Person p =new Child();
+		p.sing();
+	}
+}

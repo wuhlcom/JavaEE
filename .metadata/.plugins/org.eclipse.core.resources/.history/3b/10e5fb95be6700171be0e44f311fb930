@@ -1,0 +1,23 @@
+package com.ann.test;
+
+public class Child implements Person {
+
+	@Override
+	@Description(age=10,author="aa",desc="red")
+	public String name() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int age() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public String sing() {
+		// TODO Auto-generated method stub
+		return "sing";
+	}
+}

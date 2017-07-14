@@ -1,0 +1,5 @@
+package com.zhilu.demo.controller;
+
+public class CatController {
+
+}

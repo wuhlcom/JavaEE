@@ -1,0 +1,10 @@
+package com.ann.test;
+
+
+@SuppressWarnings("deprecation")
+public class Test {
+	public void sing(){
+		Person p =new Child();
+		p.sing();
+	}
+}
