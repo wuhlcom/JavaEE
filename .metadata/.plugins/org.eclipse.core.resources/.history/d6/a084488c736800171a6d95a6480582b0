@@ -1,0 +1,98 @@
+package com.zhilu.demo.controller;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.zhilu.demo.bean.Cat;
+import com.zhilu.demo.repository.CatRepository;
+import com.zhilu.demo.result.ResultMessage;
+import com.zhilu.demo.result.ResultStatusCode;
+import com.zhilu.demo.service.CatService;
+
+
+@RestController
+@RequestMapping("/cat")
+public class CatController {
+	@Resource
+	private CatService catService;
+	
+	@RequestMapping("/save")
+	public String save(){
+		Cat cat = new Cat();
+		cat.setCatName("tom");
+		cat.setCatAge(13);
+		catService.save(cat);
+		return "save  ok";
+	}
+	
+	@RequestMapping("/delete")
+	public String delete(){
+		catService.delete(1);
+		return "delete ok";
+	}
+	
+	@RequestMapping("/getAll")
+	public Iterable<Cat> getAll(){
+		return catService.getAll();
+	}
+	
+	 @Autowired  
+	 private CatRepository catRepositoy;  
+	      
+	    @RequestMapping("getcat")  
+	    public Object getUser(int id)  
+	    {  
+	        Cat catEntity = catRepositoy.findCatById(id);  
+	        ResultMessage resultMsg = new ResultMessage(ResultStatusCode.OK.getErrcode(), ResultStatusCode.OK.getErrmsg(), catEntity);  
+	        return resultMsg;  
+	    }  
+	      
+	    @RequestMapping("getcats")  
+	    public Object getUsers(String name)  
+	    {  
+	        List<Cat> catEntities = catRepositoy.findCatByName(name);  
+	        ResultMessage resultMsg = new ResultMessage(ResultStatusCode.OK.getErrcode(), ResultStatusCode.OK.getErrmsg(), catEntities);  
+	        return resultMsg;  
+	    }  
+	      
+	    @Modifying  
+	    @RequestMapping("addcat")  
+	    public Object addCat(@RequestBody Cat catEntity)  
+	    {  
+	        userRepositoy.save(catEntity);  
+	        ResultMsg resultMsg = new ResultMsg(ResultStatusCode.OK.getErrcode(), ResultStatusCode.OK.getErrmsg(), userEntity);  
+	        return resultMsg;  
+	    }  
+	      
+	    @Modifying  
+	    @RequestMapping("updateuser")  
+	    public Object updateUser(@RequestBody UserInfo userEntity)  
+	    {  
+	        UserInfo user = userRepositoy.findUserInfoById(userEntity.getId());  
+	        if (user != null)  
+	        {  
+	            user.setName(userEntity.getName());  
+	            userRepositoy.save(user);  
+	        }  
+	        ResultMsg resultMsg = new ResultMsg(ResultStatusCode.OK.getErrcode(), ResultStatusCode.OK.getErrmsg(), null);  
+	        return resultMsg;  
+	    }  
+	      
+	    @Modifying  
+	    @RequestMapping("deleteuser")  
+	    public Object deleteUser(int id)  
+	    {  
+	        userRepositoy.delete(id);  
+	        ResultMsg resultMsg = new ResultMsg(ResultStatusCode.OK.getErrcode(), ResultStatusCode.OK.getErrmsg(), null);  
+	        return resultMsg;  
+	    }  
+	
+}

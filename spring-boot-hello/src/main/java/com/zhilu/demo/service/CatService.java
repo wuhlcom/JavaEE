@@ -12,18 +12,19 @@ import com.zhilu.demo.repository.CatRepository;
 public class CatService {
 	@Resource
 	private CatRepository catRepository;
-	
+
 	@Transactional
-	public void save(Cat cat){
+	public void save(Cat cat) {
 		catRepository.save(cat);
 	}
-	
+
 	@Transactional
-	public void delete(int id){
+	public void delete(int id) {
 		catRepository.delete(id);
 	}
-	
-	public Iterable<Cat> getAll(){
+
+	public Iterable<Cat> getAll() {
 		return catRepository.findAll();
 	}
+
 }

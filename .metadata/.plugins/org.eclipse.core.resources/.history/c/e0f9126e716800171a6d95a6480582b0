@@ -1,0 +1,5 @@
+package com.zhilu.demo.result;
+
+public class ResultMessage {
+
+}

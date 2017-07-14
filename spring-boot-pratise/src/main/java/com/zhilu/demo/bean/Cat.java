@@ -53,8 +53,8 @@ public class Cat {
 	/**
 	 * @param i the catAge to set
 	 */
-	public void setCatAge(int i) {
-		this.catAge = i;
+	public void setCatAge(int catAge) {
+		this.catAge = catAge;
 	}
 	
 }
