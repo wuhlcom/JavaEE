@@ -1,0 +1,72 @@
+package com.zhilu.device.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.zhilu.device.bean.TblIotDevice;
+import com.zhilu.device.repository.TblIotDeviceRepository;
+import com.zhilu.device.util.ResultMsg;
+import com.zhilu.device.util.ResultStatusCode;
+
+@RestController
+@RequestMapping("device")
+public class TblIotDeviceController {
+
+	@Autowired
+	private TblIotDeviceRepository tblIotDeviceRepositoy;
+
+	@RequestMapping("getdev")
+	public Object getDev(String id) {
+		TblIotDevice tblIotDeviceEntity = tblIotDeviceRepositoy.findTblIotDeviceById(id);
+		String devId=tblIotDeviceEntity.getId();
+		ArrayList<String> listDevIds=new ArrayList<>();
+		listDevIds.add(devId);		
+		ResultMsg resultMsg = new ResultMsg(ResultStatusCode.OK.getErrcode(), ResultStatusCode.OK.getErrmsg(),
+				listDevIds);
+		return resultMsg;
+	}
+
+	@RequestMapping("getdevs")
+	public Object getDevs(String name) {
+		List<TblIotDevice> tblIotDeviceEntities = tblIotDeviceRepositoy.findTblIotDeviceByName(name);
+		ResultMsg resultMsg = new ResultMsg(ResultStatusCode.OK.getErrcode(), ResultStatusCode.OK.getErrmsg(),
+				tblIotDeviceEntities);
+		return resultMsg;
+	}
+
+	@Modifying
+	@RequestMapping("adddev")
+	public Object addDev(@RequestBody TblIotDevice tblIotDeviceEntity) {	
+		tblIotDeviceRepositoy.save(tblIotDeviceEntity);
+		ResultMsg resultMsg = new ResultMsg(ResultStatusCode.OK.getErrcode(), ResultStatusCode.OK.getErrmsg(),
+				tblIotDeviceEntity);
+		return resultMsg;
+	}
+
+	@Modifying
+	@RequestMapping("updatedev")
+	public Object updateDev(@RequestBody TblIotDevice tblIotDeviceEntity) {
+		TblIotDevice dev = tblIotDeviceRepositoy.findTblIotDeviceById(tblIotDeviceEntity.getId());
+		if (dev != null) {
+			dev.setName(tblIotDeviceEntity.getName());
+			tblIotDeviceRepositoy.save(dev);
+		}
+		ResultMsg resultMsg = new ResultMsg(ResultStatusCode.OK.getErrcode(), ResultStatusCode.OK.getErrmsg(), null);
+		return resultMsg;
+	}
+
+	@Modifying
+	@RequestMapping("deletedev")
+	public Object deleteDev(String id) {
+		tblIotDeviceRepositoy.delete(id);
+		ResultMsg resultMsg = new ResultMsg(ResultStatusCode.OK.getErrcode(), ResultStatusCode.OK.getErrmsg(), null);
+		return resultMsg;
+	}
+
+}

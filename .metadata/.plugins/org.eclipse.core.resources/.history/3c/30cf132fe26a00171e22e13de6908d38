@@ -1,0 +1,21 @@
+package com.zhilu.device.util;
+
+public enum ResultStatusCode2 {
+	OK(0),	
+	SYSTEM_ERROR(3001);
+	
+	private int errcode;
+	private ResultStatusCode2(int Errode)
+	{
+		this.errcode = Errode;	
+	}
+	
+	public int getErrcode() {
+		return errcode;
+	}
+
+	public void setErrcode(int errcode) {
+		this.errcode = errcode;
+	}
+	
+}

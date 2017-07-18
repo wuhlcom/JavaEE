@@ -1,0 +1,9 @@
+package com.zhilu.device.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.zhilu.device.bean.TblIotDevice;
+
+public interface TblIotDeviceRepository extends JpaRepository<TblIotDevice, String>{
+
+}

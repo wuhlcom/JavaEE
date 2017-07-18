@@ -1,0 +1,41 @@
+package com.zhilu.device.util;
+
+public class ResultMsg {
+	
+
+		private int errcode;
+		private String errmsg;
+		private Object devdata;
+		
+		/**
+		 * @return the devdata
+		 */
+		public Object getDevdata() {
+			return devdata;
+		}
+		/**
+		 * @param devdata the devdata to set
+		 */
+		public void setDevdata(Object devdata) {
+			this.devdata = devdata;
+		}
+		public ResultMsg(int ErrCode, String ErrMsg, Object Devdata)
+		{
+			this.errcode = ErrCode;			
+			this.errmsg = ErrMsg;
+			this.devdata = Devdata;
+		}
+		public int getErrcode() {
+			return errcode;
+		}
+		public void setErrcode(int errcode) {
+			this.errcode = errcode;
+		}
+		public String getErrmsg() {
+			return errmsg;
+		}
+		public void setErrmsg(String errmsg) {
+			this.errmsg = errmsg;
+		}		
+
+}

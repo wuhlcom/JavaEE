@@ -1,0 +1,5 @@
+package com.zhilu.device.util;
+
+public class ResultStatusCode {
+
+}

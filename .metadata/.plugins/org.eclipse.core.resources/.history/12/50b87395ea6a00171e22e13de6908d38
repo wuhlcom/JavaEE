@@ -1,0 +1,15 @@
+package com.zhilu.device.util;
+
+public class PubMethod {
+	int[] PROTOCOL = { 0, 1, 2, 3 };
+
+	public boolean isProtocol(int protocol) {
+		boolean isExist = false;
+		for (int i = 0; i < PROTOCOL.length; i++) {
+			if (PROTOCOL[i] == protocol) {
+				isExist = true;
+			}
+		}
+		return isExist;
+	}
+}

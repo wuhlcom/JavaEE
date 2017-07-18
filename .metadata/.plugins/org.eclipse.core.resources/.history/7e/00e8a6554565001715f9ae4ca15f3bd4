@@ -1,7 +1,0 @@
-package com.iheima.servlet;
-
-import javax.servlet.http.HttpServlet;
-
-public class ServletDemo3 extends HttpServlet{
-
-}

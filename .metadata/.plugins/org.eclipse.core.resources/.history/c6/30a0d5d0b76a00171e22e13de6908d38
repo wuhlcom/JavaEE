@@ -1,0 +1,5 @@
+package com.zhilu.device.repository.dao;
+
+public class TblIotDeviceImpl {
+
+}

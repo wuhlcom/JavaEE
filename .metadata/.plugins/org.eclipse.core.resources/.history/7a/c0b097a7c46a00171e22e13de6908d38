@@ -1,0 +1,22 @@
+package com.zhilu.device.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import com.zhilu.device.bean.TblIotDevice;
+
+public interface TblIotDeviceRepository extends JpaRepository<TblIotDevice, String>{
+	/**
+     * spring data jpa 会自动注入实现（根据方法命名规范）
+     * @return
+     */
+	TblIotDevice findTblIotDeviceById(String id);
+	List<TblIotDevice> findTblIotDeviceByName(String name);
+	
+	@Query(value = "select * from TblIotDevice limit ?1", nativeQuery =true)
+	List<TblIotDevice> findAllTblIotDevicesByCount(int count);
+}

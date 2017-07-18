@@ -1,0 +1,5 @@
+package com.zhilu.device.bean;
+
+public class tblIotDevice {
+
+}
