@@ -1,0 +1,27 @@
+package com.zhilu.device.service;
+
+public class DevSpec {
+
+    public static Specification<Task> method1(){
+
+        return new Specification<Task>(){
+            @Override
+            public Predicate toPredicate(Root<Task> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                return null;
+            }
+
+        };
+    }
+
+    public static Specification<Task> method2(){
+
+        return new Specification<Task>(){
+            @Override
+            public Predicate toPredicate(Root<Task> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                return null;
+            }
+
+        };
+    }
+
+}

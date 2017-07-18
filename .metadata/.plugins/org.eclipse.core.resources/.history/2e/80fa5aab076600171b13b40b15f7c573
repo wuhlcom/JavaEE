@@ -1,5 +1,0 @@
-package com.heima.ioc;
-
-public interface UserService {
-
-}

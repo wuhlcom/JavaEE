@@ -1,0 +1,5 @@
+package com.zhilu.device.controller;
+
+public class TblIotDeviceController {
+
+}

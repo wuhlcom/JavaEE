@@ -5,7 +5,7 @@
   <link rel="self" href="https://spring.io/blog.atom" />
   <id>http://spring.io/blog.atom</id>
   <icon>https://spring.io/favicon.ico</icon>
-  <updated>2017-07-18T01:52:48Z</updated>
+  <updated>2017-07-18T01:52:00Z</updated>
   <entry>
     <title>This Week in Spring - July 18th, 2017</title>
     <link rel="alternate" href="https://spring.io/blog/2017/07/18/this-week-in-spring-july-18th-2017" />
@@ -14,7 +14,7 @@
       <name>Josh Long</name>
     </author>
     <id>tag:spring.io,2017-07-18:2971</id>
-    <updated>2017-07-18T01:52:48Z</updated>
+    <updated>2017-07-18T01:52:00Z</updated>
     <content type="html">&lt;p&gt;Hi Spring fans! This week I&amp;rsquo;m in Crete, Greece, for the epic JCrete un-conference and then it&amp;rsquo;s off to Istanbul, Turkey for next week&amp;rsquo;s visits with customers and for the Spring meetup. &lt;a href="https://www.meetup.com/Istanbul-Spring-Meetup/"&gt;I hope you&amp;rsquo;ll join me in Istanbul&lt;/a&gt;! &lt;/p&gt;
 &lt;p&gt;As usual, we&amp;rsquo;ve got a lot to cover so let&amp;rsquo;s get to it!&lt;/p&gt;
 &lt;ul&gt;
@@ -23,6 +23,7 @@
   &lt;li&gt;Want to &lt;a href="https://github.com/cloudfoundry/java-buildpack/blob/master/docs/framework-your_kit_profiler.md"&gt;profile Java applications on Cloud Foundry&lt;/a&gt;? This useful tip from Ben Hale, lead of the Java experience on Cloud Foundry, should get you started!&lt;/li&gt;
   &lt;li&gt;This tip from Pivotal&amp;rsquo;s own Luke Shannon on how to fix a broken &amp;lsquo;Organize Imports&amp;rsquo; command &lt;a href="https://t.co/DQaEFcFMbf?ssr=true"&gt;in Spring Tool Suite&lt;/a&gt; when upgrading could be useful to some of you!&lt;/li&gt;
   &lt;li&gt;I liked this French-language &lt;a href="http://blog.xebia.fr/2017/07/17/spring-framework-5-tour-dhorizon-des-nouveautes/"&gt;look at some of the new features coming in Spring Framework 5&lt;/a&gt;.&lt;/li&gt;
+  &lt;li&gt;I loved this project, &lt;a href="https://github.com/ErnestOrt/Trampoline"&gt;called Trampoline&lt;/a&gt;, which helps start and stop Spring Boot-based services. This looks super convenient during development!&lt;/li&gt;
   &lt;li&gt;The work on the open-service broker API is moving forward at full-speed. Recently, work on creating &lt;a href="https://content.pivotal.io/pivotal-blog/building-cloud-foundry-on-demand-services-just-got-a-lot-easier"&gt;on-demand service brokers&lt;/a&gt; just got a lot easier and this post does a great job explaining how.&lt;/li&gt;
   &lt;li&gt;Java 9 is just around the corner and there&amp;rsquo;s a lot to recommend it beyond the modularity support. I liked this look on the Oracle blog &lt;a href="https://blogs.oracle.com/java//collections-refueled"&gt;on Java 9 Collections updates&lt;/a&gt;.&lt;/li&gt;
   &lt;li&gt;Want to get a feel for some of the &lt;a href="https://blogs.oracle.com/java/jdk-9-language-tooling-libraries"&gt;new tooling in JDK 9&lt;/a&gt;? Check out this nice post on the Oracle blog.&lt;/li&gt;

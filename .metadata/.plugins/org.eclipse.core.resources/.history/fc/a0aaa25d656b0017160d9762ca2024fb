@@ -1,0 +1,19 @@
+package com.zhilu.device.service;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.zhilu.device.domain.TblIotDeviceRepository;
+
+@Service
+public class TblIotDeviceService {
+	@Resource
+	private TblIotDeviceRepository devRepository;
+	
+	@Transactional
+	public void add(){
+		
+	}
+}

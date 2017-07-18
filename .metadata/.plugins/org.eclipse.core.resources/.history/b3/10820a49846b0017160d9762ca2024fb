@@ -1,0 +1,5 @@
+package com.zhilu.device.repository;
+
+public interface TblIotDeviceDao {
+	void test();
+}

@@ -8,9 +8,9 @@
 <item elementID="=spring-boot-pratise" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=spring-boot-hello" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=spring-boot-demo" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=spring-boot-device" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=spring-boot-api" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=SpringRest" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=zhilu-device" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 </workingSet>
 <workingSet editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1500258525076_10" label="java" name="java">
 <item elementID="=javatest" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>

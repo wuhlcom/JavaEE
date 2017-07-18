@@ -1,0 +1,10 @@
+spring:
+  profiles:
+    active: dev
+  jackson:
+    serialization:
+      indent-output: true
+      
+    
+server:
+  port: 8011

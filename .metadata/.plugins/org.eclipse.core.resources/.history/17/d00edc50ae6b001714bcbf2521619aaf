@@ -1,0 +1,38 @@
+package com.zhilu.device.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
+import org.springframework.stereotype.Service;
+
+import com.zhilu.device.repository.TblIotDeviceRepository;
+import com.zhilu.device.bean.TblIotDevice;;
+
+@Service
+public class TblIotDeviceService {	
+	    @Autowired
+	    private TblIotDeviceRepository tblIotDev;
+	    
+	    public Page<TblIotDevice> getDevsByPage(int pageNumber,int pageSize){
+	        PageRequest request = this.buildPageRequest(pageNumber,pageSize);
+	        Page<TblIotDevice> tblIotDevices= this.tblIotDev.findAll(request);
+	        return tblIotDevices;
+	    }
+        
+	    //构建PageRequest
+        private PageRequest buildPageRequest(int pageNumber, int pagzSize) {
+        	// 指定排序方式        	
+     		Order orderId = new Order(Direction.DESC, "id");
+     		Order orderType = new Order(Direction.ASC, "type");
+     		Order orderCreateTime = new Order(Direction.DESC, "createtime");
+     		Sort sort = new Sort(orderCreateTime,orderType);
+     		pageNumber = pageNumber - 1;     		
+     		PageRequest pageable = new PageRequest(pageNumber, pagzSize, sort);
+	        return pageable;
+	    }
+
+}
