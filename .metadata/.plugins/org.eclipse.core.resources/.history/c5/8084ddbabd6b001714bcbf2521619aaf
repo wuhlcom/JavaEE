@@ -69,7 +69,6 @@ public class TblIotDeviceController {
 			@RequestHeader(value = "listRows", defaultValue = "15") Integer listRows) {
 		Page<TblIotDevice> devs = null;
 		if (type == 0) {
-			System.out.println("11111111111111111111111");
 			devs = tblIotDevService.findBySpec(userid, type, page, listRows);
 		} else {
 			devs = tblIotDevService.findBySpec(userid, type, search, page, listRows);

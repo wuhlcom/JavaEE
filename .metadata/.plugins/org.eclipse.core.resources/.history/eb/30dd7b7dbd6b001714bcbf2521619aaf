@@ -51,15 +51,13 @@ public class TblIotDeviceController {
 	}
 
 	// 注意大小写
-	@GetMapping("queryAllPage")
+	@GetMapping("queryPageAll")
 	// 注解@RequestHeader限定请求参数
 	public List<TblIotDevice> getDevsByParams(@RequestHeader(value = "page", defaultValue = "1") Integer page,
 			@RequestHeader(value = "listRows", defaultValue = "10") Integer listRows) {
 		List<TblIotDevice> devices = tblIotDevService.getDevsByPage(page, listRows).getContent();
 		return devices;
 	}
-	
-	
 
 	@GetMapping("query")
 	public List<TblIotDevice> queryDevs(@RequestHeader(value = "userid", required = true) String userid,
@@ -69,7 +67,6 @@ public class TblIotDeviceController {
 			@RequestHeader(value = "listRows", defaultValue = "15") Integer listRows) {
 		Page<TblIotDevice> devs = null;
 		if (type == 0) {
-			System.out.println("11111111111111111111111");
 			devs = tblIotDevService.findBySpec(userid, type, page, listRows);
 		} else {
 			devs = tblIotDevService.findBySpec(userid, type, search, page, listRows);
