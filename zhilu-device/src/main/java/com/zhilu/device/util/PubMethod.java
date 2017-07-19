@@ -7,7 +7,7 @@ import java.util.Map;
 import com.zhilu.device.bean.TblIotDevice;
 
 public class PubMethod {
-	static int[] PROTOCOL = { 0, 1, 2, 3 };
+	final static int[] PROTOCOL = { 0, 1, 2, 3 };
 
 	/**
 	 * 判断协议是否确

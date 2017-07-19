@@ -1,5 +1,8 @@
 package com.zhilu.device.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -24,6 +27,33 @@ import com.zhilu.device.bean.TblIotDevice;
 public class TblIotDeviceService {
 	@Autowired
 	private TblIotDeviceRepository tblIotDevRepo;
+
+	//创建设备组
+	public ArrayList<?> addDevices(String userid, String devname, String product, Integer protocol, String[] ids) {
+		List<TblIotDevice> devicesobj = new ArrayList<>();
+		for (String id : ids) {
+			TblIotDevice device = new TblIotDevice();
+			device.setUserid(userid);
+			device.setProduct(product);
+			device.setProtocol(protocol);
+			device.setId(id);
+			devicesobj.add(device);
+		}
+		ArrayList<?> devids =saveDevices(devicesobj);
+		return devids;
+	}
+
+	//添加设备组
+	//返回设备ID数组
+	@Transactional
+	public ArrayList<String> saveDevices(List<TblIotDevice> devices) {
+		List<TblIotDevice> rsSave = tblIotDevRepo.save(devices);
+		ArrayList<String> devids=new ArrayList<>();
+		for (TblIotDevice device : rsSave) {
+			devids.add(device.getId());
+		}
+		return devids;
+	}
 
 	/**
 	 * 分页查询
@@ -85,9 +115,9 @@ public class TblIotDeviceService {
 		tblIotDevObj.setName(args[0]);
 		return tblIotDevRepo.save(tblIotDevObj);
 	}
-	
-	@Transactional	
-	public void deleteById(String id,String userid){
+
+	@Transactional
+	public void deleteById(String id, String userid) {
 		tblIotDevRepo.deleteByUseridAndId(id, userid);
 	}
 

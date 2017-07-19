@@ -41,7 +41,7 @@ public interface TblIotDeviceRepository
 	@Transactional	
 	@Modifying
 	@Query("delete from TblIotDevice where id = :id and userid = :userid")
-	void deleteByUseridAndId(String id,String userid);
+	void deleteByUseridAndId(String id,String userid);	
 		
 //	@Query("select * from TblIotDevice")
 //	List<TblIotDevice> findAll();
