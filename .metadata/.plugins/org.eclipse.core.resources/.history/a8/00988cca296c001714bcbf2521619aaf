@@ -1,9 +1,0 @@
-package com.zhilu.device.bean;
-/** 
-* @author 作者 E-mail: wuhongliang@zhilutec.com
-* @version 创建时间：2017年7月19日 上午10:20:19 
-* 类说明 
-*/
-public class TblIotDeviceDyn {
-
-}

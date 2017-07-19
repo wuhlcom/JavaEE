@@ -1,9 +1,0 @@
-package com.ann.test;
-
-import java.lang.annotation.Target;
-
-@Target(ElementType.ANNOTATION_TYPE)
-
-public @interface Description {
-
-}

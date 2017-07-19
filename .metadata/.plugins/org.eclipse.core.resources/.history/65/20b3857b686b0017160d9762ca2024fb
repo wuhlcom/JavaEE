@@ -1,9 +1,0 @@
-package com.zhilu.device.repository;
-
-import org.springframework.data.repository.PagingAndSortingRepository;
-
-import com.zhilu.device.bean.TblIotDevice;
-
-public interface TblIotDevicePageRepository extends PagingAndSortingRepository<TblIotDevice, String> {
-
-}

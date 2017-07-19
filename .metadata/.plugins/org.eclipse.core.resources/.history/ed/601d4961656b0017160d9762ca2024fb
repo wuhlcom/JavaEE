@@ -1,7 +1,0 @@
-package com.zhilu.device.domain;
-
-import com.zhilu.device.domain.TblIotDeviceDao;
-
-public class TblIotDeviceDaoImpl extends TblIotDeviceDao {
-
-}

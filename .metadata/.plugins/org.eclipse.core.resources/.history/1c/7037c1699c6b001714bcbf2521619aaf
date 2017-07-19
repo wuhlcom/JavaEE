@@ -1,9 +1,0 @@
-package com.zhilu.device.controller;
-
-@RestController
-public class HelloController {
-    @GetMapping("/hello")
-    public String hello(){
-    	return "Zhilu Spring-boot hello";
-    }
-}

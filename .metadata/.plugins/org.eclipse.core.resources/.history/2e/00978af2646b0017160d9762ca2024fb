@@ -1,5 +1,0 @@
-package com.zhilu.device.domain;
-
-public class TblIotDeviceDaoImpl {
-
-}
