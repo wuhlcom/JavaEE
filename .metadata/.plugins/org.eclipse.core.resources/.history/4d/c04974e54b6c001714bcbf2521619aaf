@@ -1,0 +1,8 @@
+/** 
+* @author :wuhongliang wuhongliang@zhilutec.com
+* @version :2017年7月19日 下午2:22:24 * 
+*/ 
+package com.zhilu.device.bean;
+public class TbIotDeviceBasic {
+
+}

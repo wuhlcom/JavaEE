@@ -2,10 +2,12 @@ package com.zhilu.device.repository;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 
 import com.zhilu.device.bean.TblIotDevice;
 
@@ -16,23 +18,14 @@ public interface TblIotDeviceRepository
 	 * 
 	 * 自定义的简单查询就是根据方法名来自动生成SQL，
 	 * 主要的语法是findXXBy,readAXXBy,queryXXBy,countXXBy,getXXBy后面跟属性名称：
-	 * 
-	 * User findByUserName(String userName); 也使用一些加一些关键字And、 Or
-	 * 
+	 * User findByUserName(String userName); 也使用一些加一些关键字And、 Or	
 	 * User findByUserNameOrEmail(String username, String email); 修改、删除、统计也是类似语法
-	 * 
 	 * Long deleteById(Long id);
-	 * 
 	 * Long countByUserName(String userName) 
 	 * 基本上SQL体系中的关键词都可以使用，例如：LIKE、	 * IgnoreCase、 OrderBy。
-	 * 
 	 * List<User> findByEmailLike(String email);
-	 * 
-	 * User findByUserNameIgnoreCase(String userName);
-	 * 
+	 * User findByUserNameIgnoreCase(String userName);	 
 	 * List<User> findByUserNameOrderByEmailDesc(String email);
-	 * 
-	 * @return
 	 */
 	TblIotDevice findTblIotDeviceById(String id);
 
@@ -43,8 +36,16 @@ public interface TblIotDeviceRepository
 	// 使用原生sql
 	@Query(value = "select * from TblIotDevice limit ?1", nativeQuery = true)
 	List<TblIotDevice> findAllTblIotDevicesByCount(int count);
+	
 
-	// Page<TblIotDevice> findAll(Pageable pageable);
+	@Transactional	
+	@Modifying
+	@Query("delete from TblIotDevice where id = :id and userid = :userid")
+	void deleteByUseridAndId(String id,String userid);
+		
+//	@Query("select * from TblIotDevice")
+//	List<TblIotDevice> findAll();
+	
 	// ------------- 使用 @Query 注解
 	// // 没有参数的查询
 	// @Query("select p from Person p where p.id = (select max(p2.id) from

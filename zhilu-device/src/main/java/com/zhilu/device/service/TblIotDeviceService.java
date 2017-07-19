@@ -4,6 +4,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
 import com.zhilu.device.repository.TblIotDeviceRepository;
@@ -21,14 +23,14 @@ import com.zhilu.device.bean.TblIotDevice;
 @Service
 public class TblIotDeviceService {
 	@Autowired
-	private TblIotDeviceRepository tblIotDev;
+	private TblIotDeviceRepository tblIotDevRepo;
 
 	/**
 	 * 分页查询
 	 */
 	public Page<TblIotDevice> getDevsByPage(int pageNumber, int pageSize) {
 		PageRequest request = this.buildPageRequest(pageNumber, pageSize);
-		Page<TblIotDevice> tblIotDevices = this.tblIotDev.findAll(request);
+		Page<TblIotDevice> tblIotDevices = this.tblIotDevRepo.findAll(request);
 		return tblIotDevices;
 	}
 
@@ -64,19 +66,32 @@ public class TblIotDeviceService {
 		}
 		PageRequest pageReq = this.buildPageRequest(page, size);
 		new DevSpec();
-		Page<TblIotDevice> devs = this.tblIotDev.findAll(DevSpec.devSearchSpec(uid, type, search), pageReq);
+		Page<TblIotDevice> devs = this.tblIotDevRepo.findAll(DevSpec.devSearchSpec(uid, type, search), pageReq);
 		return devs;
 	}
-	
-	public Page<TblIotDevice> findBySpec(String uid, Integer type,Integer page, Integer size) {	
+
+	public Page<TblIotDevice> findBySpec(String uid, Integer type, Integer page, Integer size) {
 		PageRequest pageReq = this.buildPageRequest(page, size);
 		new DevSpec();
-		Page<TblIotDevice> devs = this.tblIotDev.findAll(DevSpec.devSearchSpec(uid, type), pageReq);
+		Page<TblIotDevice> devs = this.tblIotDevRepo.findAll(DevSpec.devSearchSpec(uid, type), pageReq);
 		return devs;
+	}
+
+	@Transactional
+	@Modifying
+	public TblIotDevice updateDev(String id, String... args) {
+		TblIotDevice tblIotDevObj = new TblIotDevice();
+		tblIotDevObj.setId(id);
+		tblIotDevObj.setName(args[0]);
+		return tblIotDevRepo.save(tblIotDevObj);
+	}
+	
+	@Transactional	
+	public void deleteById(String id,String userid){
+		tblIotDevRepo.deleteByUseridAndId(id, userid);
 	}
 
 	private class MySpec implements Specification<TblIotDevice> {
-
 		@Override
 		public Predicate toPredicate(Root<TblIotDevice> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
 

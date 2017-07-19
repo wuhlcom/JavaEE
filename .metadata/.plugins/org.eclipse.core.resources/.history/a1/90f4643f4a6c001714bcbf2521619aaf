@@ -1,0 +1,267 @@
+package com.zhilu.device.bean;
+
+import java.util.Date;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
+@Entity()
+@Table(name = "tbl_iot_device")
+public class TblIotDevice {
+	@Id
+	private String id;
+	@NotNull
+	private String name;
+	private String basename = "";
+	private String userid = "";
+	private String sceneid;
+	private String productid = "";
+	private Integer protocol = 0;
+	private String mac = "";
+	private String groupid;
+	private String province = "";
+	private String city = "";
+	private String address = "";
+	private Integer tlsswitch;
+	private Integer tlsprotocol;
+	private Integer tlsencrypt;
+	private Integer tlscheck;
+	private String description = "";
+	private String confpath = "";
+	private String iotmodelconf = "";
+	private String username = "";
+	private Date createtime = new Date();
+	private String identification = "";
+	private Integer type;
+	private String thing_id;
+	private Integer llegal_mac;
+	private String longitude;
+	private String latitude;
+	private String product;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getBasename() {
+		return basename;
+	}
+
+	public void setBasename(String basename) {
+		this.basename = basename;
+	}
+
+	public String getUserid() {
+		return userid;
+	}
+
+	public void setUserid(String userid) {
+		this.userid = userid;
+	}
+
+	public String getSceneid() {
+		return sceneid;
+	}
+
+	public void setSceneid(String sceneid) {
+		this.sceneid = sceneid;
+	}
+
+	public String getProductid() {
+		return productid;
+	}
+
+	public void setProductid(String productid) {
+		this.productid = productid;
+	}
+
+	public Integer getProtocol() {
+		return protocol;
+	}
+
+	public void setProtocol(Integer protocol) {
+		this.protocol = protocol;
+	}
+
+	public String getMac() {
+		return mac;
+	}
+
+	public void setMac(String mac) {
+		this.mac = mac;
+	}
+
+	public String getGroupid() {
+		return groupid;
+	}
+
+	public void setGroupid(String groupid) {
+		this.groupid = groupid;
+	}
+
+	public String getProvince() {
+		return province;
+	}
+
+	public void setProvince(String province) {
+		this.province = province;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public Integer getTlsswitch() {
+		return tlsswitch;
+	}
+
+	public void setTlsswitch(Integer tlsswitch) {
+		this.tlsswitch = tlsswitch;
+	}
+
+	public Integer getTlsprotocol() {
+		return tlsprotocol;
+	}
+
+	public void setTlsprotocol(Integer tlsprotocol) {
+		this.tlsprotocol = tlsprotocol;
+	}
+
+	public Integer getTlsencrypt() {
+		return tlsencrypt;
+	}
+
+	public void setTlsencrypt(Integer tlsencrypt) {
+		this.tlsencrypt = tlsencrypt;
+	}
+
+	public Integer getTlscheck() {
+		return tlscheck;
+	}
+
+	public void setTlscheck(Integer tlscheck) {
+		this.tlscheck = tlscheck;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getConfpath() {
+		return confpath;
+	}
+
+	public void setConfpath(String confpath) {
+		this.confpath = confpath;
+	}
+
+	public String getIotmodelconf() {
+		return iotmodelconf;
+	}
+
+	public void setIotmodelconf(String iotmodelconf) {
+		this.iotmodelconf = iotmodelconf;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public Date getCreatetime() {
+		return createtime;
+	}
+
+	public void setCreatetime(Date createtime) {
+		this.createtime = createtime;
+	}
+
+	public String getIdentification() {
+		return identification;
+	}
+
+	public void setIdentification(String identification) {
+		this.identification = identification;
+	}
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
+
+	public String getThing_id() {
+		return thing_id;
+	}
+
+	public void setThing_id(String thing_id) {
+		this.thing_id = thing_id;
+	}
+
+	public Integer getLlegal_mac() {
+		return llegal_mac;
+	}
+
+	public void setLlegal_mac(Integer llegal_mac) {
+		this.llegal_mac = llegal_mac;
+	}
+
+	public String getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(String longitude) {
+		this.longitude = longitude;
+	}
+
+	public String getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(String latitude) {
+		this.latitude = latitude;
+	}
+
+	public String getProduct() {
+		return product;
+	}
+
+	public void setProduct(String product) {
+		this.product = product;
+	}
+}

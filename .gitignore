@@ -1,0 +1,13 @@
+.svn 
+.idea/ 
+.git 
+*.xlsx
+*.xls
+*html_reports* 
+*reports*
+*.log
+logs
+.metadata/
+.recommenders/
+_pasted_code_/
+

@@ -10,8 +10,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,8 +47,7 @@ public class TblIotDeviceController {
 
 	@GetMapping("getdev")
 	public Object getDev(String id) {
-		TblIotDevice tblIotDevice = tblIotDeviceRepositoy.findTblIotDeviceById(id);
-		System.out.println(tblIotDevice);
+		TblIotDevice tblIotDevice = tblIotDeviceRepositoy.findTblIotDeviceById(id);	
 		ResultCode resultMsg = new ResultCode(ResultStatusCode.OK.getErrcode(), PubMethod.getDevId(tblIotDevice));
 		return resultMsg;
 	}
@@ -58,8 +60,6 @@ public class TblIotDeviceController {
 		List<TblIotDevice> devices = tblIotDevService.getDevsByPage(page, listRows).getContent();
 		return devices;
 	}
-	
-	
 
 	@GetMapping("query")
 	public List<TblIotDevice> queryDevs(@RequestHeader(value = "userid", required = true) String userid,
@@ -68,8 +68,7 @@ public class TblIotDeviceController {
 			@RequestHeader(value = "page", defaultValue = "1") Integer page,
 			@RequestHeader(value = "listRows", defaultValue = "15") Integer listRows) {
 		Page<TblIotDevice> devs = null;
-		if (type == 0) {
-			System.out.println("11111111111111111111111");
+		if (type == 0) {			
 			devs = tblIotDevService.findBySpec(userid, type, page, listRows);
 		} else {
 			devs = tblIotDevService.findBySpec(userid, type, search, page, listRows);
@@ -97,4 +96,19 @@ public class TblIotDeviceController {
 		}
 	}
 
+	@Modifying
+	@DeleteMapping("delete")
+	public Object deleteDev(@RequestHeader(value = "userid", required = true) String userid,
+			@RequestHeader(value = "devid", required = true) String devid) {
+		tblIotDevService.deleteById(userid,devid);
+//		tblIotDeviceRepositoy.delete(devid);
+		ResultMsg resultMsg = new ResultMsg(ResultStatusCode.OK.getErrcode(), ResultStatusCode.OK.getErrmsg(), null);
+		return resultMsg;
+	}
+
+	@PutMapping(value = "update")
+	public TblIotDevice personUpdate(@PathVariable("token") String token, @RequestParam("id") String id,
+			@RequestParam("name") String name) {
+		return tblIotDevService.updateDev(id, name);
+	}
 }

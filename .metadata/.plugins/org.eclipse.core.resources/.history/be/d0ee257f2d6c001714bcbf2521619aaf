@@ -1,0 +1,17 @@
+package com.zhilu.device.bean;
+/**
+ * @author : wuhongliang@zhilutec.com
+ * @version ：2017年7月19日 上午10:20:19
+ */
+public class TblIotDeviceDyn {
+	private String deviceid;
+
+	public String getDeviceid() {
+		return deviceid;
+	}
+
+	public void setDeviceid(String deviceid) {
+		this.deviceid = deviceid;
+	}
+
+}
