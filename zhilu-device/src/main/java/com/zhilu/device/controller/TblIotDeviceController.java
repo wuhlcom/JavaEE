@@ -26,9 +26,11 @@ import com.zhilu.device.bean.TblIotDevice;
 import com.zhilu.device.repository.TblIotDeviceRepository;
 import com.zhilu.device.service.TblIotDeviceService;
 import com.zhilu.device.util.PubMethod;
-import com.zhilu.device.util.ResultCode;
+import com.zhilu.device.util.Result;
+import com.zhilu.device.util.ResultDevAdd;
 import com.zhilu.device.util.ResultMsg;
 import com.zhilu.device.util.ResultStatusCode;
+import com.zhilu.device.util.ResultErr;
 
 @RestController
 // 这里字母区分大小写
@@ -41,57 +43,14 @@ public class TblIotDeviceController {
 	@Autowired
 	private TblIotDeviceService tblIotDevService;
 
-	@GetMapping("get")
-	public Object get() {
-		return "dev";
-	}
-
-	// 使用HttpServletRequest方法来获取uri上的参数
-	@PostMapping("post")
-	public Object post(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody)
-			throws Exception {
-		System.out.println(request);
-		String token = request.getParameter("token");
-		System.out.println(token);
-		System.out.println("----------------");
-		System.out.println(requestBody);
-
-		// 转化为json对象
-		com.alibaba.fastjson.JSONObject jobj = JSON.parseObject(requestBody);
-		String name = jobj.get("name").toString();
-		System.out.println(name);
-		String devices = jobj.get("devices").toString();
-		System.out.println(devices);
-
-		// 去首尾空格
-		devices = devices.trim();
-		// 去除两头括号
-		String newstr1 = devices.substring(1, devices.length() - 1);
-		System.out.println(newstr1);
-
-		// 分割成数组
-		String[] sourceStrArray = newstr1.split(",");
-		for (int i = 0; i < sourceStrArray.length; i++) {
-			System.out.println(sourceStrArray[i]);
-		}
-
-		return "post";
-	}
-
-	// 使用bean方法来获取uir上的参数
-	@PostMapping("postbean")
-	public Object postbean(TokenParamModel request) {
-		// String token=request.getToken();
-		// System.out.println("token is:"+token);
-		return "postbean";
-	}
-
-	@GetMapping("getdev")
-	public Object getDev(String id) {
-		TblIotDevice tblIotDevice = tblIotDeviceRepositoy.findTblIotDeviceById(id);
-		ResultCode resultMsg = new ResultCode(ResultStatusCode.OK.getErrcode(), PubMethod.getDevId(tblIotDevice));
-		return resultMsg;
-	}
+	// @GetMapping("getdev")
+	// public Object getDev(String id) {
+	// TblIotDevice tblIotDevice =
+	// tblIotDeviceRepositoy.findTblIotDeviceById(id);
+	// ResultAdd resultMsg = new ResultAdd(ResultStatusCode.OK.getErrcode(),
+	// PubMethod.getDevId(tblIotDevice));
+	// return resultMsg;
+	// }
 
 	// 注意大小写
 	@GetMapping("queryAllPage")
@@ -141,26 +100,34 @@ public class TblIotDeviceController {
 	@Modifying
 	@PostMapping("add")
 	public Object addDev(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
+		Result resultMsg = null;
+
 		System.out.println(requestBody);
 		String token = request.getParameter("token");
-		System.out.println("token is:"+token);
-		
-		//獲取參數轉成JsonObject
-		com.alibaba.fastjson.JSONObject paramsJson = JSON.parseObject(requestBody);
-		String userid = paramsJson.get("userid").toString();
-		String name = paramsJson.get("name").toString();
-		String product = paramsJson.get("product").toString();
-		int protocol = Integer.parseInt(paramsJson.get("protocol").toString());
-		String idsStr = paramsJson.get("devices").toString();
-		// 去首尾空格
-		idsStr = idsStr.trim();
-		// 去除两头括号
-		String newIdsStr = idsStr.substring(1, idsStr.length() - 1);
-		// 分割成数组
-		String[] idsArray = newIdsStr.split(",");
-		ArrayList<?> devids = tblIotDevService.addDevices(userid, name, product, protocol, idsArray);
-		ResultCode resultMsg = new ResultCode(ResultStatusCode.OK.getErrcode(), devids);
+		System.out.println("token is:" + token);
+		boolean rsCheckToken = PubMethod.checkToken(token);
+		System.out.println(rsCheckToken);
+		rsCheckToken=true;
+
+		if (rsCheckToken) {
+			// 獲取參數轉成JsonObject
+			com.alibaba.fastjson.JSONObject paramsJson = JSON.parseObject(requestBody);
+			// 通过json解析参数
+			String userid = paramsJson.get("userid").toString();
+			String name = paramsJson.get("name").toString();
+			String product = paramsJson.get("product").toString();
+			int protocol = Integer.parseInt(paramsJson.get("protocol").toString());
+			// 得到Id数组
+			String[] idsArray = PubMethod.getDevids(requestBody);
+			ArrayList devids = tblIotDevService.addDevices(userid, name, product, protocol, idsArray);
+			resultMsg = new ResultDevAdd(ResultStatusCode.OK.getCode(), devids);
+			return resultMsg;
+		} else {
+			resultMsg = new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
+		}
+
 		return resultMsg;
+
 	}
 
 	@Modifying
@@ -169,7 +136,7 @@ public class TblIotDeviceController {
 			@RequestHeader(value = "devid", required = true) String devid) {
 		tblIotDevService.deleteById(userid, devid);
 		// tblIotDeviceRepositoy.delete(devid);
-		ResultMsg resultMsg = new ResultMsg(ResultStatusCode.OK.getErrcode(), ResultStatusCode.OK.getErrmsg(), null);
+		ResultMsg resultMsg = new ResultMsg(ResultStatusCode.OK.getCode(), ResultStatusCode.OK.getErrmsg(), null);
 		return resultMsg;
 	}
 

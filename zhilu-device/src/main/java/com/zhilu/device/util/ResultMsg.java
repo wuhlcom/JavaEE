@@ -1,6 +1,6 @@
 package com.zhilu.device.util;
 
-public class ResultMsg {	
+public class ResultMsg implements Result {	
 
 		private int errcode;
 		private String errmsg;
@@ -26,9 +26,7 @@ public class ResultMsg {
 			return devices;
 		}
 
-		/**
-		 * @param devices the devices to set
-		 */
+
 		public void setDevices(Object devices) {
 			this.devices = devices;
 		}		

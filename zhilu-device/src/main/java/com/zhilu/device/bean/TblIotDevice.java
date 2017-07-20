@@ -16,7 +16,7 @@ public class TblIotDevice {
 	
 	// `name` varchar(70) NOT NULL DEFAULT '',
 	@NotNull
-	private String name;
+	private String name="";
 	
 	// `basename` varchar(64) NOT NULL,
 	private String basename = "";
@@ -29,49 +29,69 @@ public class TblIotDevice {
 	
 	// `productid` varchar(16) NOT NULL COMMENT '所属产品id',
 	private String productid = "";
+	
 	// `protocol` tinyint(4) NOT NULL COMMENT '协议',
 	private Integer protocol = 0;
+	
 	// `mac` varchar(20) NOT NULL COMMENT 'mac地址',
 	private String mac = "";
+	
 	// `groupid` varchar(16) DEFAULT NULL COMMENT '所属设备组',
 	private String groupid;
+	
 	// `province` char(7) NOT NULL,
 	private String province = "";
+	
 	// `city` char(7) NOT NULL,
 	private String city = "";
+	
 	// `address` varchar(125) NOT NULL,
 	private String address = "";
+	
 	// `tlsswitch` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'tsl开关',
-	private Integer tlsswitch;
+	private Integer tlsswitch=0;
+	
 	// `tlsprotocol` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'TLS协议版本',
-	private Integer tlsprotocol;
+	private Integer tlsprotocol=0;
+	
 	// `tlsencrypt` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'TSL加密算法',
-
-	private Integer tlsencrypt;
+	private Integer tlsencrypt=0;
+	
 	// `tlscheck` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'TLS校验算法',
-	private Integer tlscheck;
-	// `description` varchar(256) NOT NULL COMMENT '设备描述',
-	private String description = "";
+	private Integer tlscheck=0;
+	// `description` varchar(256) NOT NULL COMMENT '设备描述',	
+	private String description = "";	
+	
 	// `confpath` varchar(64) NOT NULL,
 	private String confpath = "";
+	
 	// `iotmodelconf` varchar(565) NOT NULL,
 	private String iotmodelconf = "";
+	
 	// `username` varchar(64) NOT NULL DEFAULT '',
 	private String username = "";
+	
 	// `createtime` datetime NOT NULL,
 	private Date createtime = new Date();
+	
 	// `identification` varchar(64) NOT NULL COMMENT '设备唯一表示',
 	private String identification = "";
+	
 	// `type` tinyint(5) NOT NULL DEFAULT '1' COMMENT '设备类型，1：网关，2：thing物体',
-	private Integer type;
+	private Integer type=1;
+	
 	// `thing_id` varchar(64) DEFAULT NULL COMMENT '场景下设备关联的thing',
 	private String thing_id;
+	
 	// `llegal_mac` tinyint(4) NOT NULL DEFAULT '0' COMMENT	'是否是黑名单mac,默认为0代表不是',
-	private Integer llegal_mac;
+	private Integer llegal_mac=0;
+	
 	// `longitude` varchar(50) DEFAULT NULL COMMENT '经度',
 	private String longitude;
+	
 	// `latitude` varchar(50) DEFAULT NULL COMMENT '纬度',
 	private String latitude;
+	
 	// `product` varchar(255) DEFAULT NULL,
 	private String product;
 
