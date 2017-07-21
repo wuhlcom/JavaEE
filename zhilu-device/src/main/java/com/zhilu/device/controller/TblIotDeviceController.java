@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
 import com.zhilu.device.bean.TblIotDevice;
-import com.zhilu.device.repository.TblIotDeviceRepository;
+import com.zhilu.device.repository.TblIotDevRepo;
 import com.zhilu.device.service.TblIotDevSrv;
 import com.zhilu.device.util.PubMethod;
 import com.zhilu.device.util.Result;
@@ -39,7 +39,7 @@ import com.zhilu.device.util.ResultErr;
 public class TblIotDeviceController {
 
 	@Autowired
-	private TblIotDeviceRepository tblIotDeviceRepositoy;
+	private TblIotDevRepo tblIotDeviceRepositoy;
 
 	@Autowired
 	private TblIotDevSrv tblIotDevService;

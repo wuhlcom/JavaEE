@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.zhilu.device.bean.TblIotDevice;
 
-public interface TblIotDeviceRepository
+public interface TblIotDevRepo
 		extends JpaRepository<TblIotDevice, String>, JpaSpecificationExecutor<TblIotDevice> {
 	/**
 	 * spring data jpa 会自动注入实现（根据方法命名规范） 自定义简单查询

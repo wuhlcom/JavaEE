@@ -22,13 +22,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
-import com.zhilu.device.repository.TblIotDeviceBasicRepository;
-import com.zhilu.device.repository.TblIotDeviceDynRepository;
-import com.zhilu.device.repository.TblIotDeviceRepository;
 import com.zhilu.device.util.PubMethod;
 import com.zhilu.device.bean.TblIotDevice;
 import com.zhilu.device.bean.TblIotDeviceBasic;
 import com.zhilu.device.bean.TblIotDeviceDyn;
+import com.zhilu.device.repository.TblIotDevBasicRepo;
+import com.zhilu.device.repository.TblIotDevDynRepo;
+import com.zhilu.device.repository.TblIotDevRepo;
 
 @Service
 public class TblIotDevSrv {
@@ -37,10 +37,15 @@ public class TblIotDevSrv {
 	public final static String EXISITED = "existed";
 	public final static int LOOP = 100;
 	public final static int ID_NUM = 13;
+	
 	@Autowired
-	private TblIotDeviceRepository tblIotDevRepo;
-	private TblIotDeviceBasicRepository tblIotDevBasicRepo;
-	private TblIotDeviceDynRepository tblIotDevDynRepo;
+	private TblIotDevRepo tblIotDevRepo;
+	
+	@Autowired
+	private TblIotDevBasicSrv tblIotDevBasicSrv;
+	
+	@Autowired
+	private TblIotDevDynSrv tblIotDevDynSrv;
 
 	// 创建设备组并添加
 	//
@@ -136,6 +141,8 @@ public class TblIotDevSrv {
 
 		if ((exsitedDevs == null) || exsitedDevs.isEmpty()) {
 			ArrayList<String> devMacs = saveDevices(addDevs);
+			tblIotDevBasicSrv.saveDevicesBasic(addDevsBasic);
+			tblIotDevDynSrv.saveDevicesDyn(addDevsDyn);
 			devMacMap.put(ADDED, devMacs);
 		} else {
 			devMacMap.put(EXISITED, exsitedDevs);
@@ -178,17 +185,8 @@ public class TblIotDevSrv {
 			devMacs.add(device.getMac());
 		}
 		return devMacs;
-	}
+	}	
 	
-	public void saveDevicesBasic(List<TblIotDeviceBasic> devices) {
-	    tblIotDevBasicRepo.save(devices);		
-	}
-	
-	
-	public void saveDevicesDyn(List<TblIotDeviceDyn> devices) {
-		 tblIotDevDynRepo.save(devices);
-	}
-
 	/**
 	 * 分页查询
 	 */

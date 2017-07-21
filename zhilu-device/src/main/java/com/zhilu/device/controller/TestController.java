@@ -16,7 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.alibaba.fastjson.JSON;
 import com.zhilu.device.bean.TblIotDevice;
-import com.zhilu.device.repository.TblIotDeviceRepository;
+import com.zhilu.device.repository.TblIotDevRepo;
 import com.zhilu.device.service.TblIotDevSrv;
 import com.zhilu.device.util.PubMethod;
 
@@ -24,7 +24,7 @@ import com.zhilu.device.util.PubMethod;
 @RequestMapping("device")
 public class TestController {
 	private TblIotDevSrv tbSrv;
-	private TblIotDeviceRepository tbl;
+	private TblIotDevRepo tbl;
 
 	final static String TOKEN_URL = "http://119.29.68.198:9080/index.php/Users";
 

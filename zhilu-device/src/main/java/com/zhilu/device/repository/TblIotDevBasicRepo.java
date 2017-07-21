@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.zhilu.device.bean.TblIotDeviceBasic;
 
-public interface TblIotDeviceBasicRepository
+public interface TblIotDevBasicRepo
 		extends JpaRepository<TblIotDeviceBasic, String>, JpaSpecificationExecutor<TblIotDeviceBasic> {
 	
 }
