@@ -34,4 +34,12 @@ public class ResultDevAdd implements Result {
 		this.devices = devices;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "ResultDevAdd [code=" + code + ", devices=" + devices + "]";
+	}
+
 }

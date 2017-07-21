@@ -41,4 +41,12 @@ public class ResultMsg implements Result {
 		this.info = info;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "ResultMsg [errcode=" + errcode + ", errmsg=" + errmsg + ", info=" + info + "]";
+	}
+
 }

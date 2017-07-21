@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
+import com.zhilu.device.bean.TblIotDeviceBasic;
 import com.zhilu.device.bean.TblIotDeviceDyn;
 import com.zhilu.device.repository.TblIotDevDynRepo;
 @Service
@@ -24,5 +25,16 @@ public class TblIotDevDynSrv {
 	@Modifying
 	public void saveDevicesDyn(List<TblIotDeviceDyn> devices) {
 		 tblIotDevDynRepo.save(devices);
+	}
+	
+	@Transactional
+	@Modifying
+	public void deleteById(String id) {
+		 tblIotDevDynRepo.deleteTblIotDeviceDynByDeviceid(id);
+	}
+	
+	public List<TblIotDeviceDyn> findById(String id) {
+		List<TblIotDeviceDyn> rs = tblIotDevDynRepo.findTblIotDeviceDynByDeviceid(id);
+		return rs;
 	}
 }

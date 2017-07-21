@@ -6,7 +6,7 @@ spring:
       indent-output: true
   jpa:
     database: MYSQL
-#    show-sql: true
+    show-sql: true
     hibernate:
       ddl-auto: update
       naming:

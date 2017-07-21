@@ -25,6 +25,16 @@ public class TblIotDevBasicSrv {
 	@Modifying
 	public void saveDevicesBasic(List<TblIotDeviceBasic> devices) {
 		tblIotDevBasicRepo.save(devices);
+	}	
+
+	@Transactional
+	public void deleteById(String id) {
+		tblIotDevBasicRepo.deleteTblIotDeviceBasicByDeviceid(id);
+	}
+	
+	public List<TblIotDeviceBasic> findById(String id) {
+		List<TblIotDeviceBasic> rs = tblIotDevBasicRepo.findTblIotDeviceBasicByDeviceid(id);
+		return rs;
 	}
 
 }

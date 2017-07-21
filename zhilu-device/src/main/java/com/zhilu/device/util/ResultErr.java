@@ -34,4 +34,12 @@ public class ResultErr implements Result {
 		this.err_msg = err_msg;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "ResultErr [code=" + code + ", err_msg=" + err_msg + "]";
+	}
+
 }

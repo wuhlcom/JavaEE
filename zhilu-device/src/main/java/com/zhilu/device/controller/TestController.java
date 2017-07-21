@@ -93,7 +93,7 @@ public class TestController {
 
 	@GetMapping("checktoken")
 	public Object checkToken(String token) {
-		Boolean rs = CheckParams.checkToken(token);
+		Boolean rs = CheckParams.isToken(token);
 		System.out.println("-------------checktoken--------------");
 		System.out.println(rs);
 		return rs;

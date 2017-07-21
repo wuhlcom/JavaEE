@@ -11,6 +11,7 @@ public enum ResultStatusCode {
     
     UID_EMP(23001, "用户ID不能为空"),
     UID_NOT_EXISTED(23002, "用户ID不存在"),
+    UID_ERR(23003, "用户ID格式错误"), //whl add
     
     PROID_EMP(70002, "产品ID为空"),
     PROID_FORMAT_ERR(70003, "产品ID格式错误"),
@@ -19,11 +20,9 @@ public enum ResultStatusCode {
     
 	DEVID_EMP(40002, "设备ID为空"),
 	DEVID_NOT_EXISTED(40003, "设备不存在"),
-	DEVID_EXISTED(40004, "设备已存在"),//whl add
+	DEVID_EXISTED(40004, "设备存在"),//whl add
 	
 	USER_NOT_EXITED(1001, "用户不存在");
-	
-
 	
 	
 	private int code;
@@ -50,7 +49,6 @@ public enum ResultStatusCode {
 	public void setErrmsg(String errmsg) {
 		this.errmsg = errmsg;
 	}
-	
-	
+		
 	
 }

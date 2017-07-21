@@ -1,5 +1,7 @@
 package com.zhilu.device.service;
 
+import static org.mockito.Matchers.booleanThat;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,10 +24,15 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
+import com.zhilu.device.util.CheckParams;
 import com.zhilu.device.util.PubMethod;
+import com.zhilu.device.util.Result;
+import com.zhilu.device.util.ResultErr;
+import com.zhilu.device.util.ResultStatusCode;
 import com.zhilu.device.bean.TblIotDevice;
 import com.zhilu.device.bean.TblIotDeviceBasic;
 import com.zhilu.device.bean.TblIotDeviceDyn;
+import com.zhilu.device.repository.TblIotDevBasicRepo;
 import com.zhilu.device.repository.TblIotDevRepo;
 
 @Service
@@ -35,19 +42,26 @@ public class TblIotDevSrv {
 	public final static String EXISITED = "existed";
 	public final static int LOOP = 100;
 	public final static int ID_NUM = 13;
-	
+
 	@Autowired
-	private TblIotDevRepo tblIotDevRepo;	
+	private TblIotDevRepo tblIotDevRepo;
 
 	@Autowired
 	private TblIotDevBasicSrv tblIotDevBasicSrv;
-	
+
 	@Autowired
 	private TblIotDevDynSrv tblIotDevDynSrv;
 
+	public List<TblIotDevice> findById(String id) {
+		return tblIotDevRepo.findTblIotDeviceById(id);
+	}
+
+	public TblIotDevice findByUidMac(String userid, String mac) {
+		return tblIotDevRepo.findTblIotDeviceByUseridAndMac(userid, mac);
+	}
+
 	// 创建设备组并添加
-	//
-	// @return 返回添加成功和添加失败的,未存在的添加,存在的不添加
+	// @return 返回添加成功和添加失败的,未存在的添加,存在的不添加,不会返回错误码
 	public Map<String, List> addDevicesOld(String userid, String devname, String productid, Integer protocol,
 			String[] macs) {
 		List<TblIotDevice> devicesObj = new ArrayList<>();
@@ -86,7 +100,7 @@ public class TblIotDevSrv {
 		List<TblIotDevice> addDevs = new ArrayList<>();// 保存要添加的设备
 		List<TblIotDeviceBasic> addDevsBasic = new ArrayList<>();// 保存要添加的设备
 		List<TblIotDeviceDyn> addDevsDyn = new ArrayList<>();// 保存要添加的设备
-		
+
 		List<String> exsitedDevs = new ArrayList<>(); // 保存已存的设备
 
 		for (String mac : macs) {
@@ -105,7 +119,7 @@ public class TblIotDevSrv {
 				TblIotDeviceBasic deviceBasic = new TblIotDeviceBasic();
 				TblIotDeviceDyn deviceDyn = new TblIotDeviceDyn();
 				String id = generateId();
-				//device表数据
+				// device表数据
 				device.setId(id);
 				device.setUserid(userid);
 				device.setName(devname);
@@ -114,53 +128,40 @@ public class TblIotDevSrv {
 				device.setMac(PubMethod.removeQuto(mac));
 				device.setCreatetime(PubMethod.str2timestamp());
 				addDevs.add(device);
-				
-				//添加basic表数据
+
+				// 添加basic表数据
 				deviceBasic.setDeviceid(id);
 				deviceBasic.setUserid(userid);
-				deviceBasic.setName(devname);				
+				deviceBasic.setName(devname);
 				deviceBasic.setCreatetime(PubMethod.str2timestamp());
-				addDevsBasic.add(deviceBasic);				
-				
-				//添加dyn表数据
+				addDevsBasic.add(deviceBasic);
+
+				// 添加dyn表数据
 				deviceDyn.setDeviceid(id);
 				addDevsDyn.add(deviceDyn);
-						
+
 			} else {
 				exsitedDevs.add(mac);
 			}
 		}
 		Map<String, List> devMacMap = new HashMap<String, List>();
-		
+
 		// 只要有已存在在设备就不添加任何设备
 		for (String string : exsitedDevs) {
 			System.out.println(string);
 		}
-		
-//		System.out.println("--------------------"+this.getClass()+"-----------------------");
-//		System.out.println(tblIotDevBasicSrv);
-//		tblIotDevBasicSrv.saveDevicesBasic(addDevsBasic);
-//		System.out.println("--------------------"+this.getClass()+"-----------------------");
-//		return null;
 		tblIotDevDynSrv.saveDevicesDyn(addDevsDyn);
 		if ((exsitedDevs == null) || exsitedDevs.isEmpty()) {
-			ArrayList<String> devMacs = saveDevices(addDevs);			
+			ArrayList<String> devMacs = saveDevices(addDevs);
 			devMacMap.put(ADDED, devMacs);
-		tblIotDevBasicSrv.saveDevicesBasic(addDevsBasic);
-		tblIotDevDynSrv.saveDevicesDyn(addDevsDyn);
+			tblIotDevBasicSrv.saveDevicesBasic(addDevsBasic);
+			tblIotDevDynSrv.saveDevicesDyn(addDevsDyn);
 		} else {
 			devMacMap.put(EXISITED, exsitedDevs);
 		}
 		return devMacMap;
 	}
 
-	/**  
-	* @Title: generateId  
-	* @Description: TODO 
-	* @param @return   
-	* @return String   
-	* @throws  
-	*/
 	private String generateId() {
 		// 生成设备id,如果有重复id重新生成
 		String id = PubMethod.generateDevId(ID_NUM); // 测试用
@@ -189,8 +190,8 @@ public class TblIotDevSrv {
 			devMacs.add(device.getMac());
 		}
 		return devMacs;
-	}	
-	
+	}
+
 	/**
 	 * 分页查询
 	 */
@@ -253,8 +254,17 @@ public class TblIotDevSrv {
 	}
 
 	@Transactional
-	public void deleteById(String id, String userid) {
-		tblIotDevRepo.deleteByUseridAndId(id, userid);
+	public String deleteByIds(String userid, String mac) {
+		String id = null;
+		TblIotDevice dev = tblIotDevRepo.findTblIotDeviceByUseridAndMac(userid, mac);
+		if (dev != null) {
+			id = dev.getId();
+			this.tblIotDevRepo.deleteTblIotDeviceById(id);	
+			
+			this.tblIotDevBasicSrv.deleteById(id);
+			this.tblIotDevDynSrv.deleteById(id);
+		}
+		return id;
 	}
 
 	// 根据id查询单个设备
@@ -299,6 +309,26 @@ public class TblIotDevSrv {
 			 */
 			return null;
 		}
+	}
+
+	// 获取设备id
+	public static ArrayList<String> getDevId(TblIotDevice tblIotDevice) {
+		String devId = tblIotDevice.getId();
+		ArrayList<String> listDevIds = new ArrayList<>();
+		listDevIds.add(devId);
+		return listDevIds;
+	}
+
+	// 获取设备id
+	public static ArrayList<String> getDevId(List<TblIotDevice> devs) {
+		ArrayList<String> listDevIds = new ArrayList<>();
+		java.util.Iterator<TblIotDevice> it = devs.iterator();
+		while (it.hasNext()) {
+			TblIotDevice dev = it.next();
+			String devId = dev.getId();
+			listDevIds.add(devId);
+		}
+		return listDevIds;
 	}
 
 }
