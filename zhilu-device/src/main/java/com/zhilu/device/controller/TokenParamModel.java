@@ -5,6 +5,7 @@
 */
 package com.zhilu.device.controller;
 
+//解析token
 public class TokenParamModel {
 	private String token;
 

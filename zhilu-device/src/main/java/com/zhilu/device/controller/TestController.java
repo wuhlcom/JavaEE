@@ -18,6 +18,7 @@ import com.alibaba.fastjson.JSON;
 import com.zhilu.device.bean.TblIotDevice;
 import com.zhilu.device.repository.TblIotDevRepo;
 import com.zhilu.device.service.TblIotDevSrv;
+import com.zhilu.device.util.CheckParams;
 import com.zhilu.device.util.PubMethod;
 
 @RestController
@@ -92,7 +93,7 @@ public class TestController {
 
 	@GetMapping("checktoken")
 	public Object checkToken(String token) {
-		Boolean rs = PubMethod.checkToken(token);
+		Boolean rs = CheckParams.checkToken(token);
 		System.out.println("-------------checktoken--------------");
 		System.out.println(rs);
 		return rs;

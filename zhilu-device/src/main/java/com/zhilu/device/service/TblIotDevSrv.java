@@ -26,8 +26,6 @@ import com.zhilu.device.util.PubMethod;
 import com.zhilu.device.bean.TblIotDevice;
 import com.zhilu.device.bean.TblIotDeviceBasic;
 import com.zhilu.device.bean.TblIotDeviceDyn;
-import com.zhilu.device.repository.TblIotDevBasicRepo;
-import com.zhilu.device.repository.TblIotDevDynRepo;
 import com.zhilu.device.repository.TblIotDevRepo;
 
 @Service
@@ -39,8 +37,8 @@ public class TblIotDevSrv {
 	public final static int ID_NUM = 13;
 	
 	@Autowired
-	private TblIotDevRepo tblIotDevRepo;
-	
+	private TblIotDevRepo tblIotDevRepo;	
+
 	@Autowired
 	private TblIotDevBasicSrv tblIotDevBasicSrv;
 	
@@ -138,12 +136,18 @@ public class TblIotDevSrv {
 		for (String string : exsitedDevs) {
 			System.out.println(string);
 		}
-
+		
+//		System.out.println("--------------------"+this.getClass()+"-----------------------");
+//		System.out.println(tblIotDevBasicSrv);
+//		tblIotDevBasicSrv.saveDevicesBasic(addDevsBasic);
+//		System.out.println("--------------------"+this.getClass()+"-----------------------");
+//		return null;
+		tblIotDevDynSrv.saveDevicesDyn(addDevsDyn);
 		if ((exsitedDevs == null) || exsitedDevs.isEmpty()) {
-			ArrayList<String> devMacs = saveDevices(addDevs);
-			tblIotDevBasicSrv.saveDevicesBasic(addDevsBasic);
-			tblIotDevDynSrv.saveDevicesDyn(addDevsDyn);
+			ArrayList<String> devMacs = saveDevices(addDevs);			
 			devMacMap.put(ADDED, devMacs);
+		tblIotDevBasicSrv.saveDevicesBasic(addDevsBasic);
+		tblIotDevDynSrv.saveDevicesDyn(addDevsDyn);
 		} else {
 			devMacMap.put(EXISITED, exsitedDevs);
 		}

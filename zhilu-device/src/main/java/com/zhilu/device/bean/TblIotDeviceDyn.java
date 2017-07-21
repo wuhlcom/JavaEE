@@ -33,7 +33,7 @@ public class TblIotDeviceDyn {
 	// `endip` varchar(20) DEFAULT NULL,
 	private String endip;
 	// `leasetime` int(10) NOT NULL DEFAULT '3600',
-	private Long leasetime;
+	private Long leasetime=3600L;
 	// `dnsserver1` varchar(20) DEFAULT NULL,
 	private String dnsserver1;
 	// `dnsserver2` varchar(20) DEFAULT NULL,
