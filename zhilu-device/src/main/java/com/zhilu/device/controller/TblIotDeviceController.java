@@ -2,6 +2,7 @@ package com.zhilu.device.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSON;
 import com.zhilu.device.bean.TblIotDevice;
 import com.zhilu.device.repository.TblIotDeviceRepository;
-import com.zhilu.device.service.TblIotDeviceService;
+import com.zhilu.device.service.TblIotDevSrv;
 import com.zhilu.device.util.PubMethod;
 import com.zhilu.device.util.Result;
 import com.zhilu.device.util.ResultDevAdd;
@@ -41,16 +42,25 @@ public class TblIotDeviceController {
 	private TblIotDeviceRepository tblIotDeviceRepositoy;
 
 	@Autowired
-	private TblIotDeviceService tblIotDevService;
+	private TblIotDevSrv tblIotDevService;
 
-	// @GetMapping("getdev")
-	// public Object getDev(String id) {
-	// TblIotDevice tblIotDevice =
-	// tblIotDeviceRepositoy.findTblIotDeviceById(id);
-	// ResultAdd resultMsg = new ResultAdd(ResultStatusCode.OK.getErrcode(),
-	// PubMethod.getDevId(tblIotDevice));
-	// return resultMsg;
-	// }
+	// 查询单个设备
+	// get mac:xxxxxx
+	@GetMapping("findmac")
+	public Object findByMac(String mac) {
+		System.out.println("-------------findmac--------------");
+		System.out.println("-------------" + mac + "--------------");
+		List<TblIotDevice> dev = tblIotDevService.getDevByMac(mac);
+		System.out.println(dev);
+		return dev;
+	}
+
+	@GetMapping("getdev")
+	public Object getDev(String id) {
+		List<TblIotDevice> tblIotDevice = tblIotDeviceRepositoy.findTblIotDeviceById(id);
+		ResultDevAdd resultMsg = new ResultDevAdd(ResultStatusCode.OK.getCode(), PubMethod.getDevId(tblIotDevice));
+		return resultMsg;
+	}
 
 	// 注意大小写
 	@GetMapping("queryAllPage")
@@ -101,15 +111,21 @@ public class TblIotDeviceController {
 	@PostMapping("add")
 	public Object addDev(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
 		Result resultMsg = null;
-
+		System.out.println("................." + this.getClass() + "......addDev.........");
 		System.out.println(requestBody);
 		String token = request.getParameter("token");
 		System.out.println("token is:" + token);
-		boolean rsCheckToken = PubMethod.checkToken(token);
+		Boolean rsCheckToken = PubMethod.checkToken(token);
+		System.out.println(rsCheckToken.getClass());
 		System.out.println(rsCheckToken);
-		rsCheckToken=true;
+		System.out.println("................." + this.getClass() + "......addDev.........");
+		rsCheckToken = true;
 
-		if (rsCheckToken) {
+		if (rsCheckToken == null) {
+			resultMsg = new ResultDevAdd(ResultStatusCode.TOKEN_NULL.getCode(),
+					ResultStatusCode.TOKEN_NULL.getErrmsg());
+			return resultMsg;
+		} else if (rsCheckToken) {
 			// 獲取參數轉成JsonObject
 			com.alibaba.fastjson.JSONObject paramsJson = JSON.parseObject(requestBody);
 			// 通过json解析参数
@@ -118,14 +134,19 @@ public class TblIotDeviceController {
 			String product = paramsJson.get("product").toString();
 			int protocol = Integer.parseInt(paramsJson.get("protocol").toString());
 			// 得到Id数组
-			String[] idsArray = PubMethod.getDevids(requestBody);
-			ArrayList devids = tblIotDevService.addDevices(userid, name, product, protocol, idsArray);
-			resultMsg = new ResultDevAdd(ResultStatusCode.OK.getCode(), devids);
-			return resultMsg;
+			String[] macsArray = PubMethod.getDevids(requestBody);
+			Map<String,List> rsAddInfo = tblIotDevService.addDevices(userid, name, product, protocol, macsArray);
+			if(rsAddInfo.containsKey(TblIotDevSrv.ADDED)){
+				resultMsg = new ResultDevAdd(ResultStatusCode.OK.getCode(), rsAddInfo.values());
+				return resultMsg;
+			}
+			if (rsAddInfo.containsKey(TblIotDevSrv.EXISITED)){
+				resultMsg = new ResultDevAdd(ResultStatusCode.DEV_EXISTED.getCode(), rsAddInfo.values());
+				return resultMsg;
+			}			
 		} else {
 			resultMsg = new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
 		}
-
 		return resultMsg;
 
 	}

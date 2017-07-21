@@ -27,7 +27,10 @@ public interface TblIotDeviceRepository
 	 * User findByUserNameIgnoreCase(String userName);	 
 	 * List<User> findByUserNameOrderByEmailDesc(String email);
 	 */
-	TblIotDevice findTblIotDeviceById(String id);
+	List<TblIotDevice> findTblIotDeviceById(String id);
+	
+	List<TblIotDevice> findByMac(String mac);	
+	List<TblIotDevice> findTblIotDeviceByMac(String mac);	
 
 	List<TblIotDevice> findTblIotDeviceByName(String name);
 
@@ -41,7 +44,9 @@ public interface TblIotDeviceRepository
 	@Transactional	
 	@Modifying
 	@Query("delete from TblIotDevice where id = :id and userid = :userid")
-	void deleteByUseridAndId(String id,String userid);	
+	void deleteByUseridAndId(String id,String userid);
+
+	
 		
 //	@Query("select * from TblIotDevice")
 //	List<TblIotDevice> findAll();

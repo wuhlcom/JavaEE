@@ -1,5 +1,7 @@
 package com.zhilu.device.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,12 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.zhilu.device.bean.TblIotDevice;
+import com.zhilu.device.repository.TblIotDeviceRepository;
+import com.zhilu.device.service.TblIotDevSrv;
 import com.zhilu.device.util.PubMethod;
 
 @RestController
 @RequestMapping("device")
 public class TestController {
+	private TblIotDevSrv tbSrv;
+	private TblIotDeviceRepository tbl;
 
 	final static String TOKEN_URL = "http://119.29.68.198:9080/index.php/Users";
 
@@ -36,7 +42,13 @@ public class TestController {
 	@PostMapping("post")
 	public Object post(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody)
 			throws Exception {
+		System.out.println("---------token--------------");
 		String token = request.getParameter("token");
+		System.out.println(token.getClass());
+		if (token == "") {
+			System.out.println("I am 空");
+		} else
+			System.out.println("I am null");
 		System.out.println(token);
 		System.out.println("---------requestBody--------------");
 		System.out.println(requestBody);
@@ -49,7 +61,7 @@ public class TestController {
 		String devices = jobj.get("devices").toString();
 		System.out.println(devices);
 
-		String[] sourceStrArray =PubMethod.getDevids(requestBody);
+		String[] sourceStrArray = PubMethod.getDevids(requestBody);
 
 		for (int i = 0; i < sourceStrArray.length; i++) {
 			System.out.println(sourceStrArray[i]);
@@ -71,7 +83,7 @@ public class TestController {
 	@PostMapping("gettoken")
 	public Object getToken() {
 		RestTemplate restTemplate = new RestTemplate();
-		String url = TOKEN_URL+"/getToken";
+		String url = TOKEN_URL + "/getToken";
 		MultiValueMap<String, String> requestEntity = new LinkedMultiValueMap<>();
 		requestEntity.add("userid", "1879b24d-2bb7-4237-8eb1-7ef767b6455a");
 		Object token = restTemplate.postForObject(url, requestEntity, String.class);
@@ -79,14 +91,20 @@ public class TestController {
 	}
 
 	@GetMapping("checktoken")
-	public Object checkToken() {
-		RestTemplate restTemplate = new RestTemplate();
-		String url = TOKEN_URL + "/check_token?token=qwertyui1500509635e6725ed31be8895c4475111";
-		Object result = restTemplate.getForObject(url, String.class);
-		System.out.println(result);
-		com.alibaba.fastjson.JSONObject jobj = JSON.parseObject((String) result);
-		String code = jobj.get("code").toString();
-		System.out.println(code);
-		return result;
+	public Object checkToken(String token) {
+		Boolean rs = PubMethod.checkToken(token);
+		System.out.println("-------------checktoken--------------");
+		System.out.println(rs);
+		return rs;
+	}
+
+	// 查询单个设备
+	// get mac:xxxxxx
+	@GetMapping("findbymac")
+	public void findByMac(String mac) {
+		System.out.println("-------------findbymac--------------");
+		List<TblIotDevice> dev = tbSrv.getDevByMac(mac);		
+		System.out.println(dev);
+//		return dev;
 	}
 }

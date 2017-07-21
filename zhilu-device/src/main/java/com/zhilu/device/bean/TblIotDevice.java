@@ -1,11 +1,12 @@
 package com.zhilu.device.bean;
-
-import java.util.Date;
+import java.sql.Timestamp;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+
+import com.zhilu.device.util.PubMethod;
 
 @Entity()
 @Table(name = "tbl_iot_device")
@@ -34,7 +35,7 @@ public class TblIotDevice {
 	private Integer protocol = 0;
 	
 	// `mac` varchar(20) NOT NULL COMMENT 'mac地址',
-	private String mac = "";
+	private String mac = "FF:FF:FF:FF:FF:FF";
 	
 	// `groupid` varchar(16) DEFAULT NULL COMMENT '所属设备组',
 	private String groupid;
@@ -72,7 +73,7 @@ public class TblIotDevice {
 	private String username = "";
 	
 	// `createtime` datetime NOT NULL,
-	private Date createtime = new Date();
+	private Timestamp createtime = PubMethod.str2timestamp();
 	
 	// `identification` varchar(64) NOT NULL COMMENT '设备唯一表示',
 	private String identification = "";
@@ -255,11 +256,11 @@ public class TblIotDevice {
 		this.username = username;
 	}
 
-	public Date getCreatetime() {
+	public Timestamp getCreatetime() {
 		return createtime;
 	}
 
-	public void setCreatetime(Date createtime) {
+	public void setCreatetime(Timestamp createtime) {
 		this.createtime = createtime;
 	}
 

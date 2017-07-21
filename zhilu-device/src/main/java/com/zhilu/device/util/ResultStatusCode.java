@@ -4,7 +4,9 @@ public enum ResultStatusCode {
 	
 	OK(0, "OK"),	
 	SYSTEM_ERR(30001, "System error"),
-    TOKEN_ERR(60004, "无效的Token或过期");
+    TOKEN_ERR(60004, "无效的AccessToken或过期"),
+	DEV_EXISTED(40005, "AccessToken为空"),
+	TOKEN_NULL(60003, "AccessToken为空");
 	
 	private int code;
 	private String errmsg;
