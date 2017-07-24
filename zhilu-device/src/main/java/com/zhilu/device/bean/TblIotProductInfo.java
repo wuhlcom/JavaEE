@@ -111,6 +111,20 @@ public class TblIotProductInfo {
 
 	public Timestamp getCreate_time() {
 		return create_time;
+	}	
+	
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "TblIotProductInfo [id=" + id + ", name=" + name + ", type=" + type + ", boardId=" + boardId
+				+ ", diagram=" + diagram + ", createUser=" + createUser + ", modifyUser=" + modifyUser
+				+ ", create_time=" + create_time + ", modify_time=" + modify_time + ", description=" + description
+				+ ", category=" + category + ", encoding=" + encoding + ", productconf=" + productconf + ", publish="
+				+ publish + ", crt=" + crt + ", key=" + key + ", sdk=" + sdk + ", link_interval=" + link_interval
+				+ ", data_eporting_interval=" + data_eporting_interval + "]";
 	}
 
 	public void setCreate_time(Timestamp create_time) {

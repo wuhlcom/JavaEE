@@ -1,5 +1,6 @@
 package com.zhilu.device.repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -10,71 +11,167 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.zhilu.device.bean.TblIotDevice;
 
-public interface TblIotDevRepo
-		extends JpaRepository<TblIotDevice, String>, JpaSpecificationExecutor<TblIotDevice> {
+public interface TblIotDevRepo extends JpaRepository<TblIotDevice, String>, JpaSpecificationExecutor<TblIotDevice> {
 
 	List<TblIotDevice> findTblIotDeviceById(String id);
+
 	List<TblIotDevice> getTblIotDeviceById(String id);
-	
-	List<TblIotDevice> findTblIotDeviceByMac(String mac);	
-	List<TblIotDevice> getTblIotDeviceByMac(String mac);	
+
+	List<TblIotDevice> findTblIotDeviceByMac(String mac);
+
+	List<TblIotDevice> getTblIotDeviceByMac(String mac);
 
 	List<TblIotDevice> findTblIotDeviceByName(String name);
 
-	TblIotDevice findTblIotDeviceByUseridAndMac(String userid,String mac);	
-	TblIotDevice findTblIotDeviceByUseridAndId(String userid, String id);
-	
-	void deleteTblIotDeviceById(String id);
-	
-	// 使用原生sql
-	@Query(value = "select * from TblIotDevice limit ?1", nativeQuery = true)
-	List<TblIotDevice> getAllTblIotDevicesByCount(int count);
-	
+	// userid
+	List<TblIotDevice> findTblIotDeviceByUserid(String userid);
 
+	TblIotDevice findTblIotDeviceByUseridAndMac(String userid, String mac);
+
+	TblIotDevice findTblIotDeviceByUseridAndId(String userid, String id);
+
+	void deleteTblIotDeviceById(String id);
+
+	// count *
+	// @Query(" select count(t) from FollowerInfo t where investUserId =
+	// :invUserId")
+	@Query(" select count(d) from TblIotDevice d")
+	Long getDevTotalNum();
+
+	// count by id
+	Long countById(Long id);
+
+	// limit
+	// SELECT a FROM foo WHERE b = 1 LIMIT 100,10;
+	// @Query(value = "select count(id) from tbl_tot_device limit
+	// :start,:showRows", nativeQuery = true)
+	// Long getDevByPage(@Param("start") Long start, @Param("showRows") Long
+	// showRows);
+
+	// 按名称模糊查询
+	// @Query("SELECT p FROM Person p WHERE p.lastName LIKE %:lastName% OR
+	// p.email LIKE %:email%")
+	@Query("SELECT dev FROM TblIotDevice dev WHERE dev.name like %:name%)")
+	List<TblIotDevice> getDevsByName(@Param("name") String name);
+
+	// 使用原生sql
+	// @Query(value = "select * from tbl_tot_device limit ?1", nativeQuery =
+	// true)
+	// List<TblIotDevice> getAllTblIotDevicesByCount(int count);
+
+	// 两表联表查询
+	// @Query("select dev.name,dev.id,dev.productid from TblIotDevice dev inner
+	// join dev.tblBasic basic where basic.deviceid =:id")
+	// List<Object> getDevAndBasic(@Param("id") String id);
+	@Query(value = "select dev.id,dev.mac,dev.name,dev.product,dev.protocol,basic.status,basic.logintime,basic.offlinetime	from tbl_iot_device as dev	INNER JOIN tbl_iot_device_basic as basic on  dev.id =basic.deviceid where (dev.userid = :userid) limit :start,:pages", nativeQuery = true)
+	List<Object[]> getDevsAllInfoByUserid(@Param("userid") String userid, @Param("start") Long stat,
+			@Param("pages") Long pages);
+	
+	@Query(value = "select dev.id,dev.mac,dev.name,dev.product,dev.protocol,basic.status,basic.logintime,basic.offlinetime	from tbl_iot_device as dev	INNER JOIN tbl_iot_device_basic as basic on  dev.id =basic.deviceid where (dev.userid = :userid) limit :start,:pages", nativeQuery = true)
+	List<Object[]> getDevsAllInfoByName(@Param("name") String userid, @Param("start") Long stat,
+			@Param("pages") Long pages);
+
+	@Query("select dev.name from TblIotDevice dev inner join dev.tblDyn dyn where dyn.deviceid =:id")
+	List<Object> getDevAndDyn(@Param("id") String id);
+
+	// value = "select
+	// dev.id,dev.mac,dev.name,dev.product,dev.protocol,basic.status,basic.logintime,basic.offlinetime
+	// from tbl_iot_device as dev,tbl_iot_device_basic as basic
+	// where (dev.id = basic.deviceid and dev.userid =basic.userid) limit 1,10"
+
+	// 三表联表查询
+	// select application FROM Application a
+	// join a.customer c
+	// join c.users u
+	// where u.id = :userId
+	@Query("select dev.name,dev.userid,dev.id,dev.protocol,dev.productid,dev.mac,basic.status,dyn.onlinetime from TblIotDevice dev join dev.tblBasic basic join dev.tblDyn dyn where basic.deviceid =:id and  dyn.deviceid =:id")
+	List<Object[]> getDevsAllInfoById(@Param("id") String id);
+
+	// {
+	// "errcode":0,
+	// "totalRows":128,
+	// "devices":[
+	// {
+	// "devId":"02:13:18:10:12:3a",
+	// "name":"科兴设备01",
+	// "product":"\u5c4f\u5e55\u663e\u793a",
+	// "protocol":2,
+	// "status":2,
+	// "LoginTime":"2017-04-20 13:31:07",
+	// "LogoutTime":"2017-04-20 13:31:07"
+	// }
+	// ]
+	// }
+	@Query("select dev.id,dev.mac,dev.name,dev.product,dev.protocol,basic.status,basic.logintime,basic.offlinetime from TblIotDevice dev join dev.tblBasic basic join dev.tblDyn dyn where basic.deviceid =dev.id and  dyn.deviceid =dev.id")
+	List<Object[]> getDevsAllInfo();
+
+	// 根据uid查询并限制显示数量
+	@Query(value = "select dev.id,dev.mac,dev.name,dev.product,dev.protocol,basic.status,basic.logintime,basic.offlinetime from tbl_iot_device as dev,tbl_iot_device_basic as basic,tbl_iot_device_dyn as dyn	where dev.id = basic.deviceid and dev.id =dyn.deviceid limit ?1,?2", nativeQuery = true)
+	List<Object[]> getDevsAllInfoByUid(Long Start, Long showRows);
+
+	// @Query("select dev,basic,dyn from TblIotDevice dev join dev.tblBasic
+	// basic join dev.tblDyn dyn where basic.deviceid =:id and dyn.deviceid
+	// =:id")
+	// ArrayList<TblIotDevice> getDevAllInfo2(@Param("id") String id);
+
+	// @Query(value="select dev.name,dev.id,dev.mac,dev.protocol,basic.status
+	// from tbl_iot_device as dev,tbl_iot_device_basic as
+	// basic,tbl_iot_device_dyn as dyn where dev.id = basic.deviceid and dev.id
+	// =dyn.deviceid where id=:id",nativeQuery=true)
+	// List<Object[]> getDevAllInfo3(@Param("id") String id);
+	// @Query(value="select dev.name,dev.id,dev.mac,dev.protocol,basic.status
+	// from tbl_iot_device as dev,tbl_iot_device_basic as
+	// basic,tbl_iot_device_dyn as dyn where dev.id = basic.deviceid and dev.id
+	// =dyn.deviceid",nativeQuery=true)
+	// List<Object[]> getDevAllInfo3();
+
+	// 根据id与uid删除记录
 	@Modifying
 	@Query("delete from TblIotDevice where id = :id and userid = :userid")
-	void deleteByUseridAndId(String id,String userid);	
-	
+	void deleteByUseridAndId(@Param("userid") String userid, @Param("id") String id);
+
 	@Modifying
-	@Query("delete from TblIotDevice where mac = :mac and userid = :userid")
-	void deleteByUserAndMac(String mac,String userid);	
+	@Query("delete from TblIotDevice d where d.mac = :mac and d.userid = :userid")
+	void deleteByUserAndMac(@Param("userid") String userid, @Param("mac") String mac);
 
-	
-		
-//	@Query("select * from TblIotDevice")
-//	List<TblIotDevice> findAll();
-	
-	// ------------- 使用 @Query 注解
-	// // 没有参数的查询
-	// @Query("select p from Person p where p.id = (select max(p2.id) from
-	// Person p2)")
-	// TblIotDevice getMaxIdPerson();
+	// 修改设备名字
+	@Modifying(clearAutomatically = true)
+	@Query("update TblIotDevice d set d.name = :name  where d.userid = :userid and d.mac=:mac")
+	TblIotDevice setDevName(@Param("name") String name, @Param("userid") String userid, @Param("mac") String mac);
 
-	// 使用数字占位符来接收实参,实参与这里设置的顺序必须一致
-	// @Query("select p from Person p where lastName=?1 and email=?2")
-	// TblIotDevice readPersonByLastNameAndEmail(String lastName,String email);
-	// 使用符号占位符,实参可以不按顺序
-	// @Query("select p from Person p where email=:email and lastName=:name")
-	// TblIotDevice readPersonByLastNameAndEmailThroughName(@Param("name")
-	// String lastName,@Param("email") String email);
+	// 修改设备协议类型
+	@Modifying(clearAutomatically = true)
+	@Query("update TblIotDevice d set d.protocol = :protocol  where d.userid = :userid and d.mac=:mac")
+	TblIotDevice setDevProtocol(@Param("protocol") int protocol, @Param("userid") String userid,
+			@Param("mac") String mac);
+
+	// 修改设备所属产品类型
+	@Modifying
+	@Query("update TblIotDevice d set d.productid = :productid  where d.userid = :userid and d.mac=:mac")
+	TblIotDevice setDevProductid(@Param("productid") String productid, @Param("userid") String userid,
+			@Param("mac") String mac);
+
+	// 修改设备名字，协议,产品类型
+	@Modifying(clearAutomatically = true)
+	@Query("update TblIotDevice d set d.name = :name, d.protocol=:protocol, d.productid= :productid where d.userid = :userid and d.mac=:mac")
+	TblIotDevice setDevInfo(@Param("name") String name, @Param("protocol") int protocol,
+			@Param("productid") String productid, @Param("userid") String userid, @Param("mac") String mac);
+
+	// // 设置 nativeQuery=true 即可以使用原生的 SQL 查询
+	// @Query(value = "SELECT count(id) FROM jpa_persons", nativeQuery = true)
+	// long getTotalCount();
 	//
-	// 使用 like,未使用%号,实参要加%才能模糊匹配
-	// @Query("select p from Person p where lastName like ?1")
-	// TblIotDevice readPersonByLike(String likeName);
-	//
-	// @Query like 注解支持使用百分号,实参不用加%
-	// @Query("select p from Person p where lastName like %?1%")
-	// TblIotDevice readPersonByLike2(String likeName);
-	//
-	// @Query 注解支持使用百分号
-	// @Query("select p from Person p where lastName like %:lastName%")
-	// TblIotDevice readPersonByLike3(@Param("lastName")String name);
-	//
-	// // 使用原生的 SQL
-	// @Query(value="select * from jpa_person p1 where p1.last_name like
-	// %:lastName%",nativeQuery=true)
-	// TblIotDevice getPersonUsingOriginSQL(@Param("lastName")String lastName);
+	// // 可以通过自定义的 JPQL 完成 UPDATE 和 DELETE 操作. 注意: JPQL 不支持使用 INSERT
+	// // 在 @Query 注解中编写 JPQL 语句, 但必须使用 @Modifying 进行修饰. 以通知 SpringData, 这是一个
+	// // UPDATE 或 DELETE 操作
+	// // UPDATE 或 DELETE 操作需要使用事务, 此时需要定义 Service 层. 在 Service 层的方法上添加事务操作.
+	// // 默认情况下, SpringData 的每个方法上有事务, 但都是一个只读事务. 他们不能完成修改操作!
+	// @Modifying
+	// @Query("UPDATE Person p SET p.email = :email WHERE id = :id")
+	// void updatePersonEmail(@Param("id") Integer id, @Param("email") String
+	// email);
 }

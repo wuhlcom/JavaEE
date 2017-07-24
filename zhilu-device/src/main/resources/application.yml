@@ -14,7 +14,7 @@ spring:
     properties:
       hibernate:
         dialet: org.hibernate.dialect.MySQL5Dialect
-#        format_sql: true
+        format_sql: true
   mvc:
     throw-exception-if-no-handler-found: true
   resources:
@@ -52,7 +52,7 @@ security:
        
 #logging:
 #  config: classpath:logbackup.xml
-#  path: /javacode/javaee/zhilu-device/log
+#  path: /java_code/javaee/zhilu-device/log
 
 
 

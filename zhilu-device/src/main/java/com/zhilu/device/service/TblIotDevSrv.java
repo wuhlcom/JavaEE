@@ -22,6 +22,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import com.zhilu.device.util.CheckParams;
@@ -214,8 +215,8 @@ public class TblIotDevSrv {
 		Order orderType = new Order(Direction.ASC, "type");
 		Order orderCreateTime = new Order(Direction.DESC, "createtime");
 
-		Sort sort = new Sort(orderCreateTime, orderType);
-		pageNumber = pageNumber - 1;
+		Sort sort = new Sort(orderCreateTime, orderId);
+		pageNumber = pageNumber - 1; // 页码是从0开始的
 		PageRequest pageable = new PageRequest(pageNumber, pagzSize, sort);
 		return pageable;
 	}
@@ -228,11 +229,7 @@ public class TblIotDevSrv {
 	 * @return
 	 */
 	public Page<TblIotDevice> findBySpec(String uid, Integer type, String search, Integer page, Integer size) {
-		if (search == null || search.length() < 0) {
-			search = "0";
-		}
 		PageRequest pageReq = this.buildPageRequest(page, size);
-		new DevSpec();
 		Page<TblIotDevice> devs = this.tblIotDevRepo.findAll(DevSpec.devSearchSpec(uid, type, search), pageReq);
 		return devs;
 	}
@@ -244,23 +241,37 @@ public class TblIotDevSrv {
 		return devs;
 	}
 
+	// 更新设备信息
 	@Transactional
 	@Modifying
-	public TblIotDevice updateDev(String id, String... args) {
-		TblIotDevice tblIotDevObj = new TblIotDevice();
-		tblIotDevObj.setId(id);
-		tblIotDevObj.setName(args[0]);
-		return tblIotDevRepo.save(tblIotDevObj);
+	public TblIotDevice updateDev(String uid, String mac, String name, String productId, int protocol) {
+		TblIotDevice dev = findDevbyUidAndMac(uid, mac);
+		String devId = dev.getId();
+		TblIotDeviceBasic devBasic = tblIotDevBasicSrv.getById(devId);
+
+		dev.setName(name);
+		dev.setProtocol(protocol);
+		dev.setProductid(productId);
+		devBasic.setName(name);
+		tblIotDevBasicSrv.saveDevicesBasic(devBasic);
+		return tblIotDevRepo.save(dev);
 	}
 
+	// 此处mac可使用设备imei等设备id替代
+	public TblIotDevice findDevbyUidAndMac(String userid, String mac) {
+		mac = PubMethod.removeQuto(mac);
+		return tblIotDevRepo.findTblIotDeviceByUseridAndMac(userid, mac);
+	}
+
+	// mac可使用imei等设备唯一标识替换
 	@Transactional
 	public String deleteByIds(String userid, String mac) {
 		String id = null;
-		TblIotDevice dev = tblIotDevRepo.findTblIotDeviceByUseridAndMac(userid, mac);
+		TblIotDevice dev = findDevbyUidAndMac(userid, mac);
 		if (dev != null) {
 			id = dev.getId();
-			this.tblIotDevRepo.deleteTblIotDeviceById(id);	
-			
+			this.tblIotDevRepo.deleteTblIotDeviceById(id);
+
 			this.tblIotDevBasicSrv.deleteById(id);
 			this.tblIotDevDynSrv.deleteById(id);
 		}
@@ -331,4 +342,94 @@ public class TblIotDevSrv {
 		return listDevIds;
 	}
 
+	public List getDevsInfoById(String id) {
+		List devInfo = tblIotDevRepo.getDevsAllInfoById(id);
+		return devInfo;
+	}
+	
+	
+	public  Map pageByUserid(String userid,Long page,Long pages) {	
+		Long start=page*pages-1;
+		List list = tblIotDevRepo.getDevsAllInfoByUserid(userid,start,pages);
+		Map<String, Object> totalMap = parseDevAllInfo(list);
+		return totalMap;
+	}
+	
+	public  Map pageByName(String name,Long page,Long pages) {	
+		Long start=page*pages-1;
+		List list = tblIotDevRepo.getDevsAllInfoByName(name,start,pages);
+		Map<String, Object> totalMap = parseDevAllInfo(list);
+		return totalMap;
+	}
+
+	// {
+	// "errcode":0,
+	// "totalRows":128,
+	// "devices":[
+	// {
+	// "devId":"02:13:18:10:12:3a",
+	// "name":"科兴设备01",
+	// "product":"\u5c4f\u5e55\u663e\u793a",
+	// "protocol":2,
+	// "status":2,
+	// "LoginTime":"2017-04-20 13:31:07",
+	// "LogoutTime":"2017-04-20 13:31:07"
+	// }
+	// ]
+	// }
+	public Map getDevsAllInfo() {
+		List devInfo = tblIotDevRepo.getDevsAllInfo();
+		Map<String, Object> totalMap = parseDevAllInfo(devInfo);	
+		return totalMap;
+	}
+
+	/**  
+	* @Title: parseDevAllInfo  
+	* @Description: TODO 
+	* @param @param devInfo
+	* @param @return   
+	* @return Map<String,Object>   
+	* @throws  
+	*/
+	private Map<String, Object> parseDevAllInfo(List devInfo) {
+		Map<String, Object> totalMap = new HashMap<String, Object>();
+		Long number=tblIotDevRepo.getDevTotalNum();
+		totalMap.put("code", 0);
+		totalMap.put("totalRows", number);
+		ArrayList<Map> devs = new ArrayList<>();
+
+		for (Object dev : devInfo) {
+			Map<String, Object> devMap = new HashMap<String, Object>();
+			Object[] cells = (Object[]) dev;
+
+			for (int i = 0; i < cells.length; i++) {
+				Object cell = cells[i];
+				if (CheckParams.isNull(cell)) {
+					cells[i] = "";
+				}				
+			}
+
+			devMap.put("id", cells[0]);
+			devMap.put("devId", cells[1]);
+			devMap.put("name", cells[2]);
+			devMap.put("product", cells[3]);
+			devMap.put("protocol", cells[4]);
+			devMap.put("status", cells[5]);
+			devMap.put("Logintime", cells[6]);
+			devMap.put("Logintime", cells[7]);
+			devs.add(devMap);
+		}
+		totalMap.put("devices", devs);
+		return totalMap;
+	}
+
+	// 通过名称查询
+	public List<?> getDevsInfoByName(String name) {
+		List<TblIotDevice> devs = tblIotDevRepo.getDevsByName(name);
+		for (TblIotDevice dev : devs) {
+			String devid = dev.getId();
+			tblIotDevRepo.getDevsAllInfoById(devid);
+		}
+		return devs;
+	}
 }

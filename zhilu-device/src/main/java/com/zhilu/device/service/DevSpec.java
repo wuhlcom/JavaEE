@@ -2,6 +2,8 @@ package com.zhilu.device.service;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -9,6 +11,8 @@ import javax.persistence.criteria.Root;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.zhilu.device.bean.TblIotDevice;
+import com.zhilu.device.bean.TblIotDeviceBasic;
+import com.zhilu.device.bean.TblIotDeviceDyn;
 
 public class DevSpec {
 
@@ -23,9 +27,8 @@ public class DevSpec {
 	 * 类似的sql语句为: Hibernate: select count(task0_.id) as col_0_0_ from tb_task
 	 * task0_ where ( task0_.task_name like ? ) and task0_.create_time<? or
 	 * task0_.task_detail=?
-	 */
+	 */	
 	public static Specification<TblIotDevice> devSearchSpec(String uid, Integer type, String search) {
-
 		return new Specification<TblIotDevice>() {
 			@Override
 			public Predicate toPredicate(Root<TblIotDevice> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
@@ -36,7 +39,6 @@ public class DevSpec {
 						cb.like(searchExp, search));
 				return predicate;
 			}
-
 		};
 	}
 
@@ -70,7 +72,9 @@ public class DevSpec {
 		return new Specification<TblIotDevice>() {
 			@Override
 			public Predicate toPredicate(Root<TblIotDevice> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-				return null;
+				 Join<TblIotDevice,TblIotDeviceBasic> join = root.join("TblIotDeviceBasic", JoinType.INNER);
+				  Path<String> exp4 = join.get("tblBasic"); return cb.like(exp4,
+				  "%tblBasic%");
 			}
 
 		};

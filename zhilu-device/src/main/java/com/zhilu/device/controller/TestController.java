@@ -1,5 +1,6 @@
 package com.zhilu.device.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,8 +37,19 @@ public class TestController {
 
 	@GetMapping("get")
 	public Object get() {
-		return "dev";
+//	   String s="whlq40dts5bwjc4u";
+//		List<?>t = tbl.getDevAllInfo("whlq40dts5bwjc4u");
+		return "get";
 	}
+	
+
+	@PostMapping("postJoin")
+	public Object postJoin() {	
+//		  String id="whlq40dts5bwjc4u";
+//		List<?>t = tbl.getDevAllInfo(id);
+		return "postJoin";
+	}
+
 
 	// 使用HttpServletRequest方法来获取uri上的参数
 	@PostMapping("post")
@@ -104,8 +116,8 @@ public class TestController {
 	@GetMapping("findbymac")
 	public void findByMac(String mac) {
 		System.out.println("-------------findbymac--------------");
-		List<TblIotDevice> dev = tbSrv.getDevByMac(mac);		
+		List<TblIotDevice> dev = tbSrv.getDevByMac(mac);
 		System.out.println(dev);
-//		return dev;
+		// return dev;
 	}
 }

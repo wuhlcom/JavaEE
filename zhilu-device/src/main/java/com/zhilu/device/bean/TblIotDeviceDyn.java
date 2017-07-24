@@ -8,13 +8,18 @@ package com.zhilu.device.bean;
 import java.math.BigInteger;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 
 @Entity
 @Table(name = "tbl_iot_device_dyn")
 public class TblIotDeviceDyn {
+	@OneToOne(fetch = FetchType.LAZY, mappedBy = "tblBasic")
+	private TblIotDevice tblDev;
+	
 	// `deviceid` varchar(16) NOT NULL,
 	@Id
 	private String deviceid;
@@ -292,6 +297,30 @@ public class TblIotDeviceDyn {
 
 	public void setSsid(String ssid) {
 		this.ssid = ssid;
+	}	
+	
+
+	public TblIotDevice getTblDev() {
+		return tblDev;
+	}
+
+	public void setTblDev(TblIotDevice tblDev) {
+		this.tblDev = tblDev;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "TblIotDeviceDyn [deviceid=" + deviceid + ", wanaddr=" + wanaddr + ", ip=" + ip + ", mask=" + mask
+				+ ", gateway=" + gateway + ", dhcpswitch=" + dhcpswitch + ", startip=" + startip + ", endip=" + endip
+				+ ", leasetime=" + leasetime + ", dnsserver1=" + dnsserver1 + ", dnsserver2=" + dnsserver2
+				+ ", betaflag=" + betaflag + ", balancetime=" + balancetime + ", addtime=" + addtime + ", onlinenum="
+				+ onlinenum + ", maxonline=" + maxonline + ", rebootnum=" + rebootnum + ", upflux=" + upflux
+				+ ", downflux=" + downflux + ", totalflux=" + totalflux + ", payload=" + payload + ", totalmem="
+				+ totalmem + ", freemem=" + freemem + ", hotspot=" + hotspot + ", onlinetime=" + onlinetime
+				+ ", portalid=" + portalid + ", ssid=" + ssid + "]";
 	}
 
 }

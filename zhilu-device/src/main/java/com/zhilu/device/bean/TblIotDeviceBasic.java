@@ -5,16 +5,33 @@
 package com.zhilu.device.bean;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
+/**
+ * @author zhilu1234
+ *
+ */
 @Table(name = "tbl_iot_device_basic")
 @Entity
 public class TblIotDeviceBasic {
+
+	@OneToOne(fetch = FetchType.LAZY, mappedBy = "tblBasic")
+	private TblIotDevice tblDev;
+	
 	// `deviceid` varchar(16) NOT NULL,
 	@Id
+	@Column(name = "deviceid")
 	private String deviceid = "";
 
 	// `userid` varchar(64) DEFAULT NULL,
@@ -59,18 +76,25 @@ public class TblIotDeviceBasic {
 
 	// `createuser` int(10) DEFAULT NULL,
 	private String createuser;
+
 	// `createtime` datetime DEFAULT NULL,
-	private Timestamp createtime;
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date createtime=new Date();
+
 	// `logintime` datetime DEFAULT NULL,
-	private Timestamp logintime;
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date logintime=new Date();
 
 	// `upgradeno` int(5) DEFAULT '0',
 	private Long upgradeno = 0L;
 
 	// `description` varchar(256) DEFAULT NULL,
 	private String description;
+
 	// `offlinetime` datetime DEFAULT NULL,
-	private Timestamp offlinetime;
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date offlinetime=new Date();
+
 
 	public String getDeviceid() {
 		return deviceid;
@@ -216,19 +240,19 @@ public class TblIotDeviceBasic {
 		this.createuser = createuser;
 	}
 
-	public Timestamp getCreatetime() {
+	public Date getCreatetime() {
 		return createtime;
 	}
 
-	public void setCreatetime(Timestamp createtime) {
+	public void setCreatetime(Date createtime) {
 		this.createtime = createtime;
 	}
 
-	public Timestamp getLogintime() {
+	public Date getLogintime() {
 		return logintime;
 	}
 
-	public void setLogintime(Timestamp logintime) {
+	public void setLogintime(Date logintime) {
 		this.logintime = logintime;
 	}
 
@@ -248,12 +272,38 @@ public class TblIotDeviceBasic {
 		this.description = description;
 	}
 
-	public Timestamp getOfflinetime() {
+	public Date getOfflinetime() {
 		return offlinetime;
 	}
 
-	public void setOfflinetime(Timestamp offlinetime) {
+	public void setOfflinetime(Date offlinetime) {
 		this.offlinetime = offlinetime;
+	}
+
+	// @JoinColumn(name="tblDev_id", unique=true)
+	// @OneToOne(mappedBy="tblDev")
+	public TblIotDevice getTblDev() {
+		return tblDev;
+	}
+
+	public void setTblDev(TblIotDevice tblDev) {
+		this.tblDev = tblDev;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "TblIotDeviceBasic [deviceid=" + deviceid + ", userid=" + userid + ", name=" + name + ", wanmac="
+				+ wanmac + ", secret=" + secret + ", secret_bak=" + secret_bak + ", code=" + code + ", citycode="
+				+ citycode + ", region=" + region + ", fwversion=" + fwversion + ", apversion=" + apversion
+				+ ", hardware=" + hardware + ", versionid=" + versionid + ", type=" + type + ", devstate=" + devstate
+				+ ", status=" + status + ", routerswitch=" + routerswitch + ", createuser=" + createuser
+				+ ", createtime=" + createtime + ", logintime=" + logintime + ", upgradeno=" + upgradeno
+				+ ", description=" + description + ", offlinetime=" + offlinetime + "]";
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.zhilu.device.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +57,24 @@ public class TblIotDevController {
 	@Autowired
 	private TblIotDevSrv tblIotDevSrv;
 
+	@RequestMapping("getinfo")
+	public Object getAllDevInfo(@RequestBody String id) {
+		System.out.println("-------------getinfo-----------");
+		System.out.println(id.getClass());
+		System.out.println(id);
+		Object info = tblIotDevSrv.getDevsInfoById("whlq40dts5bwjc4u");
+		return info;
+	}
+
+	@RequestMapping("getinfo2")
+	public Object getAllDevInfo2(@RequestBody String id) {
+		System.out.println("-------------getinfo-----------");
+		System.out.println(id.getClass());
+		System.out.println(id);
+		Object info = tblIotDevSrv.getDevsAllInfo();
+		return info;
+	}
+
 	// 查询单个设备
 	// get mac:xxxxxx
 	@GetMapping("findmac")
@@ -76,33 +95,48 @@ public class TblIotDevController {
 		return devices;
 	}
 
-	@GetMapping("query")
-	public List<TblIotDevice> queryDevs(@RequestHeader(value = "userid", required = true) String userid,
-			@RequestHeader(value = "type", required = true) Integer type,
-			@RequestHeader(value = "search", defaultValue = "0", required = true) String search,
-			@RequestHeader(value = "page", defaultValue = "1") Integer page,
-			@RequestHeader(value = "listRows", defaultValue = "15") Integer listRows) {
-		Page<TblIotDevice> devs = null;
+	@PostMapping("query")
+	public Object queryDevs(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
+		Result resultMsg = null;
+		Long page = 1L;
+		String token = request.getParameter("token");
+		System.out.println("token is:" + token);
+		Boolean rsCheckToken = CheckParams.isToken(token);
+		System.out.println(rsCheckToken);
+		System.out.println("................." + this.getClass() + "......addDev.........");
+		System.out.println(requestBody);
+		rsCheckToken = true;
+
+		// 获取请求参数转为JsonObject
+		com.alibaba.fastjson.JSONObject paramsJson = JSON.parseObject(requestBody);
+		// 通过json解析参数
+		String userid = paramsJson.get("userid").toString();
+		int type = Integer.parseInt(paramsJson.get("type").toString());
+		String search = paramsJson.get("search").toString();
+		if (paramsJson.get("page") != null) {
+			page = Long.parseLong(paramsJson.get("page").toString()) ;
+		}
+		Long listRows = Long.parseLong(paramsJson.get("listRows").toString()) ;
+
+		Map<String, Object> devs = new HashMap<String, Object>();
 		if (type == 0) {
-			devs = tblIotDevSrv.findBySpec(userid, type, page, listRows);
-		} else {
-			devs = tblIotDevSrv.findBySpec(userid, type, search, page, listRows);
+			devs = tblIotDevSrv.pageByUserid(userid, page, listRows);
+		} else if (type == 1) {
+//			devs = tblIotDevSrv.findBySpec(userid, type, search, page, listRows);
 		}
 
-		List<TblIotDevice> devices = devs.getContent();
-		return devices;
+		
+		// List<TblIotDevice> devices = devs.getContent();
+		return devs;
 	}
 
-	 /**
+	/**
 	 * 添加设备
 	 *
 	 * @param tblIotDev
-	 * @return
-	 * userid string 32 是 平台用户编号
-	 * name string 64 是 设备名称
-	 * product string 16 是 所属产品
-	 * protocol int 4 是 通讯协议 HTTP：0 HTTPS：1 MQTT：2* COAP：3
-	 * devices List<string> 是 设备IMEI编号
+	 * @return userid string 32 是 平台用户编号 name string 64 是 设备名称 product string 16
+	 *         是 所属产品 protocol int 4 是 通讯协议 HTTP：0 HTTPS：1 MQTT：2* COAP：3
+	 *         devices List<string> 是 设备IMEI编号
 	 */
 	@PostMapping("add")
 	public Object addDev(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
@@ -170,19 +204,19 @@ public class TblIotDevController {
 		// 通过json解析参数
 		String userid = paramsJson.get(USER_ID).toString();
 		String devid = paramsJson.get(DEV_ID).toString();
-		rs = CheckParams.checkDelete(userid, devid);	
+		rs = CheckParams.checkDelete(userid, devid);
 		if (rs != null) {
 			return rs;
 		}
-	
+
 		String id = tblIotDevSrv.deleteByIds(userid, devid);
-		if (id==null){
+		if (id == null) {
 			rs = new ResultErr(ResultStatusCode.DEVID_NOT_EXISTED.getCode(),
 					ResultStatusCode.DEVID_NOT_EXISTED.getErrmsg());
 			return rs;
 		}
-		
-		rs = CheckParams.checkDelResult(devid);		
+
+		rs = CheckParams.checkDelResult(devid);
 		if (rs != null) {
 			return rs;
 		} else {
@@ -191,9 +225,58 @@ public class TblIotDevController {
 		return rs;
 	}
 
-	@PutMapping(value = "update")
-	public TblIotDevice personUpdate(@PathVariable("token") String token, @RequestParam("id") String id,
-			@RequestParam("name") String name) {
-		return tblIotDevSrv.updateDev(id, name);
+	@PostMapping(value = "update")
+	public Object updateDev(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
+		Result resultMsg = null;
+		String token = request.getParameter("token");
+		System.out.println("token is:" + token);
+		Boolean rsCheckToken = CheckParams.isToken(token);
+		System.out.println(rsCheckToken);
+		System.out.println("................." + this.getClass() + "......updateDev.........");
+		rsCheckToken = true;
+
+		if (rsCheckToken == null) {
+			resultMsg = new ResultDevAdd(ResultStatusCode.TOKEN_EMP.getCode(), ResultStatusCode.TOKEN_EMP.getErrmsg());
+			return resultMsg;
+		} else if (rsCheckToken) {
+
+			// 参数检查失败直接返回错误码,参数检查成功,开始添加设备
+			Result check = CheckParams.checkAdd(requestBody);
+
+			if (check != null) {
+				return check;
+			} else {
+				// 获取请求参数转为JsonObject
+				com.alibaba.fastjson.JSONObject paramsJson = JSON.parseObject(requestBody);
+				// 通过json解析参数
+				String userid = paramsJson.get("userid").toString();
+				String name = paramsJson.get("name").toString();
+				String product = paramsJson.get("product").toString();
+				int protocol = Integer.parseInt(paramsJson.get("protocol").toString());
+				// 得到Id数组
+				String[] macsArray = PubMethod.getDevids(requestBody);
+
+				for (String mac : macsArray) {
+					System.out.println("where--------------------------------------------------------------------");
+					System.out.println(mac);
+					TblIotDevice dev = tblIotDevSrv.findDevbyUidAndMac(userid, mac);
+
+					System.out.println(dev);
+					System.out.println("where--------------------------------------------------------------------");
+					if (dev == null) {
+						resultMsg = new ResultErr(ResultStatusCode.DEVID_NOT_EXISTED.getCode(),
+								ResultStatusCode.DEVID_NOT_EXISTED.getErrmsg());
+						return resultMsg;
+					} else {
+						tblIotDevSrv.updateDev(userid, mac, name, product, protocol);
+					}
+				}
+				resultMsg = new ResultDevAdd(ResultStatusCode.OK.getCode(), macsArray);
+				return resultMsg;
+			}
+		} else {
+			resultMsg = new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
+		}
+		return resultMsg;
 	}
 }

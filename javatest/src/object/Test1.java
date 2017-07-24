@@ -34,9 +34,7 @@ public class Test1 {
             System.out.println(sourceStrArray[i]);
         }
 		*/
-		
-		String str="\"h123h\"";
-		headEndStr(str);
+	NullTest();
 	}
 
 	
@@ -64,5 +62,10 @@ public class Test1 {
 	    newStr=newStr.substring(newStr.length()-1);
 	   System.out.println(newStr);	
   
+  }
+
+  public static void NullTest(){
+     int i = (int)"";
+	  System.out.println(i);	
   }
 }

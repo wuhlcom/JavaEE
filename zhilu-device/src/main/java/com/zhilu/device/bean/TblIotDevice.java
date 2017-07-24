@@ -1,100 +1,123 @@
 package com.zhilu.device.bean;
-import java.sql.Timestamp;
 
+import java.sql.Timestamp;
+import java.util.Date;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.zhilu.device.util.PubMethod;
 
 @Entity()
 @Table(name = "tbl_iot_device")
 public class TblIotDevice {
+
+	@OneToOne()
+	@JoinColumn(name = "id", nullable = true)
+	private TblIotDeviceBasic tblBasic;
+	
+	@OneToOne()
+	@JoinColumn(name = "id", nullable = true)
+	 private TblIotDeviceDyn tblDyn;
+	
 	// `id` varchar(16) NOT NULL,
 	@Id
+	@Column(name = "id")
 	private String id;
-	
+
 	// `name` varchar(70) NOT NULL DEFAULT '',
 	@NotNull
-	private String name="";
-	
+	private String name = "";
+
 	// `basename` varchar(64) NOT NULL,
 	private String basename = "";
-	
+
 	// `userid` varchar(64) NOT NULL,
 	private String userid = "";
-	
+
 	// `sceneid` varchar(16) DEFAULT NULL COMMENT '场景ID',
 	private String sceneid;
-	
+
 	// `productid` varchar(16) NOT NULL COMMENT '所属产品id',
 	private String productid = "";
-	
+
 	// `protocol` tinyint(4) NOT NULL COMMENT '协议',
 	private Integer protocol = 0;
-	
+
 	// `mac` varchar(20) NOT NULL COMMENT 'mac地址',
 	private String mac = "FF:FF:FF:FF:FF:FF";
-	
+
 	// `groupid` varchar(16) DEFAULT NULL COMMENT '所属设备组',
 	private String groupid;
-	
+
 	// `province` char(7) NOT NULL,
 	private String province = "";
-	
+
 	// `city` char(7) NOT NULL,
 	private String city = "";
-	
+
 	// `address` varchar(125) NOT NULL,
 	private String address = "";
-	
+
 	// `tlsswitch` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'tsl开关',
-	private Integer tlsswitch=0;
-	
+	private Integer tlsswitch = 0;
+
 	// `tlsprotocol` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'TLS协议版本',
-	private Integer tlsprotocol=0;
-	
+	private Integer tlsprotocol = 0;
+
 	// `tlsencrypt` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'TSL加密算法',
-	private Integer tlsencrypt=0;
-	
+	private Integer tlsencrypt = 0;
+
 	// `tlscheck` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'TLS校验算法',
-	private Integer tlscheck=0;
-	// `description` varchar(256) NOT NULL COMMENT '设备描述',	
-	private String description = "";	
-	
+	private Integer tlscheck = 0;
+	// `description` varchar(256) NOT NULL COMMENT '设备描述',
+	private String description = "";
+
 	// `confpath` varchar(64) NOT NULL,
 	private String confpath = "";
-	
+
 	// `iotmodelconf` varchar(565) NOT NULL,
 	private String iotmodelconf = "";
-	
+
 	// `username` varchar(64) NOT NULL DEFAULT '',
 	private String username = "";
-	
-	// `createtime` datetime NOT NULL,
-	private Timestamp createtime = PubMethod.str2timestamp();
-	
+
+	// `createtime` datetime NOT NULL,	
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date createtime = new Date();
+
 	// `identification` varchar(64) NOT NULL COMMENT '设备唯一表示',
 	private String identification = "";
-	
+
 	// `type` tinyint(5) NOT NULL DEFAULT '1' COMMENT '设备类型，1：网关，2：thing物体',
-	private Integer type=1;
-	
+	private Integer type = 1;
+
 	// `thing_id` varchar(64) DEFAULT NULL COMMENT '场景下设备关联的thing',
 	private String thing_id;
-	
-	// `llegal_mac` tinyint(4) NOT NULL DEFAULT '0' COMMENT	'是否是黑名单mac,默认为0代表不是',
-	private Integer llegal_mac=0;
-	
+
+	// `llegal_mac` tinyint(4) NOT NULL DEFAULT '0' COMMENT
+	// '是否是黑名单mac,默认为0代表不是',
+	private Integer llegal_mac = 0;
+
 	// `longitude` varchar(50) DEFAULT NULL COMMENT '经度',
 	private String longitude;
-	
+
 	// `latitude` varchar(50) DEFAULT NULL COMMENT '纬度',
 	private String latitude;
-	
+
 	// `product` varchar(255) DEFAULT NULL,
 	private String product;
+
 
 	public String getId() {
 		return id;
@@ -256,11 +279,11 @@ public class TblIotDevice {
 		this.username = username;
 	}
 
-	public Timestamp getCreatetime() {
+	public Date getCreatetime() {
 		return createtime;
 	}
 
-	public void setCreatetime(Timestamp createtime) {
+	public void setCreatetime(Date createtime) {
 		this.createtime = createtime;
 	}
 
@@ -318,5 +341,38 @@ public class TblIotDevice {
 
 	public void setProduct(String product) {
 		this.product = product;
+	}
+
+	public TblIotDeviceBasic getTblBasic() {
+		return tblBasic;
+	}
+
+	public void setTblBasic(TblIotDeviceBasic tblBasic) {
+		this.tblBasic = tblBasic;
+	}
+
+	// public TblIotDeviceDyn getTblDyn() {
+	// return tblDyn;
+	// }
+	//
+	// public void setTblDyn(TblIotDeviceDyn tblDyn) {
+	// this.tblDyn = tblDyn;
+	// }
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "TblIotDevice [id=" + id + ", name=" + name + ", basename=" + basename + ", userid=" + userid
+				+ ", sceneid=" + sceneid + ", productid=" + productid + ", protocol=" + protocol + ", mac=" + mac
+				+ ", groupid=" + groupid + ", province=" + province + ", city=" + city + ", address=" + address
+				+ ", tlsswitch=" + tlsswitch + ", tlsprotocol=" + tlsprotocol + ", tlsencrypt=" + tlsencrypt
+				+ ", tlscheck=" + tlscheck + ", description=" + description + ", confpath=" + confpath
+				+ ", iotmodelconf=" + iotmodelconf + ", username=" + username + ", createtime=" + createtime
+				+ ", identification=" + identification + ", type=" + type + ", thing_id=" + thing_id + ", llegal_mac="
+				+ llegal_mac + ", longitude=" + longitude + ", latitude=" + latitude + ", product=" + product + "]";
 	}
 }

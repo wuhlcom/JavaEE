@@ -64,4 +64,13 @@ public class TblIotUser {
 		this.userid = userid;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "TblIotUser [id=" + id + ", account=" + account + ", password=" + password + ", createtime=" + createtime
+				+ ", userid=" + userid + "]";
+	}	
+
 }

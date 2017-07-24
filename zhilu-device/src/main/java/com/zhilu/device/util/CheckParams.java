@@ -4,6 +4,9 @@
 */
 package com.zhilu.device.util;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.mockito.Matchers.booleanThat;
+
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -28,6 +31,7 @@ import com.zhilu.device.service.TblIotUsrSrv;
 public class CheckParams {
 
 	final static int[] PROTOCOL = { 0, 1, 2, 3 };
+	final static int[] TYPE = { 0, 1, 2, 3, 4, 5 };
 	final static String TOKEN_URL = "http://119.29.68.198:9080/index.php/Users";
 	final static String USER_ID = "userid";
 	final static String NAME = "name";
@@ -89,8 +93,8 @@ public class CheckParams {
 		// 通过json解析参数
 		String userid = paramsJson.get(USER_ID).toString();
 
-		//用户id为空不添加
-		if (isUidNull(userid)==true) {
+		// 用户id为空不添加
+		if (isUidNull(userid) == true) {
 			resultMsg = new ResultErr(ResultStatusCode.UID_EMP.getCode(), ResultStatusCode.UID_EMP.getErrmsg());
 			return resultMsg;
 		}
@@ -170,13 +174,13 @@ public class CheckParams {
 			return resultMsg;
 		}
 
-		//设备ID是否为空
+		// 设备ID是否为空
 		if (isIdNull(id) == true) {
 			resultMsg = new ResultErr(ResultStatusCode.DEVID_EMP.getCode(), ResultStatusCode.DEVID_EMP.getErrmsg());
 			return resultMsg;
 		}
-		
-		//设备ID不存在不需要删除
+
+		// 设备ID不存在不需要删除
 		if (isIdAdd(id) == false) {
 			resultMsg = new ResultErr(ResultStatusCode.DEVID_NOT_EXISTED.getCode(),
 					ResultStatusCode.DEVID_NOT_EXISTED.getErrmsg());
@@ -185,15 +189,31 @@ public class CheckParams {
 		return resultMsg;
 	}
 	
-	//删除设备后查询是否删除
+	public static boolean isNull(Object obj){
+		boolean rs= false;
+		if(obj==null){
+			rs =true;
+		}
+		return rs;
+	}
+	
+	public static boolean isStrNull(String obj){	
+		boolean rs= false;
+		if(obj==null||obj.length()<=0){
+			rs =true;
+		}
+		return rs;
+	}
+
+	// 删除设备后查询是否删除
 	public static Result checkDelResult(String id) {
 		Result rs = null;
 		List<TblIotDevice> rs1 = tblIotDevSrv.findById(id);
 		List<TblIotDeviceBasic> rs2 = tblIotDevBasicSrv.findById(id);
 		List<TblIotDeviceDyn> rs3 = tblIotDevDynSrv.findById(id);
-		boolean flag1 = ((rs1 == null) ||rs1.isEmpty());
-		boolean flag2 = ((rs1 == null) ||rs1.isEmpty());
-		boolean flag3 = ((rs1 == null) ||rs1.isEmpty());
+		boolean flag1 = ((rs1 == null) || rs1.isEmpty());
+		boolean flag2 = ((rs1 == null) || rs1.isEmpty());
+		boolean flag3 = ((rs1 == null) || rs1.isEmpty());
 		if (!(flag1 && flag2 && flag3)) {
 			rs = new ResultErr(ResultStatusCode.DEVID_EXISTED.getCode(), ResultStatusCode.DEVID_EXISTED.getErrmsg());
 		}
@@ -221,11 +241,11 @@ public class CheckParams {
 	// id mac imei已添加返回true
 	public static boolean isIdAdd(String id) {
 		boolean rs = true;
-		
+
 		List<TblIotDevice> devs = tblIotDevSrv.getDevByMac(id);// byMac
 		System.out.println("((((((((((((((((((((isIdAdd))))))))))))))))))))");
 		System.out.println(devs);
-		
+
 		if (devs == null || devs.isEmpty()) {
 			rs = false;
 		}
@@ -245,6 +265,29 @@ public class CheckParams {
 			}
 		}
 		return isExist;
+	}
+
+	/**
+	 * 判断查询类型是否正确,正确返回true
+	 */
+	public static boolean isType(int type) {
+		boolean isExist = false;
+		for (int i = 0; i < TYPE.length; i++) {
+			if (TYPE[i] == type) {
+				isExist = true;
+			}
+		}
+		return isExist;
+	}
+
+	/**
+	 * 判断页码类型是否正确，正确返回true
+	 */
+	public static boolean isInt(Object... args) {
+		boolean rs = false;
+		if (args[0] instanceof Integer || args[0] instanceof Long)
+			rs = true;
+		return rs;
 	}
 
 	// 为pid为Null返回true
@@ -274,15 +317,15 @@ public class CheckParams {
 		}
 		return rs;
 	}
-	
+
 	// 判断Uid输入是否合法,合法返回true
-		public static boolean isUidNull(String userid) {
-			boolean rs = false;
-			if (userid.length() <=0 && userid == null) {
-				rs = true;
-			}
-			return rs;
+	public static boolean isUidNull(String userid) {
+		boolean rs = false;
+		if (userid.length() <= 0 && userid == null) {
+			rs = true;
 		}
+		return rs;
+	}
 
 	// 判断Uid输入是否合法,合法返回true
 	public static boolean isUid(String userid) {
