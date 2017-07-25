@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.zhilu.device.bean.TblIotDevice;
 import com.zhilu.device.repository.TblIotDevRepo;
 import com.zhilu.device.service.TblIotDevSrv;
@@ -68,13 +69,13 @@ public class TestController {
 
 		System.out.println("---------json--------------");
 		// 转化为json对象
-		com.alibaba.fastjson.JSONObject jobj = JSON.parseObject(requestBody);
+		JSONObject jobj = JSON.parseObject(requestBody);
 		String name = jobj.get("name").toString();
 		System.out.println(name);
 		String devices = jobj.get("devices").toString();
 		System.out.println(devices);
 
-		String[] sourceStrArray = PubMethod.getDevids(requestBody);
+		String[] sourceStrArray = PubMethod.getDevids(jobj);
 
 		for (int i = 0; i < sourceStrArray.length; i++) {
 			System.out.println(sourceStrArray[i]);
@@ -116,7 +117,7 @@ public class TestController {
 	@GetMapping("findbymac")
 	public void findByMac(String mac) {
 		System.out.println("-------------findbymac--------------");
-		List<TblIotDevice> dev = tbSrv.getDevByMac(mac);
+		TblIotDevice dev = tbSrv.getDevByMac(mac);
 		System.out.println(dev);
 		// return dev;
 	}

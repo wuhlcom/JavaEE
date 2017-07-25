@@ -33,8 +33,8 @@ public class TblIotDevDynSrv {
 		 tblIotDevDynRepo.deleteTblIotDeviceDynByDeviceid(id);
 	}
 	
-	public List<TblIotDeviceDyn> findById(String id) {
-		List<TblIotDeviceDyn> rs = tblIotDevDynRepo.findTblIotDeviceDynByDeviceid(id);
+	public TblIotDeviceDyn findById(String id) {
+		TblIotDeviceDyn rs = tblIotDevDynRepo.findTblIotDeviceDynByDeviceid(id);
 		return rs;
 	}
 }

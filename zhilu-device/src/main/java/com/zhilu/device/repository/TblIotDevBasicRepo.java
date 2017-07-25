@@ -11,7 +11,7 @@ public interface TblIotDevBasicRepo
 		extends JpaRepository<TblIotDeviceBasic, String>, JpaSpecificationExecutor<TblIotDeviceBasic> {
 	void deleteTblIotDeviceBasicByDeviceid(String id);
 
-	List<TblIotDeviceBasic> findTblIotDeviceBasicByDeviceid(String id);
+	TblIotDeviceBasic findTblIotDeviceBasicByDeviceid(String id);
 
 	TblIotDeviceBasic getTblIotDeviceBasicByDeviceid(String id);
 }

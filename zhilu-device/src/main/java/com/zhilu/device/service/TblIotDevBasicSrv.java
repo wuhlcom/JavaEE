@@ -38,8 +38,8 @@ public class TblIotDevBasicSrv {
 		tblIotDevBasicRepo.deleteTblIotDeviceBasicByDeviceid(id);
 	}
 	
-	public List<TblIotDeviceBasic> findById(String id) {
-		List<TblIotDeviceBasic> rs = tblIotDevBasicRepo.findTblIotDeviceBasicByDeviceid(id);
+	public TblIotDeviceBasic findById(String id) {
+		TblIotDeviceBasic rs = tblIotDevBasicRepo.findTblIotDeviceBasicByDeviceid(id);
 		return rs;
 	}
 

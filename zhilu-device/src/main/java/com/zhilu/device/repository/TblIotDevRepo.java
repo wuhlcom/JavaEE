@@ -17,13 +17,13 @@ import com.zhilu.device.bean.TblIotDevice;
 
 public interface TblIotDevRepo extends JpaRepository<TblIotDevice, String>, JpaSpecificationExecutor<TblIotDevice> {
 
-	List<TblIotDevice> findTblIotDeviceById(String id);
+	TblIotDevice findTblIotDeviceById(String id);
 
 	List<TblIotDevice> getTblIotDeviceById(String id);
 
-	List<TblIotDevice> findTblIotDeviceByMac(String mac);
+	TblIotDevice findTblIotDeviceByMac(String mac);
 
-	List<TblIotDevice> getTblIotDeviceByMac(String mac);
+	TblIotDevice getTblIotDeviceByMac(String mac);
 
 	List<TblIotDevice> findTblIotDeviceByName(String name);
 

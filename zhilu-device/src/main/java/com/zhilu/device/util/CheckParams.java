@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.zhilu.device.bean.TblIotDevice;
 import com.zhilu.device.bean.TblIotDeviceBasic;
 import com.zhilu.device.bean.TblIotDeviceDyn;
@@ -31,10 +32,15 @@ import com.zhilu.device.service.TblIotUsrSrv;
 public class CheckParams {
 
 	final static int[] PROTOCOL = { 0, 1, 2, 3 };
-	final static int[] TYPE = { 0, 1, 2, 3, 4, 5 };
+	final static int[] QUERY_TYPE = { 0, 1, 2, 3, 4, 5 };
 	final static String TOKEN_URL = "http://119.29.68.198:9080/index.php/Users";
 	final static String USER_ID = "userid";
 	final static String NAME = "name";
+	final static String TYPE = "type";
+	final static String PAGE = "page";
+	final static String LIST_ROWS = "listRows";
+	final static String DEV_ID = "devid";
+	final static String SEARCH = "search";
 	final static String PRODUCT = "product";
 	final static String PROTOCOL_STR = "protocol";
 	final static int ID_LENGTH = 16;
@@ -86,9 +92,7 @@ public class CheckParams {
 	 * @param paramsJson
 	 * @return
 	 */
-	public static Result checkAdd(String requestBody) {
-		// 获取请求参数转为JsonObject
-		com.alibaba.fastjson.JSONObject paramsJson = JSON.parseObject(requestBody);
+	public static Result checkAdd(JSONObject paramsJson) {
 		Result resultMsg = null;
 		// 通过json解析参数
 		String userid = paramsJson.get(USER_ID).toString();
@@ -140,7 +144,7 @@ public class CheckParams {
 		}
 
 		// 得到Id数组
-		String[] macsArray = PubMethod.getDevids(requestBody);
+		String[] macsArray = PubMethod.getDevids(paramsJson);
 		if (isIds(macsArray) == false) {
 			resultMsg = new ResultErr(ResultStatusCode.DEVID_EMP.getCode(), ResultStatusCode.DEVID_EMP.getErrmsg());
 		}
@@ -159,8 +163,10 @@ public class CheckParams {
 	}
 
 	// id可能是mac imei id,检查输入是否合法
-	public static Result checkDelete(String userid, String id) {
+	public static Result checkDelete(JSONObject paramsJson) {
 		Result resultMsg = null;
+		String userid = paramsJson.get(USER_ID).toString();
+		String id = paramsJson.get(DEV_ID).toString();
 		// 用户ID输入不合法
 		if (isUid(userid) == false) {
 			resultMsg = new ResultErr(ResultStatusCode.UID_EMP.getCode(), ResultStatusCode.UID_EMP.getErrmsg());
@@ -188,19 +194,102 @@ public class CheckParams {
 		}
 		return resultMsg;
 	}
-	
-	public static boolean isNull(Object obj){
-		boolean rs= false;
-		if(obj==null){
-			rs =true;
+
+	public static Result checkQuery(JSONObject paramsJson) {
+		Result resultMsg = null;
+		String userid = paramsJson.get(USER_ID).toString();
+		int type = Integer.parseInt(paramsJson.get(TYPE).toString());
+		String search = paramsJson.get(SEARCH).toString();
+		Long page = Long.parseLong(paramsJson.get(PAGE).toString());
+		Long rows = Long.parseLong(paramsJson.get(LIST_ROWS).toString());
+		// 用户ID输入不合法
+		if (isUid(userid) == false) {
+			resultMsg = new ResultErr(ResultStatusCode.UID_EMP.getCode(), ResultStatusCode.UID_EMP.getErrmsg());
+			return resultMsg;
+		}
+
+		// 用户ID不存在
+		if (isUidAdd(userid) == false) {
+			resultMsg = new ResultErr(ResultStatusCode.UID_NOT_EXISTED.getCode(),
+					ResultStatusCode.UID_NOT_EXISTED.getErrmsg());
+			return resultMsg;
+		}
+
+		// type类型限制
+		if (isQueryType(type) == false) {
+			resultMsg = new ResultErr(ResultStatusCode.TYPE_ERR.getCode(), ResultStatusCode.TYPE_ERR.getErrmsg());
+			return resultMsg;
+		}
+
+		if (isIntLong(page) == false) {
+			resultMsg = new ResultErr(ResultStatusCode.PAGE_ERR.getCode(), ResultStatusCode.PAGE_ERR.getErrmsg());
+			return resultMsg;
+		}
+
+		if (isIntLong(rows) == false) {
+			resultMsg = new ResultErr(ResultStatusCode.ROWS_ERR.getCode(), ResultStatusCode.ROWS_ERR.getErrmsg());
+
+		}
+
+		// search内容检查待补充
+		if (type == 0) {
+			// 所有
+
+		} else if (type == 1) {
+			// name
+
+		} else if (type == 2) {
+			// id
+			if (isIdNull(search) == false) {
+				resultMsg = new ResultErr(ResultStatusCode.DEVID_EMP.getCode(), ResultStatusCode.DEVID_EMP.getErrmsg());
+				return resultMsg;
+			}
+		} else if (type == 3) {
+			// product
+
+		} else if (type == 4) {
+			// groupid
+
+		} else if (type == 5) {
+			// mac
+
+		} else {
+		}
+		return resultMsg;
+	}
+
+	public static Result checkOnlineStatus(JSONObject paramsJson) {
+		Result resultMsg = null;
+		String devmac = paramsJson.get("device_id").toString();
+		Long time = Long.parseLong(paramsJson.get("time").toString());
+		Integer onlineStatus = Integer.parseInt(paramsJson.get("onlineStatus").toString());
+		;
+
+		if (isIdNull(devmac) == true) {
+			resultMsg = new ResultErr(ResultStatusCode.DEVID_EMP.getCode(), ResultStatusCode.DEVID_EMP.getErrmsg());
+			return resultMsg;
+		}
+
+		if (isIdAdd(devmac) == false) {
+			resultMsg = new ResultErr(ResultStatusCode.DEVID_NOT_EXISTED.getCode(),
+					ResultStatusCode.DEVID_NOT_EXISTED.getErrmsg());
+			return resultMsg;
+		}
+		return resultMsg;
+	}
+
+	public static boolean isNull(Object obj) {
+		boolean rs = false;
+		if (obj == null) {
+			rs = true;
 		}
 		return rs;
 	}
-	
-	public static boolean isStrNull(String obj){	
-		boolean rs= false;
-		if(obj==null||obj.length()<=0){
-			rs =true;
+
+	public static boolean isStrNull(String obj) {
+		boolean rs = false;
+		if (obj == null || obj.length() <= 0) {
+			rs = true;
 		}
 		return rs;
 	}
@@ -208,12 +297,12 @@ public class CheckParams {
 	// 删除设备后查询是否删除
 	public static Result checkDelResult(String id) {
 		Result rs = null;
-		List<TblIotDevice> rs1 = tblIotDevSrv.findById(id);
-		List<TblIotDeviceBasic> rs2 = tblIotDevBasicSrv.findById(id);
-		List<TblIotDeviceDyn> rs3 = tblIotDevDynSrv.findById(id);
-		boolean flag1 = ((rs1 == null) || rs1.isEmpty());
-		boolean flag2 = ((rs1 == null) || rs1.isEmpty());
-		boolean flag3 = ((rs1 == null) || rs1.isEmpty());
+		TblIotDevice rs1 = tblIotDevSrv.findById(id);
+		TblIotDeviceBasic rs2 = tblIotDevBasicSrv.findById(id);
+		TblIotDeviceDyn rs3 = tblIotDevDynSrv.findById(id);
+		boolean flag1 = (rs1 == null);
+		boolean flag2 = (rs1 == null);
+		boolean flag3 = (rs1 == null);
 		if (!(flag1 && flag2 && flag3)) {
 			rs = new ResultErr(ResultStatusCode.DEVID_EXISTED.getCode(), ResultStatusCode.DEVID_EXISTED.getErrmsg());
 		}
@@ -241,16 +330,11 @@ public class CheckParams {
 	// id mac imei已添加返回true
 	public static boolean isIdAdd(String id) {
 		boolean rs = true;
-
-		List<TblIotDevice> devs = tblIotDevSrv.getDevByMac(id);// byMac
-		System.out.println("((((((((((((((((((((isIdAdd))))))))))))))))))))");
-		System.out.println(devs);
-
-		if (devs == null || devs.isEmpty()) {
+		TblIotDevice devs = tblIotDevSrv.getDevByMac(id);// byMac
+		if (devs == null) {
 			rs = false;
 		}
-		System.out.println(rs);
-		System.out.println("((((((((((((((((((((isIdAdd))))))))))))))))))))");
+
 		return rs;
 	}
 
@@ -270,10 +354,10 @@ public class CheckParams {
 	/**
 	 * 判断查询类型是否正确,正确返回true
 	 */
-	public static boolean isType(int type) {
+	public static boolean isQueryType(int type) {
 		boolean isExist = false;
-		for (int i = 0; i < TYPE.length; i++) {
-			if (TYPE[i] == type) {
+		for (int i = 0; i < QUERY_TYPE.length; i++) {
+			if (QUERY_TYPE[i] == type) {
 				isExist = true;
 			}
 		}
@@ -283,7 +367,7 @@ public class CheckParams {
 	/**
 	 * 判断页码类型是否正确，正确返回true
 	 */
-	public static boolean isInt(Object... args) {
+	public static boolean isIntLong(Object... args) {
 		boolean rs = false;
 		if (args[0] instanceof Integer || args[0] instanceof Long)
 			rs = true;
@@ -349,7 +433,7 @@ public class CheckParams {
 	// 从用户请求中解析出一组设备ID或mac或其它唯一标识,
 	public static String[] getDevids(String requestBody) {
 		// 转化为json对象
-		com.alibaba.fastjson.JSONObject paramsJson = JSON.parseObject(requestBody);
+		JSONObject paramsJson = JSON.parseObject(requestBody);
 		String idsStr = paramsJson.get("devices").toString();
 		// 去首尾空格
 		idsStr = idsStr.trim();
@@ -370,7 +454,7 @@ public class CheckParams {
 
 	// 转发token到token验证服务器
 	public static Boolean isToken(String token) {
-		Boolean flag = false;
+		Boolean flag = true;
 		if ((token == "") || (token.length() <= 0)) {
 			flag = null;
 		}
@@ -378,7 +462,7 @@ public class CheckParams {
 		RestTemplate restTemplate = new RestTemplate();
 
 		Object result = restTemplate.getForObject(url, String.class);
-		com.alibaba.fastjson.JSONObject jsonObj = JSON.parseObject((String) result);
+		JSONObject jsonObj = JSON.parseObject((String) result);
 		String code = jsonObj.get("code").toString();
 
 		if (code == "0") {

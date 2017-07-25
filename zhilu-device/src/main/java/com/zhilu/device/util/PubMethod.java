@@ -1,17 +1,18 @@
 package com.zhilu.device.util;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 
 
 public class PubMethod {
 	// 从用户请求中解析出一组设备ID或mac或其它唯一标识,
-	public static String[] getDevids(String requestBody) {
-		// 转化为json对象
-		com.alibaba.fastjson.JSONObject paramsJson = JSON.parseObject(requestBody);
+	public static String[] getDevids(JSONObject paramsJson) {
+		// 转化为json对象	
 		String idsStr = paramsJson.get("devices").toString();
 		// 去首尾空格
 		idsStr = idsStr.trim();
@@ -37,6 +38,30 @@ public class PubMethod {
 		Timestamp ts = Timestamp.valueOf(time);
 		return ts;
 	}
+	
+	 /* 
+     * 将时间转换为时间戳
+     */    
+    public static String date2Stamp(String s) throws ParseException{
+        String res;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = simpleDateFormat.parse(s);
+        long ts = date.getTime();
+        res = String.valueOf(ts);
+        return res;
+    }
+    
+    /* 
+     * 将时间戳转换为时间
+     */
+    public static String stamp2Date(String s){
+        String res;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        long lt = new Long(s);
+        Date date = new Date(lt);
+        res = simpleDateFormat.format(date);
+        return res;
+    }
 
 	// 生成id
 	public static String generateDevId(int strLen) {

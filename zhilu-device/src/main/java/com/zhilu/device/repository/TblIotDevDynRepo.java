@@ -12,5 +12,5 @@ public interface TblIotDevDynRepo
 	
 	void deleteTblIotDeviceDynByDeviceid(String id);
 
-	List<TblIotDeviceDyn> findTblIotDeviceDynByDeviceid(String id);
+	TblIotDeviceDyn findTblIotDeviceDynByDeviceid(String id);
 }
