@@ -12,7 +12,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 import com.zhilu.device.bean.TblIotDevice;
 import com.zhilu.device.bean.TblIotDeviceBasic;
-import com.zhilu.device.bean.TblIotDeviceDyn;
 
 public class DevSpec {
 

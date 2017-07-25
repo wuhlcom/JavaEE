@@ -6,7 +6,7 @@ spring:
       indent-output: true
   jpa:
     database: MYSQL
-    show-sql: true
+#    show-sql: true
     hibernate:
       ddl-auto: update
       naming:
@@ -14,7 +14,7 @@ spring:
     properties:
       hibernate:
         dialet: org.hibernate.dialect.MySQL5Dialect
-        format_sql: true
+#        format_sql: true
   mvc:
     throw-exception-if-no-handler-found: true
   resources:

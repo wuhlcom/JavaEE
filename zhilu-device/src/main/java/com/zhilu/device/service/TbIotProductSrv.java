@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.zhilu.device.bean.TblIotProductInfo;
-import com.zhilu.device.bean.TblIotUser;
 import com.zhilu.device.repository.TblIotProductRepo;
 
 

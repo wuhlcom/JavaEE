@@ -13,7 +13,7 @@ public class ResultDevAdd implements Result {
 		this.devices = devices;
 	}
 	
-	public ResultDevAdd(int code, List devices) {
+	public ResultDevAdd(int code, List<?> devices) {
 		this.code = code;
 		this.devices = devices;
 	}

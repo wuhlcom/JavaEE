@@ -1,17 +1,10 @@
 package com.zhilu.device.service;
 
-import static org.mockito.Matchers.booleanThat;
-
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +14,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
-import org.springframework.data.jpa.domain.Specification;
+
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.repository.query.Param;
+
 import org.springframework.stereotype.Service;
 
 import com.zhilu.device.util.CheckParams;
@@ -32,12 +25,10 @@ import com.zhilu.device.util.Result;
 import com.zhilu.device.util.ResultDevAdd;
 import com.zhilu.device.util.ResultErr;
 import com.zhilu.device.util.ResultStatusCode;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zhilu.device.bean.TblIotDevice;
 import com.zhilu.device.bean.TblIotDeviceBasic;
 import com.zhilu.device.bean.TblIotDeviceDyn;
-import com.zhilu.device.repository.TblIotDevBasicRepo;
 import com.zhilu.device.repository.TblIotDevRepo;
 
 @Service

@@ -1,8 +1,5 @@
 package com.zhilu.device.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -27,7 +24,6 @@ import com.zhilu.device.util.PubMethod;
 @RequestMapping("device")
 public class TestController {
 	private TblIotDevSrv tbSrv;
-	private TblIotDevRepo tbl;
 
 	final static String TOKEN_URL = "http://119.29.68.198:9080/index.php/Users";
 

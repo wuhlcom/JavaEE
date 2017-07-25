@@ -4,9 +4,6 @@
 */
 package com.zhilu.device.util;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.mockito.Matchers.booleanThat;
-
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -263,7 +260,6 @@ public class CheckParams {
 		String devmac = paramsJson.get("device_id").toString();
 		Long time = Long.parseLong(paramsJson.get("time").toString());
 		Integer onlineStatus = Integer.parseInt(paramsJson.get("onlineStatus").toString());
-		;
 
 		if (isIdNull(devmac) == true) {
 			resultMsg = new ResultErr(ResultStatusCode.DEVID_EMP.getCode(), ResultStatusCode.DEVID_EMP.getErrmsg());
@@ -301,8 +297,8 @@ public class CheckParams {
 		TblIotDeviceBasic rs2 = tblIotDevBasicSrv.findById(id);
 		TblIotDeviceDyn rs3 = tblIotDevDynSrv.findById(id);
 		boolean flag1 = (rs1 == null);
-		boolean flag2 = (rs1 == null);
-		boolean flag3 = (rs1 == null);
+		boolean flag2 = (rs2 == null);
+		boolean flag3 = (rs3 == null);
 		if (!(flag1 && flag2 && flag3)) {
 			rs = new ResultErr(ResultStatusCode.DEVID_EXISTED.getCode(), ResultStatusCode.DEVID_EXISTED.getErrmsg());
 		}
@@ -405,7 +401,7 @@ public class CheckParams {
 	// 判断Uid输入是否合法,合法返回true
 	public static boolean isUidNull(String userid) {
 		boolean rs = false;
-		if (userid.length() <= 0 && userid == null) {
+		if (userid.length() <= 0 || (userid == null)) {
 			rs = true;
 		}
 		return rs;
