@@ -95,6 +95,9 @@ public class TblIotDevController {
 		return devices;
 	}
 
+	/*
+	 * 查询设备
+	 * */
 	@PostMapping("query")
 	public Object queryDevs(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
 		Result resultMsg = null;
@@ -103,7 +106,7 @@ public class TblIotDevController {
 		System.out.println("token is:" + token);
 		Boolean rsCheckToken = CheckParams.isToken(token);
 		System.out.println(rsCheckToken);
-		System.out.println("................." + this.getClass() + "......addDev.........");
+		System.out.println("................." + this.getClass() + "......query.........");
 		System.out.println(requestBody);
 		rsCheckToken = true;
 
@@ -114,19 +117,12 @@ public class TblIotDevController {
 		int type = Integer.parseInt(paramsJson.get("type").toString());
 		String search = paramsJson.get("search").toString();
 		if (paramsJson.get("page") != null) {
-			page = Long.parseLong(paramsJson.get("page").toString()) ;
+			page = Long.parseLong(paramsJson.get("page").toString());
 		}
-		Long listRows = Long.parseLong(paramsJson.get("listRows").toString()) ;
+		Long listRows = Long.parseLong(paramsJson.get("listRows").toString());
 
 		Map<String, Object> devs = new HashMap<String, Object>();
-		if (type == 0) {
-			devs = tblIotDevSrv.pageByUserid(userid, page, listRows);
-		} else if (type == 1) {
-//			devs = tblIotDevSrv.findBySpec(userid, type, search, page, listRows);
-		}
-
-		
-		// List<TblIotDevice> devices = devs.getContent();
+		devs = tblIotDevSrv.pageInfo(type, userid, search, page, listRows);
 		return devs;
 	}
 

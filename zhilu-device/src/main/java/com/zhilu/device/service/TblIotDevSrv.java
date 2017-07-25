@@ -290,38 +290,7 @@ public class TblIotDevSrv {
 		return dev;
 	}
 
-	private class MySpec implements Specification<TblIotDevice> {
-		@Override
-		public Predicate toPredicate(Root<TblIotDevice> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-
-			// 1.混合条件查询
-			/*
-			 * Path<String> exp1 = root.get("taskName"); Path<Date> exp2 =
-			 * root.get("createTime"); Path<String> exp3 =
-			 * root.get("taskDetail"); Predicate predicate =
-			 * cb.and(cb.like(exp1, "%taskName%"),cb.lessThan(exp2, new
-			 * Date())); return cb.or(predicate,cb.equal(exp3, "kkk"));
-			 * 
-			 * 类似的sql语句为: Hibernate: select count(task0_.id) as col_0_0_ from
-			 * tb_task task0_ where ( task0_.task_name like ? ) and
-			 * task0_.create_time<? or task0_.task_detail=?
-			 */
-
-			// 2.多表查询
-			/*
-			 * Join<Task,Project> join = root.join("project", JoinType.INNER);
-			 * Path<String> exp4 = join.get("projectName"); return cb.like(exp4,
-			 * "%projectName%");
-			 * 
-			 * Hibernate: select count(task0_.id) as col_0_0_ from tb_task
-			 * task0_ inner join tb_project project1_ on
-			 * task0_.project_id=project1_.id where project1_.project_name like
-			 * ?
-			 */
-			return null;
-		}
-	}
-
+	
 	// 获取设备id
 	public static ArrayList<String> getDevId(TblIotDevice tblIotDevice) {
 		String devId = tblIotDevice.getId();
@@ -346,22 +315,50 @@ public class TblIotDevSrv {
 		List devInfo = tblIotDevRepo.getDevsAllInfoById(id);
 		return devInfo;
 	}
-	
-	
-	public  Map pageByUserid(String userid,Long page,Long pages) {	
-		Long start=page*pages-1;
-		List list = tblIotDevRepo.getDevsAllInfoByUserid(userid,start,pages);
-		Map<String, Object> totalMap = parseDevAllInfo(list);
-		return totalMap;
-	}
-	
-	public  Map pageByName(String name,Long page,Long pages) {	
-		Long start=page*pages-1;
-		List list = tblIotDevRepo.getDevsAllInfoByName(name,start,pages);
+
+	public Map pageByUserid(String userid, Long page, Long pages) {
+		Long start = (page -1)* pages;//数据库记录编号是从0开始,这里要减1
+		List list = tblIotDevRepo.getDevsAllInfoByUserid(userid, start, pages);
 		Map<String, Object> totalMap = parseDevAllInfo(list);
 		return totalMap;
 	}
 
+	public Map pageByName(String userid, String search, Long page, Long pages) {
+		Long start = (page-1) * pages;		 
+		List list = tblIotDevRepo.getDevsAllInfoByName(userid, search, start, pages);	
+		Map<String, Object> totalMap = parseDevAllInfo(list);
+		return totalMap;
+	}
+	
+	public Map<String, Object> pageInfo(int type,String userid, String search, Long page, Long pages) {
+		Long start = (page-1) * pages;
+		List<?> list =null;	
+		if (type == 0) {
+			//所有
+			list = tblIotDevRepo.getDevsAllInfoByUserid(userid, start, pages);
+		}else if (type == 1) {		
+			//name
+			list = tblIotDevRepo.getDevsAllInfoByName(userid, search, start, pages);
+		}else if (type == 2) {		
+			//id
+			list = tblIotDevRepo.getDevsAllInfoById(userid, search, start, pages);
+		}
+		else if (type == 3) {	
+			//product
+			list = tblIotDevRepo.getDevsAllInfoByProduct(userid, search, start, pages);
+		}
+		else if (type == 4) {		
+			//groupid
+			list = tblIotDevRepo.getDevsAllInfoByGroupid(userid, search, start, pages);
+		}
+		else if (type == 5) {		
+			//mac
+			list = tblIotDevRepo.getDevsAllInfoByMac(userid, search, start, pages);
+		}else{}
+		Map<String, Object> totalMap = parseDevAllInfo(list);
+		return totalMap;
+	}
+	
 	// {
 	// "errcode":0,
 	// "totalRows":128,
@@ -379,21 +376,17 @@ public class TblIotDevSrv {
 	// }
 	public Map getDevsAllInfo() {
 		List devInfo = tblIotDevRepo.getDevsAllInfo();
-		Map<String, Object> totalMap = parseDevAllInfo(devInfo);	
+		Map<String, Object> totalMap = parseDevAllInfo(devInfo);
 		return totalMap;
 	}
 
-	/**  
-	* @Title: parseDevAllInfo  
-	* @Description: TODO 
-	* @param @param devInfo
-	* @param @return   
-	* @return Map<String,Object>   
-	* @throws  
-	*/
+	/**
+	 * @Title: parseDevAllInfo @Description: TODO @param @param
+	 * devInfo @param @return @return Map<String,Object> @throws
+	 */
 	private Map<String, Object> parseDevAllInfo(List devInfo) {
 		Map<String, Object> totalMap = new HashMap<String, Object>();
-		Long number=tblIotDevRepo.getDevTotalNum();
+		Long number = tblIotDevRepo.getDevTotalNum();
 		totalMap.put("code", 0);
 		totalMap.put("totalRows", number);
 		ArrayList<Map> devs = new ArrayList<>();
@@ -406,7 +399,7 @@ public class TblIotDevSrv {
 				Object cell = cells[i];
 				if (CheckParams.isNull(cell)) {
 					cells[i] = "";
-				}				
+				}
 			}
 
 			devMap.put("id", cells[0]);

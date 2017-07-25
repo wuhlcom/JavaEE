@@ -63,17 +63,39 @@ public interface TblIotDevRepo extends JpaRepository<TblIotDevice, String>, JpaS
 	// true)
 	// List<TblIotDevice> getAllTblIotDevicesByCount(int count);
 
-	// 两表联表查询
+	// 两表联表查询并分页
 	// @Query("select dev.name,dev.id,dev.productid from TblIotDevice dev inner
 	// join dev.tblBasic basic where basic.deviceid =:id")
 	// List<Object> getDevAndBasic(@Param("id") String id);
+	// 通过userid
 	@Query(value = "select dev.id,dev.mac,dev.name,dev.product,dev.protocol,basic.status,basic.logintime,basic.offlinetime	from tbl_iot_device as dev	INNER JOIN tbl_iot_device_basic as basic on  dev.id =basic.deviceid where (dev.userid = :userid) limit :start,:pages", nativeQuery = true)
-	List<Object[]> getDevsAllInfoByUserid(@Param("userid") String userid, @Param("start") Long stat,
+	List<Object[]> getDevsAllInfoByUserid(@Param("userid") String userid, @Param("start") Long start,
 			@Param("pages") Long pages);
-	
-	@Query(value = "select dev.id,dev.mac,dev.name,dev.product,dev.protocol,basic.status,basic.logintime,basic.offlinetime	from tbl_iot_device as dev	INNER JOIN tbl_iot_device_basic as basic on  dev.id =basic.deviceid where (dev.userid = :userid) limit :start,:pages", nativeQuery = true)
-	List<Object[]> getDevsAllInfoByName(@Param("name") String userid, @Param("start") Long stat,
-			@Param("pages") Long pages);
+
+	// 通过name
+	@Query(value = "select dev.id,dev.mac,dev.name,dev.product,dev.protocol,basic.status,basic.logintime,basic.offlinetime	from tbl_iot_device as dev	INNER JOIN tbl_iot_device_basic as basic on  dev.id =basic.deviceid where (dev.userid = :userid and dev.name like %:name%) limit :start,:pages", nativeQuery = true)
+	List<Object[]> getDevsAllInfoByName(@Param("userid") String userid, @Param("name") String name,
+			@Param("start") Long start, @Param("pages") Long pages);
+
+	// 通过id
+	@Query(value = "select dev.id,dev.mac,dev.name,dev.product,dev.protocol,basic.status,basic.logintime,basic.offlinetime	from tbl_iot_device as dev	INNER JOIN tbl_iot_device_basic as basic on  dev.id =basic.deviceid INNER JOIN tbl_iot_device_dyn as dyn on  dev.id =dyn.deviceid where (dev.userid = :userid and dev.id like %:id%) limit :start,:pages", nativeQuery = true)
+	List<Object[]> getDevsAllInfoById(@Param("userid") String userid, @Param("id") String id,
+			@Param("start") Long start, @Param("pages") Long pages);
+
+	// 通过Product
+	@Query(value = "select dev.id,dev.mac,dev.name,dev.product,dev.protocol,basic.status,basic.logintime,basic.offlinetime	from tbl_iot_device as dev	INNER JOIN tbl_iot_device_basic as basic on  dev.id =basic.deviceid where (dev.userid = :userid and dev.product like %:product%) limit :start,:pages", nativeQuery = true)
+	List<Object[]> getDevsAllInfoByProduct(@Param("userid") String userid, @Param("product") String product,
+			@Param("start") Long start, @Param("pages") Long pages);
+
+	// 通过Group
+	@Query(value = "select dev.id,dev.mac,dev.name,dev.product,dev.protocol,basic.status,basic.logintime,basic.offlinetime	from tbl_iot_device as dev	INNER JOIN tbl_iot_device_basic as basic on  dev.id =basic.deviceid where (dev.userid = :userid and dev.groupid=:groupid) limit :start,:pages", nativeQuery = true)
+	List<Object[]> getDevsAllInfoByGroupid(@Param("userid") String userid, @Param("groupid") String group,
+			@Param("start") Long start, @Param("pages") Long pages);
+
+	// 通过Mac
+	@Query(value = "select dev.id,dev.mac,dev.name,dev.product,dev.protocol,basic.status,basic.logintime,basic.offlinetime	from tbl_iot_device as dev	INNER JOIN tbl_iot_device_basic as basic on  dev.id =basic.deviceid where (dev.userid = :userid and dev.mac=:mac) limit :start,:pages", nativeQuery = true)
+	List<Object[]> getDevsAllInfoByMac(@Param("userid") String userid, @Param("mac") String mac,
+			@Param("start") Long start, @Param("pages") Long pages);
 
 	@Query("select dev.name from TblIotDevice dev inner join dev.tblDyn dyn where dyn.deviceid =:id")
 	List<Object> getDevAndDyn(@Param("id") String id);
