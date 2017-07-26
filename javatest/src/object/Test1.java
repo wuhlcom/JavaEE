@@ -34,7 +34,7 @@ public class Test1 {
             System.out.println(sourceStrArray[i]);
         }
 		*/
-	NullTest();
+     1 instan
 	}
 
 	
