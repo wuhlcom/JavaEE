@@ -115,7 +115,7 @@ public class MenuController {
 	}
 
 	@RequestMapping(value = "/queryMenu", method = RequestMethod.POST, produces = PubFunction.DATA_CODE)
-	public Object queryValve(HttpServletRequest request, HttpServletResponse response,
+	public Object queryMenu(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody String requestBody) {
 		try {
 			// 权限验证
