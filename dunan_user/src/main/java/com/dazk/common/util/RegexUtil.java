@@ -513,6 +513,19 @@ public class RegexUtil {
             return false;
         }
     }
+    
+    /**
+     * 用户名限制
+    * @Title: isLoginName  
+    * @Description: TODO 
+    * @param @param loginName
+    * @param @return   
+    * @return boolean   
+    * @throws
+     */
+    public static boolean isLoginName(String loginName){
+    	return match(loginName, "^[A-Za-z][A-Za-z1-9_-]+$");
+    }
 
 
 // 参考地址：http://www.cnblogs.com/yansheng/archive/2010/05/07/1730188.html    

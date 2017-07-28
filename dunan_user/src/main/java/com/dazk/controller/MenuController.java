@@ -13,6 +13,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.dazk.common.ErrCode;
 import com.dazk.common.errcode.ResultErr;
 import com.dazk.common.errcode.ResultStatusCode;
+import com.dazk.common.util.ParamValidator;
 import com.dazk.common.util.PubFunction;
 import com.dazk.db.model.Menu;
 import com.dazk.service.MenuService;
@@ -63,7 +64,7 @@ public class MenuController {
 			// 权限验证
 			String token = request.getParameter("token");
 			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
-
+		
 			JSONObject parameter = JSON.parseObject(requestBody);
 			// 数据校验
 			if (!JsonParamValidator.menuVal(parameter)) {
@@ -95,8 +96,8 @@ public class MenuController {
 			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
 
 			JSONObject parameter = JSON.parseObject(requestBody);
-			if (!JsonParamValidator.isCode(parameter.getString("code"))) {
-				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "非法住户编号");
+			if (!JsonParamValidator.isCode(parameter.getString("code"),JsonParamValidator.MENU_CODE_MIN,JsonParamValidator.MENU_CODE_MAX)) {
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "非法菜单编号");
 			}
 			// 数据入库，成功后返回.
 			int res = menuService.delMenu(parameter);
@@ -124,6 +125,11 @@ public class MenuController {
 			JSONObject resultObj = new JSONObject();
 			JSONObject parameter = JSON.parseObject(requestBody);
 
+			if (!JsonParamValidator.menuQueryVal(parameter)) {
+				// 非法数据，返回错误码
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+			}
+			
 			// 数据查询，成功后返回.
 			List<Menu> result = menuService.queryMenu(parameter);
 			for (int i = 0; i < result.size(); i++) {

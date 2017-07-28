@@ -4,8 +4,6 @@
 */
 package com.dazk.db.model;
 
-
-
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,18 +13,20 @@ import javax.persistence.Table;
 //注意Menu对应的表名为resource
 @Table(name = "resource")
 public class Menu extends BaseEntity {
-	// `id` int(11) NOT NULL AUTO_INCREMENT,	
+	// `id` int(11) NOT NULL AUTO_INCREMENT,
 	private Long id;
 	// `name` varchar(20) NOT NULL COMMENT '名称',
 	private String name;
 	// `code` varchar(20) NOT NULL COMMENT '编号',
 	private String code;
-	// `url` varchar(45) NOT NULL COMMENT 'url地址',
-	private String url;
+	// `uri` varchar(45) NOT NULL COMMENT 'uri地址',
+	private String uri;
 	// `is_menu` tinyint(4) DEFAULT NULL,
 	private Integer is_menu;
-	// `role_id` int(11) DEFAULT NULL,
-	private Long role_id;
+	// `lv` int(11) DEFAULT NULL,
+	private Long lv;
+	// `role_code` 20 DEFAULT NULL,
+	private String role_code;
 	// `include_url` tinyint(4) DEFAULT NULL,
 	private Integer include_url;
 	// `created_at` bigint(20) NOT NULL,
@@ -58,12 +58,12 @@ public class Menu extends BaseEntity {
 		this.code = code;
 	}
 
-	public String getUrl() {
-		return url;
+	public String getUri() {
+		return uri;
 	}
 
-	public void setUrl(String url) {
-		this.url = url;
+	public void setUri(String uri) {
+		this.uri = uri;
 	}
 
 	public Integer getIs_menu() {
@@ -74,12 +74,20 @@ public class Menu extends BaseEntity {
 		this.is_menu = is_menu;
 	}
 
-	public Long getRole_id() {
-		return role_id;
+	public Long getLv() {
+		return lv;
 	}
 
-	public void setRole_id(Long role_id) {
-		this.role_id = role_id;
+	public void setLv(Long lv) {
+		this.lv = lv;
+	}
+
+	public String getRole_code() {
+		return role_code;
+	}
+
+	public void setRole_code(String role_code) {
+		this.role_code = role_code;
 	}
 
 	public Integer getInclude_url() {

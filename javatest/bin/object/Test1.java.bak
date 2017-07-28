@@ -65,7 +65,7 @@ public class Test1 {
   }
 
   public static void NullTest(){
-     int i = (int)null;
+     int i = (int)"";
 	  System.out.println(i);	
   }
 }

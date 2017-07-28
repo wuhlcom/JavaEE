@@ -20,13 +20,13 @@ public class Role extends BaseEntity{
 	private String code;
 	
 	// `disuserd` tinyint(4) NOT NULL COMMENT '是否废弃',
-	private Integer disuserd;
+	private Integer disused;
 	
 	// `remark` varchar(45) NOT NULL DEFAULT '' COMMENT '备注',
 	private String remark;
 	
 	// `created_at` bigint(20) NOT NULL,
-	private BigInteger created_at;
+	private Long created_at;
 	
 	// `isdel` tinyint(4) NOT NULL DEFAULT '0',
 	private Integer isdel;
@@ -55,12 +55,12 @@ public class Role extends BaseEntity{
 		this.code = code;
 	}
 
-	public Integer getDisuserd() {
-		return disuserd;
+	public Integer getDisused() {
+		return disused;
 	}
 
-	public void setDisuserd(Integer disuserd) {
-		this.disuserd = disuserd;
+	public void setDisused(Integer disuserd) {
+		this.disused = disuserd;
 	}
 
 	public String getRemark() {
@@ -71,11 +71,11 @@ public class Role extends BaseEntity{
 		this.remark = remark;
 	}
 
-	public BigInteger getCreated_at() {
+	public Long getCreated_at() {
 		return created_at;
 	}
 
-	public void setCreated_at(BigInteger created_at) {
+	public void setCreated_at(Long created_at) {
 		this.created_at = created_at;
 	}
 

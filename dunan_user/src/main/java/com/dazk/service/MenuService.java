@@ -1,15 +1,15 @@
+/**
+ * 添加菜单
+ * @param json
+ * @return
+ * @author wuhongliang
+ */
 package com.dazk.service;
-
 import java.util.List;
 
 import com.alibaba.fastjson.JSONObject;
 import com.dazk.db.model.Menu;
-/**
- * 添加设备
- * @param json
- * @return
- * @author sunjd
- */
+
 public interface MenuService {
 	public int addMenu(JSONObject json);
 
