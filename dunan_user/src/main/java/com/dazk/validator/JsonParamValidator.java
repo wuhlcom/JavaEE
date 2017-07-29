@@ -22,6 +22,9 @@ public class JsonParamValidator {
 	public static final int LOGIN_NAME_MIN = 8;
 	public static final int LOGIN_NAME_MAX = 32;
 
+	public static final int USER_ID_MIN = 1;
+	public static final int USER_ID_MAX = 11;
+
 	/**
 	 * 添加菜单时校验参数
 	 * 
@@ -197,22 +200,22 @@ public class JsonParamValidator {
 		System.out.println("password：" + password);
 		if (!RegexUtil.isPwd(password))
 			return false;
-		
+
 		String name = json.getString("name");
 		System.out.println("name：" + name);
-		if (!RegexUtil.isChinese(name)&&!RegexUtil.isEnglish(name))
+		if (!RegexUtil.isChinese(name) && !RegexUtil.isEnglish(name))
 			return false;
 
 		String email = json.getString("email");
 		System.out.println("email：" + email);
-		if (RegexUtil.isNotNull(email)&&!RegexUtil.isEmail(email))
+		if (RegexUtil.isNotNull(email) && !RegexUtil.isEmail(email))
 			return false;
-		
+
 		String telephone = json.getString("telephone");
 		System.out.println("email：" + telephone);
-		if (RegexUtil.isNotNull(telephone)&&!RegexUtil.isTel(telephone))
+		if (RegexUtil.isNotNull(telephone) && !RegexUtil.isTel(telephone))
 			return false;
-		
+
 		Integer sex = json.getInteger("sex");
 		System.out.println("sex：" + sex);
 		if (sex == null)
@@ -221,28 +224,28 @@ public class JsonParamValidator {
 		if (sex != null && sex != 0 && sex != 1) {
 			return false;
 		}
-		
+
 		String company = json.getString("company");
 		System.out.println("company：" + company);
-		if (RegexUtil.isNotNull(company)&&!RegexUtil.stringCheck(company)) {
+		if (RegexUtil.isNotNull(company) && !RegexUtil.stringCheck(company)) {
 			return false;
 		}
 
 		String address = json.getString("address");
 		System.out.println("address：" + address);
-		if (RegexUtil.isNotNull(address)&&!RegexUtil.stringCheck(address)) {
+		if (RegexUtil.isNotNull(address) && !RegexUtil.stringCheck(address)) {
 			return false;
 		}
-		
+
 		String lv = json.getString("lv");
 		System.out.println("lv：" + lv);
-		if (RegexUtil.isNotNull(lv)&&!RegexUtil.isDigits(lv)) {
+		if (RegexUtil.isNotNull(lv) && !RegexUtil.isDigits(lv)) {
 			return false;
 		}
-		
+
 		String role_code = json.getString("role_code");
 		System.out.println("role_code：" + role_code);
-		if (RegexUtil.isNotNull(role_code)&&!isCode(role_code, MENU_CODE_MIN, MENU_CODE_MAX)) {
+		if (RegexUtil.isNotNull(role_code) && !isCode(role_code, MENU_CODE_MIN, MENU_CODE_MAX)) {
 			return false;
 		}
 
@@ -250,6 +253,75 @@ public class JsonParamValidator {
 		return true;
 	}
 
+	public static boolean queryUserVal(JSONObject json) {
+		String login_name = json.getString("login_name");
+		String id = json.getString("id");
+		System.out.println("login_name：" + login_name);
+		if (login_name == null && id == null) {
+			return false;
+		}
+
+		if (login_name != null) {
+			if (!ParamValidator.isStrLength(login_name, LOGIN_NAME_MIN, LOGIN_NAME_MAX))
+				return false;
+			if (RegexUtil.isLoginName(login_name))
+				return false;
+		}
+
+		System.out.println("id：" + id);
+		if (!isCode(id, USER_ID_MIN, USER_ID_MAX)) {
+			return false;
+		}
+
+		System.out.println("验证通过");
+		return true;
+	}
+
+	public static boolean queryUserByRoleVal(JSONObject json) {
+		Integer type = json.getInteger("type");
+		System.out.println("type：" + type);
+		if (type == null)
+			return false;
+
+		if (type != null && type != 0 && type != 1) {
+			return false;
+		}
+
+		if (type == 1) {
+			String search = json.getString("search");
+			System.out.println("search：" + search);
+			if (!isMenuName(search)) {
+				return false;
+			}
+		}
+
+		System.out.println("验证通过");
+		return true;
+	}
+
+	
+	public static boolean dataPermiVal(JSONObject json) {
+//		String name = json.getString("name");
+//		System.out.println("name：" + name);
+//		if (!isMenuName(name)) {
+//			return false;
+//		}
+//
+//		String code = json.getString("code");
+//		System.out.println("code：" + code);
+//		if (!isCode(code, MENU_CODE_MIN, MENU_CODE_MAX)) {
+//			return false;
+//		}
+//
+//		String remark = json.getString("remark");
+//		System.out.println("remark：" + remark);
+//		if (RegexUtil.isNotNull(remark) && !ParamValidator.isStrLength(remark, 0, ROLE_REMARKS_MAX)) {
+//			return false;
+//		}
+
+		System.out.println("验证通过");
+		return true;
+	}
 	/**
 	 * 菜单名是否合法
 	 */

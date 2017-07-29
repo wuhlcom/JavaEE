@@ -73,7 +73,6 @@ public class RoleServiceImpl implements RoleService {
 		}
 	}
 		
-
 	@Override
 	public List<Role> queryRole(JSONObject obj) {
 		Integer type = obj.getInteger("type");

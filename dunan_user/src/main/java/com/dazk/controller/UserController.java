@@ -125,45 +125,59 @@ public class UserController {
 
 	@RequestMapping(value = "/queryUser", method = RequestMethod.POST, produces = PubFunction.DATA_CODE)
 	public Object queryUser(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
-		return requestBody;
-		// try {
-		// // 权限验证
-		// String token = request.getParameter("token");
-		// // 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
-		// JSONObject resultObj = new JSONObject();
-		// JSONObject parameter = JSON.parseObject(requestBody);
-		//
-		// if (!JsonParamValidator.userQueryVal(parameter)) {
-		// // 非法数据，返回错误码
-		// return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(),
-		// ResultStatusCode.PARAME_ERR.getErrmsg());
-		// }
-		//
-		// // 数据查询，成功后返回.
-		// List<User> result = userService.queryUser(parameter);
-		// for (int i = 0; i < result.size(); i++) {
-		// result.get(i).setIsdel(null);
-		// result.get(i).setCreated_at(null);
-		// result.get(i).setListRows(null);
-		// result.get(i).setPage(null);
-		// }
-		// int totalRows = userService.queryUserCount(parameter);
-		// resultObj.put("errcode", ErrCode.success);
-		// resultObj.put("totalRows", totalRows);
-		// resultObj.put("result", result);
-		// return resultObj.toJSONString();
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(),
-		// "查询菜单时出现异常");
-		// }
+		try {
+			// 权限验证
+			String token = request.getParameter("token");
+			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续	
+			JSONObject parameter = JSON.parseObject(requestBody);
+
+			if (!JsonParamValidator.queryUserVal(parameter)) {
+				// 非法数据，返回错误码
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+			}
+
+			// 数据查询，成功后返回.
+			List<User> result = (List<User>) userService.queryUser(parameter);		
+			for (int i = 0; i < result.size(); i++) {
+				result.get(i).setIsdel(null);
+				result.get(i).setCreated_at(null);
+				result.get(i).setListRows(null);
+				result.get(i).setPage(null);
+			}
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "查询用户时出现异常");
+		}
 	}
 
 	@RequestMapping(value = "/queryUserByRole", method = RequestMethod.POST, produces = PubFunction.DATA_CODE)
 	public Object queryUserByRole(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody String requestBody) {
 		System.out.println(requestBody);
-		JSONObject parameter = JSON.parseObject(requestBody);
-		return userService.queryUserByRole(parameter);
+		// JSONObject parameter = JSON.parseObject(requestBody);
+		// return userService.queryUserByRole(parameter);
+		try {
+			// 权限验证
+			String token = request.getParameter("token");
+			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
+			Object resultObj = null;
+			JSONObject parameter = JSON.parseObject(requestBody);
+
+			if (!JsonParamValidator.queryUserByRoleVal(parameter)) {
+				// 非法数据，返回错误码
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+			}
+
+			// 数据查询，成功后返回.
+			resultObj = userService.queryUserByRole(parameter);
+			if (resultObj == null) {
+				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), ResultStatusCode.NODATA_ERR.getErrmsg());
+			}
+			return resultObj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "查询角色下用户时出现异常");
+		}
 	}
 }

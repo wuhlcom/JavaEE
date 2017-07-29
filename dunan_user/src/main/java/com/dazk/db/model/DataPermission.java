@@ -4,7 +4,7 @@
 */
 package com.dazk.db.model;
 
-public class DataPermission {
+public class DataPermission extends BaseEntity{
 	// `id` int(11) NOT NULL AUTO_INCREMENT,
 	private Long id;
 

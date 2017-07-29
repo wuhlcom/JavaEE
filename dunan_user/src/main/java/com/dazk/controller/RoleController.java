@@ -146,7 +146,6 @@ public class RoleController {
 				// 非法数据，返回错误码
 				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
 			}
-
 		
 			// 数据查询，成功后返回.
 			List<Role> result = roleService.queryRole(parameter);

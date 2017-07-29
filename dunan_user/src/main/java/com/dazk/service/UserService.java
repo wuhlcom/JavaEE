@@ -14,7 +14,7 @@ public interface UserService {
 
 	public int delUser(JSONObject obj);
 
-	public List<User> queryUser(JSONObject obj);
+	public Object queryUser(JSONObject obj);
 
 	public int updateUser(JSONObject obj);
 	

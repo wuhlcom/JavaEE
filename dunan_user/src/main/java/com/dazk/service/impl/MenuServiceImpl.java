@@ -55,7 +55,7 @@ public class MenuServiceImpl implements MenuService {
 		record.setIsdel(1);
 
 		int exist = menuMapper.selectCount(record);
-		if (exist == 1) {
+		if (exist != 0) {
 			return 1;
 		}
 		try {

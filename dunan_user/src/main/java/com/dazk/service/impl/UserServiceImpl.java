@@ -35,7 +35,6 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public int addUser(JSONObject obj) {
-		System.out.println("1-----------addUser-----");
 		User record = new User();
 		// 用户名已存在则不添加
 		record.setLogin_name(obj.getString("login_name"));
@@ -45,7 +44,6 @@ public class UserServiceImpl implements UserService {
 		if (exist > 0) {
 			return -1;
 		}
-		System.out.println("2-----------addUser-----");
 
 		// 邮箱已存在则不添加
 		User record1 = new User();
@@ -57,7 +55,6 @@ public class UserServiceImpl implements UserService {
 			return -1;
 		}
 
-		System.out.println("3-----------addUser-----");
 		// 电话号码已存在则不添加
 		User record2 = new User();
 		record2.setTelephone(obj.getString("telephone"));
@@ -68,7 +65,6 @@ public class UserServiceImpl implements UserService {
 			return -1;
 		}
 
-		System.out.println("4-----------addUser-----");
 		record = JSON.parseObject(obj.toJSONString(), User.class);
 		record.setCreated_at(System.currentTimeMillis() / 1000);
 
@@ -91,20 +87,37 @@ public class UserServiceImpl implements UserService {
 	public int delUser(JSONObject obj) {
 		User record = new User();
 		String login_name = obj.getString("login_name");
-		record.setName(login_name);
-		record.setIsdel(1);
+		Long id = obj.getLong("id");
 
-		int exist = userMapper.selectCount(record);
-		if (exist == 1) {
+		int exist = 0;
+		if (login_name != null) {
+			record.setLogin_name(login_name);
+			record.setIsdel(1);
+			exist = userMapper.selectCount(record);
+		} else if (id != null) {
+			record.setId(id);
+			record.setIsdel(1);
+			exist = userMapper.selectCount(record);
+		}
+
+		if (exist != 0) {
 			return 1;
 		}
+
+		// 创建example
+		Example example = new Example(User.class);
+		// 创建查询条件
+		Example.Criteria recordCriteria = example.createCriteria();
+		// 设置查询条件 多个andEqualTo串联表示 and条件查询
+
 		try {
-			// 创建example
-			Example example = new Example(User.class);
-			// 创建查询条件
-			Example.Criteria criteria = example.createCriteria();
-			// 设置查询条件 多个andEqualTo串联表示 and条件查询
-			criteria.andEqualTo("login_name", login_name).andEqualTo("isdel", 0);
+			if (login_name != null) {
+				recordCriteria.andEqualTo("login_name", login_name).andEqualTo("isdel", 0);
+				example.and(recordCriteria);
+			} else if (id != null) {
+				recordCriteria.andEqualTo("id", id).andEqualTo("isdel", 0);
+				example.and(recordCriteria);
+			}
 			return userMapper.updateByExampleSelective(record, example);
 		} catch (Exception e) {
 			return -1;
@@ -114,28 +127,26 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<User> queryUser(JSONObject obj) {
 		User record = new User();
-
 		String login_name = obj.getString("login_name");
-		record.setLogin_name(login_name);
-		record.setIsdel(0);
-		int exist = userMapper.selectCount(record);
-		if (exist == 0) {
-			return new ArrayList<User>();
-		}
-
-		if (exist > 1) {
-			ArrayList<User> list = new ArrayList<User>();
-			list.add(new User());
-			list.add(new User());
-			return list;
-		}
-
+		Long id = obj.getLong("id");
 		Example example = new Example(User.class);
 		// 创建查询条件
 		Example.Criteria recordCriteria = example.createCriteria();
+		if (login_name != null) {
+			recordCriteria.andEqualTo("login_name", login_name).andEqualTo("isdel", 0);
+			example.and(recordCriteria);
+		} else if (id != null) {
+			recordCriteria.andEqualTo("id", id).andEqualTo("isdel", 0);
+			example.and(recordCriteria);
+		}
 
-		recordCriteria.andEqualTo("login_name", login_name).andEqualTo("isdel", 0);
-		example.and(recordCriteria);
+		if (record.getPage() != null && record.getListRows() != null) {
+			PageHelper.startPage(record.getPage(), record.getListRows());
+		} else if (record.getPage() == null && record.getListRows() != null) {
+			PageHelper.startPage(1, record.getListRows());
+		} else if (record.getListRows() == null) {
+			PageHelper.startPage(1, 0);
+		}
 		return userMapper.selectByExample(example);
 	}
 
@@ -144,57 +155,79 @@ public class UserServiceImpl implements UserService {
 		Integer type = obj.getInteger("type");
 		String search = obj.getString("search");
 
+		Example roleExample = new Example(Role.class);
+		Example userExample = new Example(User.class);
+		// 创建查询条件
+		Example.Criteria roleCriteria = roleExample.createCriteria();
+		Example.Criteria userCriteria = userExample.createCriteria();
+		List<Role> roles = null;
+		List<User> users = null;
 		if (type == 0) {
-			Example roleExample = new Example(Role.class);
-			Example userExample = new Example(User.class);
-			// 创建查询条件
-			Example.Criteria roleCriteria = roleExample.createCriteria();
-			Example.Criteria userCriteria = userExample.createCriteria();
-
 			roleCriteria.andEqualTo("isdel", 0).andEqualTo("disused", 0);
 			roleExample.and(roleCriteria);
 
 			userCriteria.andEqualTo("isdel", 0).andEqualTo("disused", 0);
 			userExample.and(userCriteria);
-			List<Role> roles = roleMapper.selectByExample(roleExample);
-			List<User> users = userMapper.selectByExample(userExample);
 
-			List<Object> list = new ArrayList<>();
-			String userName = new String();
-			Long userId = 0L;
-			String userLoginName = "";
-			String userRemark = "";
-			String roleCode = "";
-			String roleName = "";
-			for (Role role : roles) {
-				roleCode = role.getCode();
-				roleName = role.getName();
-				Map<String, Object> roleMap = new HashMap<>();
-				List<Object> userList = new ArrayList<>();
-				for (User user : users) {
-					Map<String, Object> userMap = new HashMap();
-					if (user.getRole_code() == roleCode) {
-						userName = user.getName();
-						userId = user.getId();
-						userLoginName = user.getLogin_name();
-						userRemark = user.getRemark();
-						userMap.put("id", userId);
-						userMap.put("name", userName);
-						userMap.put("login_name", userLoginName);
-						userMap.put("remark", userRemark);
-					}
-					if (!userMap.isEmpty()) {
-						userList.add(userMap);
-					}
+			roles = roleMapper.selectByExample(roleExample);
+			users = userMapper.selectByExample(userExample);
+		} else if (type == 1) {
+			roleCriteria.andLike("name", "%" + search + "%").andEqualTo("isdel", 0).andEqualTo("disused", 0);
+			roleExample.and(roleCriteria);
+
+			userCriteria.andEqualTo("isdel", 0).andEqualTo("disused", 0);
+			userExample.and(userCriteria);
+			roles = roleMapper.selectByExample(roleExample);
+			users = userMapper.selectByExample(userExample);
+		}
+		if (roles == null || users == null) {
+			return null;
+		}
+		return queryUserAllByRole(roles, users);
+	}
+
+	/**
+	 * 通过角色查询用户信息
+	 * 
+	 */
+	private Object queryUserAllByRole(List<Role> roles, List<User> users) {
+		List<Object> list = new ArrayList<>();
+		String userName = new String();
+		Long userId = 0L;
+		String userLoginName = "";
+		String userRemark = "";
+		String roleCode = "";
+		String roleName = "";
+		for (Role role : roles) {
+			roleCode = role.getCode();
+			roleName = role.getName();
+			Map<String, Object> roleMap = new HashMap<>();
+			List<Object> userList = new ArrayList<>();
+			for (User user : users) {
+				Map<String, Object> userMap = new HashMap<String, Object>();
+				if (user.getRole_code().equals(roleCode)) {
+					userName = user.getName();
+					userId = user.getId();
+					userLoginName = user.getLogin_name();
+					userRemark = user.getRemark();
+					userMap.put("id", userId);
+					userMap.put("name", userName);
+					userMap.put("login_name", userLoginName);
+					userMap.put("remark", userRemark);
 				}
-				if (!userList.isEmpty()) {
-					roleMap.put(roleName, userList);
-					list.add(roleMap);
+				if (!userMap.isEmpty()) {
+					userList.add(userMap);
 				}
 			}
-			return list;
+			if (!userList.isEmpty()) {
+				roleMap.put(roleName, userList);
+				list.add(roleMap);
+			}
 		}
-		return null;
+		if (list.isEmpty()) {
+			return null;
+		}
+		return list;
 	}
 
 	@Override
