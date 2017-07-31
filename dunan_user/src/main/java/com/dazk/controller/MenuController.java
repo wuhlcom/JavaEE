@@ -14,10 +14,12 @@ import com.dazk.common.ErrCode;
 import com.dazk.common.errcode.ResultErr;
 import com.dazk.common.errcode.ResultStatusCode;
 import com.dazk.common.util.ParamValidator;
-import com.dazk.common.util.PubFunction;
+import com.dazk.common.util.PubUtil;
 import com.dazk.db.model.Menu;
 import com.dazk.service.MenuService;
+import com.dazk.validator.FieldLimit;
 import com.dazk.validator.JsonParamValidator;
+import com.dazk.validator.MenuValidator;
 
 @RestController
 @RequestMapping("/menu")
@@ -25,7 +27,7 @@ public class MenuController {
 	@Resource
 	private MenuService menuService;
 
-	@RequestMapping(value = "/addMenu", method = RequestMethod.POST, produces = PubFunction.DATA_CODE)
+	@RequestMapping(value = "/addMenu", method = RequestMethod.POST, produces = PubUtil.DATA_CODE)
 	public Object addMenu(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
 		// 权限验证
 		String token = request.getParameter("token");
@@ -34,7 +36,7 @@ public class MenuController {
 			System.out.println("result=" + requestBody);
 			JSONObject parameter = JSON.parseObject(requestBody);
 			// 数据校验
-			if (!JsonParamValidator.menuVal(parameter)) {
+			if (!MenuValidator.menuVal(parameter)) {
 				// 非法数据，返回错误码
 				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
 			}
@@ -56,8 +58,35 @@ public class MenuController {
 		}
 		return new ResultErr(ResultStatusCode.UNKNOW_ERR.getCode(), ResultStatusCode.UNKNOW_ERR.getErrmsg());
 	}
+	
+	@RequestMapping(value = "/delMenu", method = RequestMethod.POST, produces = PubUtil.DATA_CODE)
+	public Object delMenu(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
+		try {
+			// 权限验证
+			String token = request.getParameter("token");
+			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
 
-	@RequestMapping(value = "/updateMenu", method = RequestMethod.POST, produces = PubFunction.DATA_CODE)
+			JSONObject parameter = JSON.parseObject(requestBody);
+			if (!MenuValidator.isMenuCode(parameter.getString("code"),FieldLimit.MENU_CODE_MIN,FieldLimit.MENU_CODE_MAX)) {
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "非法菜单编号");
+			}
+			// 数据入库，成功后返回.
+			int res = menuService.delMenu(parameter);
+			if (res >= 1) {
+				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
+			} else if (res == -1) {
+				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "删除时程序出错");
+			} else if (res == 0) {
+				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "删除数据不存在");
+			}
+			return new ResultErr(ResultStatusCode.UNKNOW_ERR.getCode(), ResultStatusCode.UNKNOW_ERR.getErrmsg());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), ResultStatusCode.ROUTINE_ERR.getErrmsg());
+		}
+	}
+
+	@RequestMapping(value = "/updateMenu", method = RequestMethod.POST, produces = PubUtil.DATA_CODE)
 	public Object updateMenu(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody String requestBody) {
 		try {
@@ -67,7 +96,7 @@ public class MenuController {
 		
 			JSONObject parameter = JSON.parseObject(requestBody);
 			// 数据校验
-			if (!JsonParamValidator.menuVal(parameter)) {
+			if (!MenuValidator.menuVal(parameter)) {
 				// 非法数据，返回错误码
 				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
 			}
@@ -87,35 +116,9 @@ public class MenuController {
 			return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), ResultStatusCode.ROUTINE_ERR.getErrmsg());
 		}
 	}
+	
 
-	@RequestMapping(value = "/delMenu", method = RequestMethod.POST, produces = PubFunction.DATA_CODE)
-	public Object delMenu(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
-		try {
-			// 权限验证
-			String token = request.getParameter("token");
-			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
-
-			JSONObject parameter = JSON.parseObject(requestBody);
-			if (!JsonParamValidator.isCode(parameter.getString("code"),JsonParamValidator.MENU_CODE_MIN,JsonParamValidator.MENU_CODE_MAX)) {
-				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "非法菜单编号");
-			}
-			// 数据入库，成功后返回.
-			int res = menuService.delMenu(parameter);
-			if (res >= 1) {
-				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
-			} else if (res == -1) {
-				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "删除时程序出错");
-			} else if (res == 0) {
-				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "删除数据不存在");
-			}
-			return new ResultErr(ResultStatusCode.UNKNOW_ERR.getCode(), ResultStatusCode.UNKNOW_ERR.getErrmsg());
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), ResultStatusCode.ROUTINE_ERR.getErrmsg());
-		}
-	}
-
-	@RequestMapping(value = "/queryMenu", method = RequestMethod.POST, produces = PubFunction.DATA_CODE)
+	@RequestMapping(value = "/queryMenu", method = RequestMethod.POST, produces = PubUtil.DATA_CODE)
 	public Object queryMenu(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody String requestBody) {
 		try {
@@ -125,7 +128,7 @@ public class MenuController {
 			JSONObject resultObj = new JSONObject();
 			JSONObject parameter = JSON.parseObject(requestBody);
 
-			if (!JsonParamValidator.menuQueryVal(parameter)) {
+			if (!MenuValidator.menuQueryVal(parameter)) {
 				// 非法数据，返回错误码
 				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
 			}

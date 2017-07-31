@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dazk.db.dao.DataPermissionMapper;
+import com.dazk.db.dao.UserMapper;
 import com.dazk.db.model.DataPermission;
+import com.dazk.db.model.User;
 import com.dazk.db.model.DataPermission;
 import com.dazk.service.DataPermissionService;
 import com.github.pagehelper.PageHelper;
@@ -25,17 +27,29 @@ public class DataPermissionServiceImpl implements DataPermissionService {
 	@Autowired
 	private DataPermissionMapper dataPermiMapper;
 
+	@Autowired
+	private UserMapper userMapper;
+
 	@Override
 	public int addDataPermi(JSONObject obj) {
-		DataPermission record = new DataPermission();
-		Long id = obj.getLong("id");
 		Long user_id = obj.getLong("user_id");
-		String company_code = obj.getString("company_code");
+		String codeValue = obj.getString("codeValue");
+		User user = new User();
+		user.setId(user_id);
+		int exist = userMapper.selectCount(user);
+		// 用户不存在则返回错误
+		if (exist == 0) {
+			return 0;
+		}
 
-		record.setId(id);
+		if (exist > 1) {
+			return -2;
+		}
+
+		DataPermission record = new DataPermission();
 		record.setUser_id(user_id);
-		record.setCompany_code(company_code);
-		int exist = dataPermiMapper.selectCount(record);
+		record.setCodeValue(codeValue);
+		exist = dataPermiMapper.selectCount(record);
 
 		if (exist > 0) {
 			return -1;
@@ -45,22 +59,25 @@ public class DataPermissionServiceImpl implements DataPermissionService {
 		return dataPermiMapper.insertSelective(record);
 	}
 
+	/**
+	 * type 0按id删除 type 1按user_id删除 type 2按id+user_id删除
+	 */
 	@Override
-	public int delDataPermi(JSONObject obj) {
+	public int delDataPermi(JSONObject obj) {		
 		DataPermission record = new DataPermission();
-		Long id = obj.getLong("id");
-		Long user_id = obj.getLong("user_id");
-		String company_code = obj.getString("company_code");
-		String hotstation_code = obj.getString("hotstation_code");
-		String community_code = obj.getString("community_code");
 
-		record.setId(id);
-		record.setUser_id(user_id);
-		record.setCompany_code(company_code);
+		Integer type = obj.getInteger("type");
+		Long id = obj.getLong("id");		
+		Long user_id = obj.getLong("user_id");	
+		if (type == 0) {
+			record.setId(id);
+		} else if (type == 1) {
+			record.setUser_id(user_id);
+		} 
 
 		int exist = dataPermiMapper.selectCount(record);
-		if (exist != 0) {
-			return 1;
+		if (exist == 0) {
+			return 0;
 		}
 
 		// 创建example
@@ -70,33 +87,61 @@ public class DataPermissionServiceImpl implements DataPermissionService {
 		// 设置查询条件 多个andEqualTo串联表示 and条件查询
 
 		try {
-			if (hotstation_code != null && community_code == null) {
-				criteria.andEqualTo("id", id).andEqualTo("company_code", company_code).andEqualTo("user_id", user_id)
-						.andEqualTo("hotstation_code", hotstation_code);
-			} else if (hotstation_code == null && community_code != null) {
-				criteria.andEqualTo("id", id).andEqualTo("company_code", company_code).andEqualTo("user_id", user_id)
-						.andEqualTo("community_code", community_code);
-			} else if (hotstation_code != null && community_code != null) {
-				criteria.andEqualTo("id", id).andEqualTo("company_code", company_code).andEqualTo("user_id", user_id)
-						.andEqualTo("community_code", community_code).andEqualTo("hotstation_code", hotstation_code);
-			} else {
-				criteria.andEqualTo("id", id).andEqualTo("company_code", company_code).andEqualTo("user_id", user_id);
-			}
+			if (type == 0) {
+				criteria.andEqualTo("id", id);
+			} else if (type == 1) {
+				criteria.andEqualTo("user_id", user_id);
+			} 		
+			System.out.println(example);
 			return dataPermiMapper.deleteByExample(example);
 		} catch (Exception e) {
 			return -1;
 		}
 	}
 
+	
+	@Override
+	public int updateDataPermi(JSONObject obj) {
+		DataPermission record = new DataPermission();
+		Long id = obj.getLong("id");
+		Long user_id = obj.getLong("user_id");		
+
+		record.setId(id);
+		record.setUser_id(user_id);
+		
+		int exist = dataPermiMapper.selectCount(record);
+		if (exist > 1) {
+			return -2;
+		}
+
+		if (exist == 0) {
+			return 0;
+		}
+
+		record = JSON.parseObject(obj.toJSONString(), DataPermission.class);
+		try {
+			// 创建example
+			Example example = new Example(DataPermission.class);
+			// 创建查询条件
+			Example.Criteria criteria = example.createCriteria();
+			// 设置查询条件 多个andEqualTo串联表示 and条件查询
+			criteria.andEqualTo("id", id).andEqualTo("user_id", user_id);
+			return dataPermiMapper.updateByExampleSelective(record, example);
+		} catch (Exception e) {
+			return -1;
+		}
+
+	}
+	
 	/**
-	 * type 0 所有，type 1 id, user_id, company_code
+	 * type 0 所有， type 1 user_id type 2 id+user_id
 	 */
 	@Override
 	public List<DataPermission> queryDataPermi(JSONObject obj) {
 		Integer type = obj.getInteger("type");
 		Long id = obj.getLong("id");
 		Long user_id = obj.getLong("user_id");
-		String company_code = obj.getString("company_code");
+
 
 		DataPermission record = new DataPermission();
 		record = JSON.parseObject(obj.toJSONString(), DataPermission.class);
@@ -115,7 +160,11 @@ public class DataPermissionServiceImpl implements DataPermissionService {
 		if (type == 0) {
 			return dataPermiMapper.selectAll();
 		} else if (type == 1) {
-			recordCriteria.andEqualTo("id", id).andEqualTo("user_id", user_id).andEqualTo("company_code", company_code);
+			recordCriteria.andEqualTo("user_id", user_id);
+			example.and(recordCriteria);
+			return dataPermiMapper.selectByExample(example);
+		} else if (type == 2) {
+			recordCriteria.andEqualTo("id", id).andEqualTo("user_id", user_id);
 			example.and(recordCriteria);
 			return dataPermiMapper.selectByExample(example);
 		} else {
@@ -125,58 +174,23 @@ public class DataPermissionServiceImpl implements DataPermissionService {
 	}
 
 	@Override
-	public int updateDataPermi(JSONObject obj) {
-		DataPermission record = new DataPermission();
-		Long id = obj.getLong("id");
-		Long user_id = obj.getLong("user_id");
-		String company_code = obj.getString("company_code");
-
-		record.setId(id);
-		record.setUser_id(user_id);
-		record.setCompany_code(company_code);
-
-		int exist = dataPermiMapper.selectCount(record);
-		if (exist > 1) {
-			return -2;
-		}
-
-		if (exist == 0) {
-			return 0;
-		}
-
-		record = JSON.parseObject(obj.toJSONString(), DataPermission.class);
-		try {
-			// 创建example
-			Example example = new Example(DataPermission.class);
-			// 创建查询条件
-			Example.Criteria criteria = example.createCriteria();
-			// 设置查询条件 多个andEqualTo串联表示 and条件查询
-			criteria.andEqualTo("id", id).andEqualTo("company_code", company_code).andEqualTo("user_id", user_id);
-			return dataPermiMapper.updateByExampleSelective(record, example);
-		} catch (Exception e) {
-			return -1;
-		}
-
-	}
-
-	@Override
 	public int queryDataPermiCount(JSONObject obj) {
-		Integer type = obj.getInteger("type");	
+		Integer type = obj.getInteger("type");
 		Long id = obj.getLong("id");
 		Long user_id = obj.getLong("user_id");
-		String company_code = obj.getString("company_code");
+	
 		DataPermission record = new DataPermission();
 		record = JSON.parseObject(obj.toJSONString(), DataPermission.class);
 		Example example = new Example(DataPermission.class);
 		// 设置查询条件 多个andEqualTo串联表示 and条件查询
 		Example.Criteria recordCriteria = example.createCriteria();
-		if (type == 0) {			
+		if (type == 0) {
 			example.and(recordCriteria);
 		} else if (type == 1) {
-			recordCriteria.andEqualTo("id", id).andEqualTo("company_code", company_code).andEqualTo("user_id", user_id);
-			example.and(recordCriteria);			
+			recordCriteria.andEqualTo("id", id).andEqualTo("user_id", user_id);
+			example.and(recordCriteria);
 		}
-		return dataPermiMapper.selectCountByExample(example);	
+		return dataPermiMapper.selectCountByExample(example);
 	}
 
 }

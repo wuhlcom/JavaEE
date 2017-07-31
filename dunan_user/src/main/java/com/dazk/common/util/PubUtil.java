@@ -8,7 +8,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.codec.binary.Base64;
 
-public class PubFunction {
+public class PubUtil {
 	public final static String DATA_CODE = "application/json;charset=UTF-8";
 
 	// 生成code

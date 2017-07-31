@@ -13,7 +13,7 @@ public class RolePermission extends BaseEntity {
 	// `reso_code` int(20) NOT NULL COMMENT '菜单ID',
 	private String reso_code;
 	// `disused` int(4) NOT NULL COMMENT '是否废弃',
-	private Integer disused;
+	private Integer disused=0;
 	// `role_code` int(20) NOT NULL,
 	private String role_code;
 

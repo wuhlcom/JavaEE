@@ -71,8 +71,8 @@ public class MenuServiceImpl implements MenuService {
 		}
 	}
 
-	@Override
-	public List<Menu> queryMenu(JSONObject obj) {
+
+	public List<Menu> queryMenuOld(JSONObject obj) {
 		Integer type = obj.getInteger("type");
 		String search = obj.getString("search");
 
@@ -97,6 +97,37 @@ public class MenuServiceImpl implements MenuService {
 
 		} else if (type == 1) {
 			recordCriteria.andEqualTo("code", search).andEqualTo("isdel", 0);
+			example.and(recordCriteria);
+		}
+		return menuMapper.selectByExample(example);
+	}
+	
+	@Override
+	public List<Menu> queryMenu(JSONObject obj) {
+		Integer type = obj.getInteger("type");
+		String search = obj.getString("search");
+
+		Menu record = new Menu();
+		record = JSON.parseObject(obj.toJSONString(), Menu.class);
+		
+		if (record.getPage() != null && record.getListRows() != null) {
+			PageHelper.startPage(record.getPage(), record.getListRows());
+		}else if(record.getPage() == null && record.getListRows() != null){
+			PageHelper.startPage(1, record.getListRows());
+		}else if (record.getListRows() == null){
+			PageHelper.startPage(1, 0);
+		}		
+
+		Example example = new Example(Menu.class);
+		// 创建查询条件
+		Example.Criteria recordCriteria = example.createCriteria();
+		if (type == 0) {
+			// 设置查询条件 多个andEqualTo串联表示 and条件查询
+			recordCriteria.andEqualTo("isdel", 0).andEqualTo("is_menu", 0);
+			example.and(recordCriteria);
+		} else if (type == 1) {
+			//查询子菜单
+			recordCriteria.andEqualTo("parent", search).andEqualTo("isdel", 0);
 			example.and(recordCriteria);
 		}
 		return menuMapper.selectByExample(example);

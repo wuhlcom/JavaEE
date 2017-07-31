@@ -4,21 +4,23 @@
 */
 package com.dazk.db.model;
 
-public class DataPermission extends BaseEntity{
+import javax.persistence.Column;
+
+public class DataPermission extends BaseEntity {
+
 	// `id` int(11) NOT NULL AUTO_INCREMENT,
 	private Long id;
-
 	// `user_id` int(11) NOT NULL COMMENT '账号ID',
 	private Long user_id;
-
-	// `company_code` varchar(32) NOT NULL COMMENT '热力公司code',
-	private String company_code;
-
-	// `hotstation_code` varchar(32) NOT NULL COMMENT '热站code',
-	private String hotstation_code;
-
-	// `community_code` varchar(32) NOT NULL COMMENT '小区code',
-	private String community_code;
+	// `code` varchar(32) NOT NULL COMMENT '公司编号,热站编号，小区编号',
+	@Column(name="codeValue")
+	private String codeValue;
+	// `dataType` tinyint(4) NOT NULL COMMENT '数据权限类型,1 增删改查 0：查询',
+	@Column(name="dataType")
+	private Integer dataType;
+	// `codeType` tinyint(4) NOT NULL COMMENT '1 公司编号 2 热站编号 3 小区编号',
+	@Column(name="codeType")
+	private Integer codeType;
 
 	public Long getId() {
 		return id;
@@ -36,28 +38,29 @@ public class DataPermission extends BaseEntity{
 		this.user_id = user_id;
 	}
 
-	public String getCompany_code() {
-		return company_code;
+
+	public String getCodeValue() {
+		return codeValue;
 	}
 
-	public void setCompany_code(String company_code) {
-		this.company_code = company_code;
+	public void setCodeValue(String codeValue) {
+		this.codeValue = codeValue;
 	}
 
-	public String getHotstation_code() {
-		return hotstation_code;
+	public Integer getDataType() {
+		return dataType;
 	}
 
-	public void setHotstation_code(String hotstation_code) {
-		this.hotstation_code = hotstation_code;
+	public void setDataType(Integer dataType) {
+		this.dataType = dataType;
 	}
 
-	public String getCommunity_code() {
-		return community_code;
+	public Integer getCodeType() {
+		return codeType;
 	}
 
-	public void setCommunity_code(String community_code) {
-		this.community_code = community_code;
+	public void setCodeType(Integer codeType) {
+		this.codeType = codeType;
 	}
 
 }

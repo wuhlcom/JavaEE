@@ -16,13 +16,15 @@ public class Menu extends BaseEntity {
 	// `id` int(11) NOT NULL AUTO_INCREMENT,
 	private Long id;
 	// `name` varchar(20) NOT NULL COMMENT '名称',
+	// parent
+	private String parent;
 	private String name;
 	// `code` varchar(20) NOT NULL COMMENT '编号',
 	private String code;
 	// `uri` varchar(45) NOT NULL COMMENT 'uri地址',
 	private String uri;
 	// `is_menu` tinyint(4) DEFAULT NULL,
-	private Integer is_menu;
+	private Integer is_menu=0;
 	// `lv` int(11) DEFAULT NULL,
 	private Long lv;
 	// `role_code` 20 DEFAULT NULL,
@@ -113,5 +115,15 @@ public class Menu extends BaseEntity {
 	public void setIsdel(Integer isdel) {
 		this.isdel = isdel;
 	}
+
+	public String getParent() {
+		return parent;
+	}
+
+	public void setParent(String parent) {
+		this.parent = parent;
+	}
+	
+	
 
 }

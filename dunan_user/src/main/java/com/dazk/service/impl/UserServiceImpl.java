@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.dazk.common.util.PubFunction;
+import com.dazk.common.util.PubUtil;
 import com.dazk.db.dao.RoleMapper;
 import com.dazk.db.dao.UserMapper;
 import com.dazk.db.model.Role;
@@ -180,6 +180,8 @@ public class UserServiceImpl implements UserService {
 			roles = roleMapper.selectByExample(roleExample);
 			users = userMapper.selectByExample(userExample);
 		}
+	
+
 		if (roles == null || users == null) {
 			return null;
 		}
@@ -204,8 +206,8 @@ public class UserServiceImpl implements UserService {
 			Map<String, Object> roleMap = new HashMap<>();
 			List<Object> userList = new ArrayList<>();
 			for (User user : users) {
-				Map<String, Object> userMap = new HashMap<String, Object>();
-				if (user.getRole_code().equals(roleCode)) {
+				Map<String, Object> userMap = new HashMap<String, Object>();				
+				if ((user.getRole_code()!=null)&&user.getRole_code().equals(roleCode)) {
 					userName = user.getName();
 					userId = user.getId();
 					userLoginName = user.getLogin_name();

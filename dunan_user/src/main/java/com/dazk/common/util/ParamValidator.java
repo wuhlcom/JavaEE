@@ -59,7 +59,22 @@ public class ParamValidator {
      * @return
      */
 	public static boolean isStrLength(String str,int minLen,int maxLen){
+		if (str==null) return false;
 		if(str.length() < minLen || str.length() > maxLen) return false;
 		return true;		
 	}
+	
+	/**
+	 * 菜单code,目前不清楚code格式，这里只约束code长度和限制为数字
+	 */
+	public static boolean isCode(String code, int min, int max) {
+		if (RegexUtil.isNull(code) || !ParamValidator.isStrLength(code, min, max)) {
+			return false;
+		}
+		if (!RegexUtil.isDigits(code)) {
+			return false;
+		}
+		return true;
+	}
+
 }
