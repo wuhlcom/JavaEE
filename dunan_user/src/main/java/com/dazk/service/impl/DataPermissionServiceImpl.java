@@ -60,7 +60,7 @@ public class DataPermissionServiceImpl implements DataPermissionService {
 	}
 
 	/**
-	 * type 0按id删除 type 1按user_id删除 type 2按id+user_id删除
+	 * type 0按id删除 type 1按user_id删除 type 按id+user_id删除
 	 */
 	@Override
 	public int delDataPermi(JSONObject obj) {		

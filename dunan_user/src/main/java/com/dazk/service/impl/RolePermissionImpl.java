@@ -35,7 +35,7 @@ public class RolePermissionImpl implements RolePermissionService {
 	private MenuMapper menuMapper;
 
 	@Override
-	public List<RolePermission> queryRolePermission(JSONObject obj) {
+	public List<RolePermission> queryRolePermi(JSONObject obj) {
 		String role_code = obj.getString("role_code");
 		RolePermission record = new RolePermission();
 		record = JSON.parseObject(obj.toJSONString(), RolePermission.class);

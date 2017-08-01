@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.dazk.common.ErrCode;
 import com.dazk.common.errcode.ResultErr;
 import com.dazk.common.errcode.ResultStatusCode;
 import com.dazk.common.util.PubUtil;
@@ -156,10 +155,7 @@ public class UserController {
 
 	@RequestMapping(value = "/queryUserByRole", method = RequestMethod.POST, produces = PubUtil.DATA_CODE)
 	public Object queryUserByRole(HttpServletRequest request, HttpServletResponse response,
-			@RequestBody String requestBody) {
-		System.out.println(requestBody);
-		// JSONObject parameter = JSON.parseObject(requestBody);
-		// return userService.queryUserByRole(parameter);
+			@RequestBody String requestBody) {	
 		try {
 			// 权限验证
 			String token = request.getParameter("token");

@@ -33,16 +33,17 @@ public class MenuServiceImpl implements MenuService {
 			return -1;
 		}
 
-		Menu record2 = new Menu();
-		record2.setCode(obj.getString("code"));
-		record2.setIsdel(0);
-		int exist2 = menuMapper.selectCount(record2);
-		if (exist2 > 0) {
-			return -1;
-		}
+//		Menu record2 = new Menu();
+//		record2.setId(obj.getLong("id"));
+//		record2.setIsdel(0);
+//		int exist2 = menuMapper.selectCount(record2);
+//		if (exist2 > 0) {
+//			return -1;
+//		}
 
 		record = JSON.parseObject(obj.toJSONString(), Menu.class);
 		record.setIs_menu(obj.getInteger("type"));
+		record.setParent_id(obj.getLong("parent"));
 		record.setCreated_at(System.currentTimeMillis() / 1000);
 		return menuMapper.insertSelective(record);
 	}

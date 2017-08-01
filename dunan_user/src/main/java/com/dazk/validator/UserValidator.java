@@ -120,6 +120,7 @@ public class UserValidator {
 		if (listRows != null && !RegexUtil.isDigits(listRows)) {
 			return false;
 		}
+		
 		System.out.println("验证通过");
 		return true;
 	}

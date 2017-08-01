@@ -9,9 +9,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.dazk.db.model.RolePermission;
 
 public interface RolePermissionService {
-	public List<RolePermission> queryRolePermission(JSONObject obj);
 	public int queryRolePermiCount(JSONObject obj) ;
 	public int updateRolePermi(JSONObject obj);
 	public int addRolePermi(JSONObject obj);
 	public int delRolePermi(JSONObject obj);
+	List<RolePermission> queryRolePermi(JSONObject obj);
 }

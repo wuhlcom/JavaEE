@@ -1,7 +1,7 @@
 /** 
 * @author :wuhongliang wuhongliang@zhilutec.com
 * @version :2017年7月31日 下午4:53:55 * 
-*/ 
+*/
 package com.dazk.validator;
 
 import com.alibaba.fastjson.JSONObject;
@@ -40,13 +40,14 @@ public class MenuValidator {
 
 		String uri = json.getString("uri");
 		System.out.println("uri：" + uri);
-		isUriParam(uri);
-
-		String code = json.getString("code");
-		System.out.println("code：" + code);
-		if (!isMenuCode(code, FieldLimit.MENU_CODE_MIN, FieldLimit.MENU_CODE_MAX)) {
+		if (!isUriParam(uri))
 			return false;
-		}
+
+//		String code = json.getString("code");
+//		System.out.println("code：" + code);
+//		if (!isMenuCode(code, FieldLimit.MENU_CODE_MIN, FieldLimit.MENU_CODE_MAX)) {
+//			return false;
+//		}
 
 		System.out.println("验证通过");
 		return true;
@@ -98,12 +99,13 @@ public class MenuValidator {
 		System.out.println("验证通过");
 		return true;
 	}
-	
+
 	/**
 	 * 菜单名是否合法
 	 */
 	public static boolean isMenuName(String name) {
-		if (RegexUtil.isNull(name) || !ParamValidator.isStrLength(name, FieldLimit.MENU_NAME_MIN, FieldLimit.MENU_NAME_MAX)) {
+		if (RegexUtil.isNull(name)
+				|| !ParamValidator.isStrLength(name, FieldLimit.MENU_NAME_MIN, FieldLimit.MENU_NAME_MAX)) {
 			return false;
 		}
 		if (!RegexUtil.stringCheck(name)) {
@@ -124,7 +126,6 @@ public class MenuValidator {
 			return false;
 		return true;
 	}
-	
 
 	/**
 	 * 菜单code,目前不清楚code格式，这里只约束code长度和限制为数字
@@ -138,6 +139,5 @@ public class MenuValidator {
 		}
 		return true;
 	}
-
 
 }

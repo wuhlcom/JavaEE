@@ -16,8 +16,6 @@ public class Menu extends BaseEntity {
 	// `id` int(11) NOT NULL AUTO_INCREMENT,
 	private Long id;
 	// `name` varchar(20) NOT NULL COMMENT '名称',
-	// parent
-	private String parent;
 	private String name;
 	// `code` varchar(20) NOT NULL COMMENT '编号',
 	private String code;
@@ -35,6 +33,11 @@ public class Menu extends BaseEntity {
 	private Long created_at;
 	// `isdel` tinyint(4) NOT NULL DEFAULT '0',
 	private Integer isdel;
+	
+	// parent	
+	private Long parent_id;
+	
+	private String front_router;
 
 	public Long getId() {
 		return id;
@@ -116,14 +119,22 @@ public class Menu extends BaseEntity {
 		this.isdel = isdel;
 	}
 
-	public String getParent() {
-		return parent;
+	public Long getParent_id() {
+		return parent_id;
 	}
 
-	public void setParent(String parent) {
-		this.parent = parent;
+	public void setParent_id(Long parent_id) {
+		this.parent_id = parent_id;
 	}
-	
+
+	public String getFront_router() {
+		return front_router;
+	}
+
+	public void setFront_router(String front_router) {
+		this.front_router = front_router;
+	}
+
 	
 
 }

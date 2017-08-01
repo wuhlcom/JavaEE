@@ -22,7 +22,7 @@ public class RoleValidator {
 
 		String code = json.getString("code");
 		System.out.println("code：" + code);
-		if (!isRoleCode(code, FieldLimit.ROLE_CODE_MIN, FieldLimit.ROLE_CODE_MIN)) {
+		if (!isRoleCode(code, FieldLimit.ROLE_CODE_MIN, FieldLimit.ROLE_CODE_MAX)) {
 			return false;
 		}
 

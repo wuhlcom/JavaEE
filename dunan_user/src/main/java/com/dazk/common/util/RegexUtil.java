@@ -10,8 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Java表单验证工具类
  *
- * @author jiqinlin
- *
  */
 @SuppressWarnings("unchecked")
 public class RegexUtil {

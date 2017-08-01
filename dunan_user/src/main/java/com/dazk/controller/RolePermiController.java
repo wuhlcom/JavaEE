@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.dazk.common.ErrCode;
 import com.dazk.common.errcode.ResultErr;
 import com.dazk.common.errcode.ResultStatusCode;
 import com.dazk.common.util.PubUtil;
@@ -145,7 +144,7 @@ public class RolePermiController {
 
 		
 			// 数据查询，成功后返回.
-			List<RolePermission> result = rolePermiService.queryRolePermission(parameter);
+			List<RolePermission> result = rolePermiService.queryRolePermi(parameter);
 			for (int i = 0; i < result.size(); i++) {
 				result.get(i).setDisused(null);
 				result.get(i).setRole_code(null);
@@ -154,7 +153,7 @@ public class RolePermiController {
 			}		
 
 			int totalRows = rolePermiService.queryRolePermiCount(parameter);
-			resultObj.put("errcode", ErrCode.success);
+			resultObj.put("errcode", ResultStatusCode.SUCCESS.getCode());
 			resultObj.put("totalRows", totalRows);
 			resultObj.put("result", result);
 			
