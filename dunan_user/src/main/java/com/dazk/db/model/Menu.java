@@ -25,8 +25,7 @@ public class Menu extends BaseEntity {
 	private Integer is_menu=0;
 	// `lv` int(11) DEFAULT NULL,
 	private Long lv;
-	// `role_code` 20 DEFAULT NULL,
-	private String role_code;
+	private Long role_id;
 	// `include_url` tinyint(4) DEFAULT NULL,
 	private Integer include_url;
 	// `created_at` bigint(20) NOT NULL,
@@ -87,12 +86,13 @@ public class Menu extends BaseEntity {
 		this.lv = lv;
 	}
 
-	public String getRole_code() {
-		return role_code;
+
+	public Long getRole_id() {
+		return role_id;
 	}
 
-	public void setRole_code(String role_code) {
-		this.role_code = role_code;
+	public void setRole_id(Long role_id) {
+		this.role_id = role_id;
 	}
 
 	public Integer getInclude_url() {

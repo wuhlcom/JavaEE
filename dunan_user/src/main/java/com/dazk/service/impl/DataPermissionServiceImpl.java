@@ -33,7 +33,7 @@ public class DataPermissionServiceImpl implements DataPermissionService {
 	@Override
 	public int addDataPermi(JSONObject obj) {
 		Long user_id = obj.getLong("user_id");
-		String codeValue = obj.getString("codeValue");
+		String code_value = obj.getString("code_value");
 		User user = new User();
 		user.setId(user_id);
 		int exist = userMapper.selectCount(user);
@@ -48,7 +48,7 @@ public class DataPermissionServiceImpl implements DataPermissionService {
 
 		DataPermission record = new DataPermission();
 		record.setUser_id(user_id);
-		record.setCodeValue(codeValue);
+		record.setCode_value(code_value);
 		exist = dataPermiMapper.selectCount(record);
 
 		if (exist > 0) {

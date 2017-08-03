@@ -13,10 +13,11 @@ public interface DataPermissionService {
 	public int addDataPermi(JSONObject json);
 
 	public int delDataPermi(JSONObject json);
+	public int updateDataPermi(JSONObject json);
+	
 
 	public List<DataPermission> queryDataPermi(JSONObject json);
 
-	public int updateDataPermi(JSONObject json);
 	
 	public int queryDataPermiCount(JSONObject obj);
 }

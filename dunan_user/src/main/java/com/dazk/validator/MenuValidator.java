@@ -28,7 +28,7 @@ public class MenuValidator {
 		if (type == null)
 			return false;
 
-		if (type != null && type != 0 && type != 1) {
+		if (type != null && type != 0 && type != 1 && type != 2) {
 			return false;
 		}
 
@@ -43,11 +43,12 @@ public class MenuValidator {
 		if (!isUriParam(uri))
 			return false;
 
-//		String code = json.getString("code");
-//		System.out.println("code：" + code);
-//		if (!isMenuCode(code, FieldLimit.MENU_CODE_MIN, FieldLimit.MENU_CODE_MAX)) {
-//			return false;
-//		}
+		// String code = json.getString("code");
+		// System.out.println("code：" + code);
+		// if (!isMenuCode(code, FieldLimit.MENU_CODE_MIN,
+		// FieldLimit.MENU_CODE_MAX)) {
+		// return false;
+		// }
 
 		System.out.println("验证通过");
 		return true;
@@ -61,24 +62,32 @@ public class MenuValidator {
 	 */
 	public static boolean menuQueryVal(JSONObject json) {
 		Integer type = json.getInteger("type");
+		String search = json.getString("search");
 		System.out.println("type：" + type);
 		if (type == null)
 			return false;
 
-		if (type != null && type != 0 && type != 1) {
+		if (type != null && type != 0 && type != 1 && type != 2 && type != 3) {
 			return false;
 		}
 
-		if (type == 1) {
-			String search = json.getString("search");
+		if (type == 2) {
+			System.out.println("search：" + search);
+			if (!isMenuName(search)) {
+				return false;
+			}
+		}
+
+		if (type == 3) {
 			System.out.println("search：" + search);
 			if (type != null && !RegexUtil.isDigits(search)) {
 				return false;
 			}
+		}
 
-			if (!isMenuCode(search, FieldLimit.MENU_CODE_MIN, FieldLimit.MENU_CODE_MAX)) {
-				return false;
-			}
+		Integer menuType = json.getInteger("menuType");
+		if (menuType != null && menuType != 0 && menuType != 1) {
+			return false;
 		}
 
 		String page = json.getString("page");
@@ -135,6 +144,16 @@ public class MenuValidator {
 			return false;
 		}
 		if (!RegexUtil.isDigits(code)) {
+			return false;
+		}
+		return true;
+	}
+	
+	public static boolean isMenuId(String id, int min, int max) {
+		if (RegexUtil.isNull(id) && !ParamValidator.isStrLength(id, min, max)) {
+			return false;
+		}
+		if (!RegexUtil.isDigits(id)) {
 			return false;
 		}
 		return true;

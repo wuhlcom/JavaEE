@@ -15,7 +15,7 @@ public class UserValidator {
 		if (login_name == null) {
 			return false;
 		}
-	
+
 		if (!isLogin_name(login_name))
 			return false;
 
@@ -35,16 +35,16 @@ public class UserValidator {
 		if (sex == null) {
 			return false;
 		}
-	
+
 		if (sex != null && sex != 0 && sex != 1)
-			return false;	
+			return false;
 
 		String name = json.getString("name");
 		System.out.println("name：" + name);
 		if (name == null) {
 			return false;
 		}
-		
+
 		if (name != null && !isUserName(name))
 			return false;
 
@@ -83,6 +83,14 @@ public class UserValidator {
 		if (position != null && !isLv(lv))
 			return false;
 
+		String role_id = json.getString("role_id");
+		System.out.println("role_id：" + role_id);
+		if (role_id != null) {
+			if (RolePermiValidator.isRoleId(role_id, FieldLimit.ROLE_ID_MIN, FieldLimit.ROLE_ID_MAX)) {
+				return false;
+			}
+		}
+
 		String remark = json.getString("remark");
 
 		System.out.println("验证通过");
@@ -105,7 +113,6 @@ public class UserValidator {
 			return false;
 		}
 
-
 		String page = json.getString("page");
 		System.out.println("page：" + page);
 		if (page != null && !RegexUtil.isDigits(page)) {
@@ -120,7 +127,7 @@ public class UserValidator {
 		if (listRows != null && !RegexUtil.isDigits(listRows)) {
 			return false;
 		}
-		
+
 		System.out.println("验证通过");
 		return true;
 	}

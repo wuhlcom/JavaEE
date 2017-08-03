@@ -6,12 +6,16 @@ package com.dazk.service;
 
 import java.util.List;
 import com.alibaba.fastjson.JSONObject;
+import com.dazk.db.model.Role;
 import com.dazk.db.model.RolePermission;
 
 public interface RolePermissionService {
-	public int queryRolePermiCount(JSONObject obj) ;
-	public int updateRolePermi(JSONObject obj);
+
 	public int addRolePermi(JSONObject obj);
 	public int delRolePermi(JSONObject obj);
+	public int updateRolePermi(JSONObject obj);	
 	List<RolePermission> queryRolePermi(JSONObject obj);
+	public int queryRolePermiCount(JSONObject obj) ;
+	List<RolePermission> queryRoleMenu(JSONObject obj);
+	int addRoleMenu(JSONObject obj);
 }

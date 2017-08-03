@@ -20,12 +20,6 @@ public class RoleValidator {
 			return false;
 		}
 
-		String code = json.getString("code");
-		System.out.println("code：" + code);
-		if (!isRoleCode(code, FieldLimit.ROLE_CODE_MIN, FieldLimit.ROLE_CODE_MAX)) {
-			return false;
-		}
-
 		String remark = json.getString("remark");
 		System.out.println("remark：" + remark);
 		if (RegexUtil.isNotNull(remark) && !ParamValidator.isStrLength(remark, 0, FieldLimit.ROLE_REMARKS_MAX)) {
@@ -84,7 +78,7 @@ public class RoleValidator {
 	}
 	
 	/**
-	 * 菜单名是否合法
+	 * 角色名是否合法
 	 */
 	public static boolean isRoleName(String name) {
 		if (RegexUtil.isNull(name) || !ParamValidator.isStrLength(name, FieldLimit.ROLE_NAME_MIN, FieldLimit.ROLE_NAME_MAX)) {
@@ -98,7 +92,7 @@ public class RoleValidator {
 	}
 	
 	/**
-	 * 菜单code,目前不清楚code格式，这里只约束code长度和限制为数字
+	 * 角色Code
 	 */
 	public static boolean isRoleCode(String code, int min, int max) {
 		if (RegexUtil.isNull(code) || !ParamValidator.isStrLength(code, min, max)) {

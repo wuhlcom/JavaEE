@@ -207,7 +207,7 @@ public class UserServiceImpl implements UserService {
 			List<Object> userList = new ArrayList<>();
 			for (User user : users) {
 				Map<String, Object> userMap = new HashMap<String, Object>();				
-				if ((user.getRole_code()!=null)&&user.getRole_code().equals(roleCode)) {
+				if ((user.getRole_id()!=null)&&user.getRole_id().equals(roleCode)) {
 					userName = user.getName();
 					userId = user.getId();
 					userLoginName = user.getLogin_name();

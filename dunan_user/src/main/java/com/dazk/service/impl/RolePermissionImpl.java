@@ -4,13 +4,19 @@
 */
 package com.dazk.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Resource;
+
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.dazk.db.dao.MenuMapper;
 import com.dazk.db.dao.RoleMapper;
 import com.dazk.db.dao.RolePermissionMapper;
@@ -18,6 +24,7 @@ import com.dazk.db.model.Menu;
 import com.dazk.db.model.Role;
 import com.dazk.db.model.RolePermission;
 import com.dazk.service.RolePermissionService;
+import com.dazk.service.RoleService;
 import com.github.pagehelper.PageHelper;
 
 import tk.mybatis.mapper.entity.Example;
@@ -34,57 +41,79 @@ public class RolePermissionImpl implements RolePermissionService {
 	@Autowired
 	private MenuMapper menuMapper;
 
+	@Resource
+	private RoleService roleService;
+
 	@Override
-	public List<RolePermission> queryRolePermi(JSONObject obj) {
-		String role_code = obj.getString("role_code");
+	public int addRolePermi(JSONObject obj) {
 		RolePermission record = new RolePermission();
-		record = JSON.parseObject(obj.toJSONString(), RolePermission.class);
-		if (record.getPage() != null && record.getListRows() != null) {
-			PageHelper.startPage(record.getPage(), record.getListRows());
-		} else if (record.getPage() == null && record.getListRows() != null) {
-			PageHelper.startPage(1, record.getListRows());
-		} else if (record.getListRows() == null) {
-			PageHelper.startPage(1, 0);
+		Long role_id = obj.getLong("role_id");
+
+		// 找不到角色就不添加
+		Role roleRecord = new Role();
+		roleRecord.setId(role_id);
+		roleRecord.setIsdel(0);
+		int exist1 = roleMapper.selectCount(roleRecord);
+		if (exist1 > 0) {
+			return -2;
 		}
 
-		Example example = new Example(RolePermission.class);
-		// 创建查询条件
-		Example.Criteria recordCriteria = example.createCriteria();
-		recordCriteria.andEqualTo("role_code", role_code).andEqualTo("disused", 0);
-		example.and(recordCriteria);
-		return rolePermiMapper.selectByExample(example);
+		// 找不到菜单不添加
+		Long reso_id = obj.getLong("reso_id");
+		Menu menuRecord = new Menu();
+		menuRecord.setId(reso_id);
+		menuRecord.setIsdel(0);
+		int exist2 = menuMapper.selectCount(menuRecord);
+		if (exist2 > 0) {
+			return -2;
+		}
+
+		record.setRole_id(role_id);
+		record.setReso_id(reso_id);
+		record.setDisused(0);
+		int exist = rolePermiMapper.selectCount(record);
+		if (exist > 0) {
+			return -1;
+		}
+
+		record = JSON.parseObject(obj.toJSONString(), RolePermission.class);
+		return rolePermiMapper.insertSelective(record);
 	}
 
 	@Override
-	public int queryRolePermiCount(JSONObject obj) {
-		String role_code = obj.getString("role_code");
+	public int delRolePermi(JSONObject obj) {
 		RolePermission record = new RolePermission();
-		record = JSON.parseObject(obj.toJSONString(), RolePermission.class);
-
-		if (record.getPage() != null && record.getListRows() != null) {
-			PageHelper.startPage(record.getPage(), record.getListRows());
-		} else if (record.getPage() == null && record.getListRows() != null) {
-			PageHelper.startPage(1, record.getListRows());
-		} else if (record.getListRows() == null) {
-			PageHelper.startPage(1, 0);
+		Long role_id = obj.getLong("role_id");
+		Long reso_id = obj.getLong("reso_id");
+		record.setRole_id(role_id);
+		record.setReso_id(reso_id);
+		record.setDisused(1);
+		int exist = rolePermiMapper.selectCount(record);
+		if (exist >= 1) {
+			return 1;
 		}
 
-		Example example = new Example(RolePermission.class);
-		// 设置查询条件 多个andEqualTo串联表示 and条件查询
-		Example.Criteria recordCriteria = example.createCriteria();
-		recordCriteria.andEqualTo("role_code", role_code).andEqualTo("disused", 0);
-		example.and(recordCriteria);
-		return rolePermiMapper.selectCountByExample(example);
+		try {
+			// 创建example
+			Example example = new Example(RolePermission.class);
+			// 创建查询条件
+			Example.Criteria criteria = example.createCriteria();
+			// 设置查询条件 多个andEqualTo串联表示 and条件查询
+			criteria.andEqualTo("role_id", role_id).andEqualTo("reso_id", reso_id).andEqualTo("disused", 0);
+			return rolePermiMapper.updateByExampleSelective(record, example);
+		} catch (Exception e) {
+			return -1;
+		}
 	}
 
 	@Override
 	public int updateRolePermi(JSONObject obj) {
 		RolePermission record = new RolePermission();
-		String role_code = obj.getString("role_code");
+		Long role_id = obj.getLong("role_id");
 
 		// 找不到角色
 		Role roleRecord = new Role();
-		roleRecord.setCode(role_code);
+		roleRecord.setId(role_id);
 		roleRecord.setIsdel(0);
 		int exist1 = roleMapper.selectCount(roleRecord);
 		if (exist1 > 1) {
@@ -96,10 +125,10 @@ public class RolePermissionImpl implements RolePermissionService {
 		}
 
 		// 找不到菜单
-		String reso_code = obj.getString("reso_code");
-		if (reso_code != null) {
+		Long reso_id = obj.getLong("reso_id");
+		if (reso_id != null) {
 			Menu menuRecord = new Menu();
-			menuRecord.setCode(reso_code);
+			menuRecord.setId(reso_id);
 			menuRecord.setIsdel(0);
 			int exist2 = menuMapper.selectCount(menuRecord);
 			if (exist2 > 1) {
@@ -111,7 +140,7 @@ public class RolePermissionImpl implements RolePermissionService {
 			}
 		}
 
-		record.setRole_code(role_code);
+		record.setRole_id(role_id);
 		record.setDisused(0);
 		int exist = rolePermiMapper.selectCount(record);
 		if (exist > 1) {
@@ -128,7 +157,7 @@ public class RolePermissionImpl implements RolePermissionService {
 			// 创建查询条件
 			Example.Criteria criteria = example.createCriteria();
 			// 设置查询条件 多个andEqualTo串联表示 and条件查询
-			criteria.andEqualTo("role_code", role_code).andEqualTo("disused", 0);
+			criteria.andEqualTo("role_id", role_id).andEqualTo("disused", 0);
 			return rolePermiMapper.updateByExampleSelective(record, example);
 		} catch (Exception e) {
 			return -1;
@@ -136,65 +165,214 @@ public class RolePermissionImpl implements RolePermissionService {
 	}
 
 	@Override
-	public int addRolePermi(JSONObject obj) {
+	public List<RolePermission> queryRolePermi(JSONObject obj) {
+		Integer type = obj.getInteger("type");
+		String search = obj.getString("search");
+
 		RolePermission record = new RolePermission();
-		String role_code = obj.getString("role_code");
-
-		// 找不到角色就不添加
-		Role roleRecord = new Role();
-		roleRecord.setCode(role_code);
-		roleRecord.setIsdel(0);
-		int exist1 = roleMapper.selectCount(roleRecord);
-		if (exist1 > 0) {
-			return -1;
-		}
-
-		// 找不到菜单不添加
-		String reso_code = obj.getString("reso_code");
-		Menu menuRecord = new Menu();
-		menuRecord.setCode(reso_code);
-		menuRecord.setIsdel(0);
-		int exist2 = menuMapper.selectCount(menuRecord);
-		if (exist2 > 0) {
-			return -1;
-		}
-
-		record.setRole_code(role_code);
-		record.setReso_code(reso_code);
-		record.setDisused(0);
-		int exist = rolePermiMapper.selectCount(record);
-		if (exist > 0) {
-			return -1;
-		}
-
 		record = JSON.parseObject(obj.toJSONString(), RolePermission.class);
-		return rolePermiMapper.insertSelective(record);
-	}
-
-	@Override
-	public int delRolePermi(JSONObject obj) {
-		RolePermission record = new RolePermission();
-		String role_code = obj.getString("role_code");
-		String reso_code = obj.getString("reso_code");
-		record.setRole_code(role_code);
-		record.setReso_code(reso_code);
-		record.setDisused(1);
-		int exist = rolePermiMapper.selectCount(record);
-		if (exist >= 1) {
-			return 1;
+		if (record.getPage() != null && record.getListRows() != null) {
+			PageHelper.startPage(record.getPage(), record.getListRows());
+		} else if (record.getPage() == null && record.getListRows() != null) {
+			PageHelper.startPage(1, record.getListRows());
+		} else if (record.getListRows() == null) {
+			PageHelper.startPage(1, 0);
 		}
 
-		try {
-			// 创建example
-			Example example = new Example(RolePermission.class);
-			// 创建查询条件
+		Example example = new Example(Role.class);
+		// 创建查询条件
+		Example.Criteria recordCriteria = example.createCriteria();
+		if (type == 0) {
+			// 设置查询条件 多个andEqualTo串联表示 and条件查询
+			recordCriteria.andEqualTo("isdel", 0);
+			example.and(recordCriteria);
+		} else if (type == 1) {
 			Example.Criteria criteria = example.createCriteria();
 			// 设置查询条件 多个andEqualTo串联表示 and条件查询
-			criteria.andEqualTo("role_code", role_code).andEqualTo("reso_code", reso_code).andEqualTo("disused", 0);
-			return rolePermiMapper.updateByExampleSelective(record, example);
-		} catch (Exception e) {
-			return -1;
+			recordCriteria.andEqualTo("role_id", search).andEqualTo("isdel", 0);
+			example.and(recordCriteria);
 		}
+		return rolePermiMapper.selectByExample(example);
+	}
+
+	@Override
+	public int queryRolePermiCount(JSONObject obj) {
+		String role_id = obj.getString("role_id");
+		RolePermission record = new RolePermission();
+		record = JSON.parseObject(obj.toJSONString(), RolePermission.class);
+
+		if (record.getPage() != null && record.getListRows() != null) {
+			PageHelper.startPage(record.getPage(), record.getListRows());
+		} else if (record.getPage() == null && record.getListRows() != null) {
+			PageHelper.startPage(1, record.getListRows());
+		} else if (record.getListRows() == null) {
+			PageHelper.startPage(1, 0);
+		}
+
+		Example example = new Example(RolePermission.class);
+		// 设置查询条件 多个andEqualTo串联表示 and条件查询
+		Example.Criteria recordCriteria = example.createCriteria();
+		recordCriteria.andEqualTo("role_id", role_id).andEqualTo("disused", 0);
+		example.and(recordCriteria);
+		return rolePermiMapper.selectCountByExample(example);
+	}
+
+	@Override
+	@Transactional()
+	public int addRoleMenu(JSONObject obj) {
+		String roleName = obj.getString("name");
+
+		int rs = roleService.addRole(obj);
+		if (rs == -2) {
+			return -2; // 角色添加失败
+		}
+		// 获取角id
+		Example example = new Example(Role.class);
+		// 创建查询条件
+		Example.Criteria roleCriteria = example.createCriteria();
+		// 设置查询条件 多个andEqualTo串联表示 and条件查询
+		roleCriteria.andEqualTo("name", roleName).andEqualTo("isdel", 0);
+		example.and(roleCriteria);
+		List<Role> role = roleMapper.selectByExample(example);
+
+		Long role_id = role.get(0).getId();
+		String menuIds = obj.getString("menus");
+
+		// 分割menu id成数组
+		String[] menuIdArray = menuIds.split(",");
+		Menu menuRecord = new Menu();
+		int rsInsert = 0;
+		for (String menuId : menuIdArray) {
+			Long meId = Long.valueOf(menuId);
+			menuRecord.setId(meId);
+			menuRecord.setIsdel(0);
+			int exist2 = menuMapper.selectCount(menuRecord);
+			if (exist2 == 0) {
+				// 找不到菜单id将会回滚角色的创建,使用异常来实现事务功能
+				throw new NullPointerException("菜单不存在为空");
+				// return -2; // 找不到菜单id不添加
+			}
+
+			RolePermission record = new RolePermission();
+			record.setRole_id(role_id);
+			record.setReso_id(meId);
+			record.setDisused(0);
+
+			int exist = rolePermiMapper.selectCount(record);
+			if (exist > 0) {
+				continue; // 角色菜单已添加
+			}
+			rsInsert = rolePermiMapper.insertSelective(record);
+			if (rsInsert == 0) {
+				throw new NullPointerException("插入菜单数据过程有错误");
+			}
+		}
+		return rsInsert;
+	}
+
+	@Override
+	public List queryRoleMenu(JSONObject obj) {
+		Long role_id = obj.getLong("role_id");
+		List parentLs = new ArrayList();
+		JSONObject parentJson = new JSONObject();
+		JSONObject subJson = new JSONObject();
+
+		// 找不到角色
+		Role roleRecord = new Role();
+		roleRecord.setId(role_id);
+		roleRecord.setIsdel(0);
+		int exist1 = roleMapper.selectCount(roleRecord);
+		if (exist1 > 1) {
+			return null;
+		}
+
+		if (exist1 == 0) {
+			return null;
+		}
+
+		// 查询角色菜单
+		Example recordExample = new Example(RolePermission.class);
+		// 创建查询条件
+		Example.Criteria recordCriteria = recordExample.createCriteria();
+		// 设置查询条件 多个andEqualTo串联表示 and条件查询
+		recordCriteria.andEqualTo("role_id", role_id).andEqualTo("disused", 0);
+		recordExample.and(recordCriteria);
+		List<RolePermission> roleMenus = rolePermiMapper.selectByExample(recordExample);
+
+		for (RolePermission roleMenu : roleMenus) {
+			Long menuId = roleMenu.getReso_id();
+
+			Menu menuRecord = new Menu();
+			menuRecord.setId(menuId);
+			menuRecord.setIsdel(0);
+			int exist = roleMapper.selectCount(roleRecord);
+
+			if (exist == 0) {
+				// 菜单不存在
+				continue;
+			} else {
+				// 菜单存在
+
+				Example menuExample = new Example(Menu.class);
+				Example.Criteria menuCriteria = menuExample.createCriteria();
+				menuCriteria.andEqualTo("id", menuId).andEqualTo("isdel", 0);
+				menuExample.and(menuCriteria);
+				List<Menu> menus = menuMapper.selectByExample(menuExample);
+
+				for (Menu menu : menus) {
+					// 重新初始化防止出$ref循环重复引用
+					parentJson = new JSONObject();
+					Long pid = menu.getParent_id();
+					// 父ID为0的为顶级菜单
+					if (pid == 0) {
+						parentJson.put("id", menu.getId());
+						parentJson.put("name", menu.getName());
+						parentJson.put("uri", menu.getUri());
+						if (menu.getFront_router() != null) {
+							parentJson.put("front_router", menu.getFront_router());
+						}
+						parentJson.put("parent_id", menu.getParent_id());
+						parentJson.put("is_menu", menu.getIs_menu());
+
+						menuExample.clear();
+
+						// 取出父id为0的菜单的子菜单
+						Example.Criteria menuCriteria2 = menuExample.createCriteria();
+						menuCriteria2.andEqualTo("parent_id", menu.getId()).andEqualTo("isdel", 0);
+						menuExample.and(menuCriteria2);
+						List<Menu> subMenus = menuMapper.selectByExample(menuExample);
+
+						// 解析子菜单
+						if (!subMenus.isEmpty()) {
+							List subLs = new ArrayList();
+							for (Menu subMenu : subMenus) {
+								subJson = new JSONObject();
+								subJson.put("id", subMenu.getId());
+								subJson.put("name", subMenu.getName());
+								System.out.println(subMenu.getName());
+								subJson.put("uri", subMenu.getUri());
+								if (menu.getFront_router() != null) {
+									subJson.put("front_router", subMenu.getFront_router());
+								}
+								subJson.put("parent_id", subMenu.getParent_id());
+								subJson.put("is_menu", subMenu.getIs_menu());
+								System.out.println(subJson);
+								subLs.add(subJson);
+								//
+							}
+							JSON.toJSONString(subLs, SerializerFeature.DisableCircularReferenceDetect);
+							// 插入子菜单信息
+							parentJson.put("children", subLs);
+
+						}
+						// 父菜单id为0的直接保存到list
+						parentLs.add(parentJson);
+						JSON.toJSONString(parentLs, SerializerFeature.DisableCircularReferenceDetect);
+					}
+				}
+			}
+		}
+		return parentLs;
 	}
 
 }

@@ -57,7 +57,7 @@ public class MenuController {
 		}
 		return new ResultErr(ResultStatusCode.UNKNOW_ERR.getCode(), ResultStatusCode.UNKNOW_ERR.getErrmsg());
 	}
-	
+
 	@RequestMapping(value = "/delMenu", method = RequestMethod.POST, produces = PubUtil.DATA_CODE)
 	public Object delMenu(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
 		try {
@@ -66,8 +66,9 @@ public class MenuController {
 			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
 
 			JSONObject parameter = JSON.parseObject(requestBody);
-			if (!MenuValidator.isMenuCode(parameter.getString("code"),FieldLimit.MENU_CODE_MIN,FieldLimit.MENU_CODE_MAX)) {
-				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "非法菜单编号");
+			if (!MenuValidator.isMenuId(parameter.getString("id"), FieldLimit.MENU_ID_MIN,
+					FieldLimit.MENU_ID_MAX)) {
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "非法菜单ID");
 			}
 			// 数据入库，成功后返回.
 			int res = menuService.delMenu(parameter);
@@ -92,7 +93,7 @@ public class MenuController {
 			// 权限验证
 			String token = request.getParameter("token");
 			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
-		
+
 			JSONObject parameter = JSON.parseObject(requestBody);
 			// 数据校验
 			if (!MenuValidator.menuVal(parameter)) {
@@ -115,11 +116,9 @@ public class MenuController {
 			return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), ResultStatusCode.ROUTINE_ERR.getErrmsg());
 		}
 	}
-	
 
 	@RequestMapping(value = "/queryMenu", method = RequestMethod.POST, produces = PubUtil.DATA_CODE)
-	public Object queryMenu(HttpServletRequest request, HttpServletResponse response,
-			@RequestBody String requestBody) {
+	public Object queryMenu(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
 		try {
 			// 权限验证
 			String token = request.getParameter("token");
@@ -131,19 +130,29 @@ public class MenuController {
 				// 非法数据，返回错误码
 				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
 			}
-			
-			// 数据查询，成功后返回.
-			List<Menu> result = menuService.queryMenu(parameter);
-			for (int i = 0; i < result.size(); i++) {
-				result.get(i).setIsdel(null);
-				result.get(i).setCreated_at(null);
-				result.get(i).setListRows(null);
-				result.get(i).setPage(null);
+
+			// 数据查询，成功后返回.			
+			Integer type = parameter.getInteger("type");
+			if (type == 0 || type == 1||type==2) {
+				List<Menu> result = menuService.queryMenu(parameter);
+				for (int i = 0; i < result.size(); i++) {
+					result.get(i).setIsdel(null);
+					result.get(i).setCode(null);
+					result.get(i).setRole_id(null);
+					result.get(i).setCreated_at(null);
+					result.get(i).setListRows(null);
+					result.get(i).setPage(null);
+				}
+
+				int totalRows = menuService.queryMenuCount(parameter);
+				resultObj.put("errcode", ResultStatusCode.SUCCESS.getCode());
+				resultObj.put("totalRows", totalRows);
+				resultObj.put("result", result);
+			} else {
+				List<?> result = menuService.queryMenu(parameter);	
+				resultObj.put("errcode", ResultStatusCode.SUCCESS.getCode());
+				resultObj.put("result", result);
 			}
-			int totalRows = menuService.queryMenuCount(parameter);
-			resultObj.put("errcode", ResultStatusCode.SUCCESS.getCode());
-			resultObj.put("totalRows", totalRows);
-			resultObj.put("result", result);
 			return resultObj.toJSONString();
 		} catch (Exception e) {
 			e.printStackTrace();

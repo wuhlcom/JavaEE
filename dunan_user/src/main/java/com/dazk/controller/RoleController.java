@@ -53,11 +53,10 @@ public class RoleController {
 			int res = roleService.addRole(parameter);
 			if (res == 1) {
 				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
-			} else if (res == -1) {
+			} else if (res == -1||res == -2) {
 				return new ResultErr(ResultStatusCode.REPETITION_ERR.getCode(),
 						ResultStatusCode.REPETITION_ERR.getErrmsg());
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), ResultStatusCode.ROUTINE_ERR.getErrmsg());

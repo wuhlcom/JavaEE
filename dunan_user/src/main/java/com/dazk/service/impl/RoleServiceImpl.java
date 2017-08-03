@@ -11,9 +11,11 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.dazk.common.util.PubUtil;
 import com.dazk.db.dao.RoleMapper;
 import com.dazk.db.dao.RolePermissionMapper;
 import com.dazk.db.dao.UserMapper;
+import com.dazk.db.model.Menu;
 import com.dazk.db.model.Role;
 import com.dazk.db.model.RolePermission;
 import com.dazk.db.model.User;
@@ -43,17 +45,27 @@ public class RoleServiceImpl implements RoleService {
 		if (exist > 0) {
 			return -1;
 		}
+		
+		String code = PubUtil.genCode(8);
 
 		Role record2 = new Role();
-		record2.setCode(obj.getString("code"));
-		record2.setIsdel(0);
-		int exist2 = roleMapper.selectCount(record2);
-		if (exist2 > 0) {
-			return -1;
+		record2.setCode(code);
+		exist = roleMapper.selectCount(record2);
+		int i = 0;
+		//反复生成code直到得到无重复的code
+		while (exist > 0) {
+			code = PubUtil.genCode(8);
+			record2.setCode(code);
+			exist = roleMapper.selectCount(record2);
+			if (i == 100) {
+				return -2;
+			}
+			i++;
 		}
-
+		
 		record = JSON.parseObject(obj.toJSONString(), Role.class);
 		record.setDisused(0);
+		record.setCode(code);
 		record.setCreated_at(System.currentTimeMillis() / 1000);
 		return roleMapper.insertSelective(record);
 	}
@@ -61,8 +73,8 @@ public class RoleServiceImpl implements RoleService {
 	@Override
 	public int delRole(JSONObject obj) {
 		Role record = new Role();
-		String code = obj.getString("code");
-		record.setCode(code);
+		Long role_id = obj.getLong("id");
+		record.setId(role_id);
 		record.setIsdel(1);
 
 		int exist = roleMapper.selectCount(record);
@@ -75,14 +87,14 @@ public class RoleServiceImpl implements RoleService {
 			// 删除角色菜单关系
 			try {
 				RolePermission permiRecord = new RolePermission();
-				permiRecord.setRole_code(code);
+				permiRecord.setRole_id(role_id);
 				permiRecord.setDisused(1);
 				
 				Example permiExample = new Example(RolePermission.class);
 				// 创建查询条件
 				Example.Criteria permiCriteria = permiExample.createCriteria();
 				// 设置查询条件 多个andEqualTo串联表示 and条件查询
-				permiCriteria.andEqualTo("role_code", code).andEqualTo("disused", 1);
+				permiCriteria.andEqualTo("role_id", role_id).andEqualTo("disused", 1);
 				return rolePermiMapper.updateByExampleSelective(permiRecord, permiExample);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -96,8 +108,9 @@ public class RoleServiceImpl implements RoleService {
 				Example.Criteria userCriteria = userExample.createCriteria();
 				// 设置查询条件 多个andEqualTo串联表示 and条件查询
 				User userRecord = new User();
-				userRecord.setRole_code(code);
-				userCriteria.andEqualTo("role_code", code).andEqualTo("isdel", 0);
+				userRecord.setRole_id(null);
+				
+				userCriteria.andEqualTo("role_id", role_id).andEqualTo("isdel", 0);
 				userExample.and(userCriteria);
 				return userMapper.updateByExampleSelective(userRecord, userExample);
 			} catch (Exception e) {
@@ -109,7 +122,7 @@ public class RoleServiceImpl implements RoleService {
 			// 创建查询条件
 			Example.Criteria criteria = example.createCriteria();
 			// 设置查询条件 多个andEqualTo串联表示 and条件查询
-			criteria.andEqualTo("code", code).andEqualTo("isdel", 0);
+			criteria.andEqualTo("id", role_id).andEqualTo("isdel", 0);
 			return roleMapper.updateByExampleSelective(record, example);
 
 		} catch (Exception e) {
@@ -117,6 +130,36 @@ public class RoleServiceImpl implements RoleService {
 		}
 	}
 
+	@Override
+	public int updateRole(JSONObject obj) {
+		Role record = new Role();
+		Long id = obj.getLong("id");
+		record.setId(id);
+		record.setIsdel(0);
+		int exist = roleMapper.selectCount(record);
+
+		if (exist > 1) {
+			return -2;
+		}
+
+		if (exist == 0) {
+			return 0;
+		}
+
+		record = JSON.parseObject(obj.toJSONString(), Role.class);
+		try {
+			// 创建example
+			Example example = new Example(Role.class);
+			// 创建查询条件
+			Example.Criteria criteria = example.createCriteria();
+			// 设置查询条件 多个andEqualTo串联表示 and条件查询
+			criteria.andEqualTo("id", id).andEqualTo("isdel", 0);
+			return roleMapper.updateByExampleSelective(record, example);
+		} catch (Exception e) {
+			return -1;
+		}
+	}
+	
 	@Override
 	public List<Role> queryRole(JSONObject obj) {
 		Integer type = obj.getInteger("type");
@@ -167,36 +210,6 @@ public class RoleServiceImpl implements RoleService {
 		}
 		return roleMapper.selectCountByExample(example);
 	}
-
-	@Override
-	public int updateRole(JSONObject obj) {
-		Role record = new Role();
-		String code = obj.getString("code");
-		record.setCode(code);
-		record.setIsdel(0);
-		int exist = roleMapper.selectCount(record);
-
-		if (exist > 1) {
-			return -2;
-		}
-
-		if (exist == 0) {
-			return 0;
-		}
-
-		record = JSON.parseObject(obj.toJSONString(), Role.class);
-		try {
-			// 创建example
-			Example example = new Example(Role.class);
-			// 创建查询条件
-			Example.Criteria criteria = example.createCriteria();
-			// 设置查询条件 多个andEqualTo串联表示 and条件查询
-			criteria.andEqualTo("code", code).andEqualTo("isdel", 0);
-			return roleMapper.updateByExampleSelective(record, example);
-		} catch (Exception e) {
-			return -1;
-		}
-
-	}
+	
 
 }

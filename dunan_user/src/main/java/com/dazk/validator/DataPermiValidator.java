@@ -21,34 +21,34 @@ public class DataPermiValidator {
 			return false;
 		}
 
-		String codeValue = json.getString("codeValue");
-		System.out.println("codeValue：" + codeValue);
-		if (codeValue == null) {
+		String code_value = json.getString("code_value");
+		System.out.println("code_value：" + code_value);
+		if (code_value == null) {
 			return false;
 		}
 
-		if (!ParamValidator.isCode(codeValue, FieldLimit.DATA_CODE_MIN, FieldLimit.DATA_CODE_MIN)) {
+		if (!ParamValidator.isCode(code_value, FieldLimit.DATA_CODE_MIN, FieldLimit.DATA_CODE_MIN)) {
 			return false;
 		}
 
-		Integer dataType = json.getInteger("dataType");
-		System.out.println("dataType：" + dataType);
-		if (dataType == null) {
+		Integer data_type = json.getInteger("data_type");
+		System.out.println("data_type：" + data_type);
+		if (data_type == null) {
 			return false;
 		}
 
-		Integer dataTypeInt = json.getInteger("dataType");
-		if (RegexUtil.isNotNull(dataType) && dataTypeInt != 0 && dataTypeInt != 1) {
+		Integer data_typeInt = json.getInteger("data_type");
+		if (RegexUtil.isNotNull(data_type) && data_typeInt != 0 && data_typeInt != 1) {
 			return false;
 		}
 
-		Integer codeType = json.getInteger("codeType");
-		System.out.println("codeType：" + codeType);
-		if (codeType == null) {
+		Integer code_type = json.getInteger("code_type");
+		System.out.println("code_type：" + code_type);
+		if (code_type == null) {
 			return false;
 		}
 
-		if (!FieldLimit.containCkList(FieldLimit.CODE_TYPE_ARR, codeType)) {
+		if (!FieldLimit.containCkList(FieldLimit.CODE_TYPE_ARR, code_type)) {
 			return false;
 		}
 
@@ -78,23 +78,23 @@ public class DataPermiValidator {
 			return false;
 		}
 
-		String codeValue = json.getString("codeValue");
-		System.out.println("codeValue：" + codeValue);		
-		if (RegexUtil.isNotNull(codeValue) && !ParamValidator.isCode(codeValue, FieldLimit.DATA_CODE_MIN, FieldLimit.DATA_CODE_MIN)) {
+		String code_value = json.getString("code_value");
+		System.out.println("code_value：" + code_value);		
+		if (RegexUtil.isNotNull(code_value) && !ParamValidator.isCode(code_value, FieldLimit.DATA_CODE_MIN, FieldLimit.DATA_CODE_MIN)) {
 			return false;
 		}
 
-		Integer dataType = json.getInteger("dataType");
-		System.out.println("dataType：" + dataType);	
+		Integer data_type = json.getInteger("data_type");
+		System.out.println("data_type：" + data_type);	
 
-		Integer dataTypeInt = json.getInteger("dataType");
-		if (RegexUtil.isNotNull(dataType) && dataTypeInt != 0 && dataTypeInt != 1) {
+		Integer data_typeInt = json.getInteger("data_type");
+		if (RegexUtil.isNotNull(data_type) && data_typeInt != 0 && data_typeInt != 1) {
 			return false;
 		}
 
-		Integer codeType = json.getInteger("codeType");
-		System.out.println("codeType：" + codeType);		
-		if (RegexUtil.isNotNull(codeType)&&!FieldLimit.containCkList(FieldLimit.CODE_TYPE_ARR, codeType)) {
+		Integer code_type = json.getInteger("code_type");
+		System.out.println("code_type：" + code_type);		
+		if (RegexUtil.isNotNull(code_type)&&!FieldLimit.containCkList(FieldLimit.CODE_TYPE_ARR, code_type)) {
 			return false;
 		}
 

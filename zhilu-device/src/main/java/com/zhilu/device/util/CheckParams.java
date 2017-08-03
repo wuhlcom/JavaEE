@@ -274,12 +274,11 @@ public class CheckParams {
 		return resultMsg;
 	}
 
-	public static boolean isNull(Object obj) {
-		boolean rs = false;
-		if (obj == null) {
-			rs = true;
+	public static boolean isNull(Object obj) {	
+		if (obj != null) {
+			return false;
 		}
-		return rs;
+		return true;
 	}
 
 	public static boolean isStrNull(String obj) {
@@ -380,12 +379,11 @@ public class CheckParams {
 	}
 
 	// pid是错误的返回true
-	public static boolean isProductIdErr(String productId) {
-		boolean rs = false;
-		if ((productId.length() != ID_LENGTH)) {
-			rs = true;
+	public static boolean isProductIdErr(String productId) {	
+		if ((productId.length() > ID_LENGTH)) {
+			return false;
 		}
-		return rs;
+		return true;
 	}
 
 	// pid已经添加返回true
@@ -408,22 +406,20 @@ public class CheckParams {
 	}
 
 	// 判断Uid输入是否合法,合法返回true
-	public static boolean isUid(String userid) {
-		boolean rs = false;
-		if (userid.length() == 64) {
-			rs = true;
+	public static boolean isUid(String userid) {		
+		if (userid.length() > 64) {
+			return false;
 		}
-		return rs;
+		return true;
 	}
 
 	// 判断是否已经添加UID,存在返回true
-	private static boolean isUidAdd(String userid) {
-		boolean rs = false;
+	private static boolean isUidAdd(String userid) {		
 		List<TblIotUser> users = tblIotUsrSrv.findUserByUserid(userid);
-		if (!(users == null) && !users.isEmpty()) {
-			rs = true;
+		if (users == null || users.isEmpty()) {
+			return false;
 		}
-		return rs;
+		return true;
 	}
 
 	// 从用户请求中解析出一组设备ID或mac或其它唯一标识,
@@ -455,7 +451,7 @@ public class CheckParams {
 			flag = null;
 		}
 		String url = TOKEN_URL + "/check_token?token=" + token;
-		RestTemplate restTemplate = new RestTemplate();
+		RestTemplate restTemplate = new RestTemplate();		
 
 		Object result = restTemplate.getForObject(url, String.class);
 		JSONObject jsonObj = JSON.parseObject((String) result);

@@ -14,6 +14,8 @@ public class FieldLimit {
 	public static final int URI_LEN_MAX = 45;
 	public static final int MENU_CODE_MIN = 1;
 	public static final int MENU_CODE_MAX = 20;
+	public static final int MENU_ID_MIN = 1;
+	public static final int MENU_ID_MAX = 11;
 
 	//role
 	public static final int ROLE_NAME_MIN = 1;

@@ -10,12 +10,9 @@ import javax.persistence.Table;
 public class RolePermission extends BaseEntity {
 	// id` int(11) NOT NULL AUTO_INCREMENT,
 	private Long id;
-	// `reso_code` int(20) NOT NULL COMMENT '菜单ID',
-	private String reso_code;
-	// `disused` int(4) NOT NULL COMMENT '是否废弃',
+	private Long reso_id;
 	private Integer disused=0;
-	// `role_code` int(20) NOT NULL,
-	private String role_code;
+	private Long role_id;
 
 	public Long getId() {
 		return id;
@@ -33,20 +30,22 @@ public class RolePermission extends BaseEntity {
 		this.disused = disused;
 	}
 
-	public String getReso_code() {
-		return reso_code;
+	public Long getReso_id() {
+		return reso_id;
 	}
 
-	public void setReso_code(String reso_code) {
-		this.reso_code = reso_code;
+	public void setReso_id(Long reso_id) {
+		this.reso_id = reso_id;
 	}
 
-	public String getRole_code() {
-		return role_code;
+	public Long getRole_id() {
+		return role_id;
 	}
 
-	public void setRole_code(String role_code) {
-		this.role_code = role_code;
+	public void setRole_id(Long role_id) {
+		this.role_id = role_id;
 	}
+
+	
 
 }

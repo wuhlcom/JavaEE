@@ -19,4 +19,6 @@ public interface RoleService {
 	public int queryRoleCount(JSONObject obj);
 
 	public List<Role> queryRole(JSONObject obj);
+
+
 }

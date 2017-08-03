@@ -38,8 +38,8 @@ public class User extends BaseEntity {
 	private Integer disused = 0;
 	// `remark` varchar(255) NOT NULL DEFAULT '' COMMENT '说明',
 	private String remark;
-	// `role_code` 20 NOT NULL,
-	private String role_code;
+
+	private Long role_id;
 	
 	private String idcard;
 	private String position;
@@ -164,13 +164,14 @@ public class User extends BaseEntity {
 	public void setRemark(String remark) {
 		this.remark = remark;
 	}
+	
 
-	public String getRole_code() {
-		return role_code;
+	public Long getRole_id() {
+		return role_id;
 	}
 
-	public void setRole_code(String role_code) {
-		this.role_code = role_code;
+	public void setRole_id(Long role_id) {
+		this.role_id = role_id;
 	}
 
 	public String getIdcard() {
