@@ -75,10 +75,7 @@ public class RolePermiController {
 			String token = request.getParameter("token");
 			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
 
-			JSONObject parameter = JSON.parseObject(requestBody);
-			// if
-			// (!RoleValidator.isRoleCode(parameter.getString("code"),FieldLimit.ROLE_CODE_MIN,FieldLimit.ROLE_CODE_MAX))
-			// {
+			JSONObject parameter = JSON.parseObject(requestBody);		
 			if (!RolePermiValidator.rolePermiVal(parameter)) {
 				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "非法角色编号");
 			}
@@ -191,16 +188,70 @@ public class RolePermiController {
 			} else if (res == -2) {
 				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "角色添加失败");
 			}
-
-		} catch (
-
-		Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), ResultStatusCode.ROUTINE_ERR.getErrmsg());
 		} finally {
 
 		}
 		return new ResultErr(ResultStatusCode.UNKNOW_ERR.getCode(), ResultStatusCode.UNKNOW_ERR.getErrmsg());
+	}
+	
+	@RequestMapping(value = "/delRoleMenu", method = RequestMethod.POST, produces = PubUtil.DATA_CODE)
+	public Object delRoleMenu(HttpServletRequest request, HttpServletResponse response,
+			@RequestBody String requestBody) {
+		try {
+			// 权限验证
+			String token = request.getParameter("token");
+			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
+
+			JSONObject parameter = JSON.parseObject(requestBody);		
+			if (!RolePermiValidator.roleMenuDelVal(parameter)) {
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+			}
+			// 数据入库，成功后返回.
+			int res = rolePermiService.delRoleMenu(parameter);
+			if (res >= 1) {
+				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
+			} else if (res == -1) {
+				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "删除时程序出错");
+			} else if (res == 0) {
+				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "删除数据不存在");
+			}
+			return new ResultErr(ResultStatusCode.UNKNOW_ERR.getCode(), ResultStatusCode.UNKNOW_ERR.getErrmsg());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), ResultStatusCode.ROUTINE_ERR.getErrmsg());
+		}
+	}
+	
+	@RequestMapping(value = "/updateRoleMenu", method = RequestMethod.POST, produces = PubUtil.DATA_CODE)
+	public Object updateRoleMenu(HttpServletRequest request, HttpServletResponse response,
+			@RequestBody String requestBody) {
+		try {
+			// 权限验证
+			String token = request.getParameter("token");
+			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
+
+			JSONObject parameter = JSON.parseObject(requestBody);
+			// 数据校验
+			if (!RolePermiValidator.roleMenuUpdateVal(parameter)) {
+				// 非法数据，返回错误码
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+			}
+
+			// 数据入库，成功后返回.
+			int res = rolePermiService.updateRoleMenu(parameter);
+			if (res >= 1) {
+				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
+			} else if (res == 0) {
+				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "要更新的数据不存在");
+			}
+			return new ResultErr(ResultStatusCode.UNKNOW_ERR.getCode(), ResultStatusCode.UNKNOW_ERR.getErrmsg());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), ResultStatusCode.ROUTINE_ERR.getErrmsg());
+		}
 	}
 
 	@RequestMapping(value = "/queryRoleMenu", method = RequestMethod.POST, produces = PubUtil.DATA_CODE)

@@ -7,9 +7,16 @@ package com.dazk.validator;
 import com.alibaba.fastjson.JSONObject;
 import com.dazk.common.util.ParamValidator;
 import com.dazk.common.util.RegexUtil;
+import com.mysql.jdbc.Field;
 
 public class UserValidator {
 	public static boolean userVal(JSONObject json) {
+		String user_id = json.getString("user_id");
+		System.out.println("user_id：" + user_id);		
+		if (!isUserId(user_id,FieldLimit.USER_ID_MIN,FieldLimit.USER_ID_MAX)) {
+			return false;
+		}
+
 		String login_name = json.getString("login_name");
 		System.out.println("login_name：" + login_name);
 		if (login_name == null) {
@@ -256,13 +263,13 @@ public class UserValidator {
 	}
 
 	/**
-	 * user_id这里只约束code长度和限制为数字
+	 * user_id这里只约束id长度和限制为数字
 	 */
-	public static boolean isUserId(String code, int min, int max) {
-		if (RegexUtil.isNull(code) || !ParamValidator.isStrLength(code, min, max)) {
+	public static boolean isUserId(String id, int min, int max) {
+		if (RegexUtil.isNull(id) || !ParamValidator.isStrLength(id, min, max)) {
 			return false;
 		}
-		if (!RegexUtil.isDigits(code)) {
+		if (!RegexUtil.isDigits(id)) {
 			return false;
 		}
 		return true;

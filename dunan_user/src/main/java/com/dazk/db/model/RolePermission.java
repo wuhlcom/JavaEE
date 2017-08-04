@@ -46,6 +46,11 @@ public class RolePermission extends BaseEntity {
 		this.role_id = role_id;
 	}
 
-	
+
+	@Override
+	public String toString() {
+		return "RolePermission [id=" + id + ", reso_id=" + reso_id + ", disused=" + disused + ", role_id=" + role_id
+				+ "]";
+	}	
 
 }

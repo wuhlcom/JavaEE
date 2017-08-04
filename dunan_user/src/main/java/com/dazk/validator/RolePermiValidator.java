@@ -57,6 +57,39 @@ public class RolePermiValidator {
 		System.out.println("验证通过");
 		return true;
 	}
+	
+	public static boolean roleMenuUpdateVal(JSONObject json) {
+		String role_id = json.getString("role_id");
+		System.out.println("role_id：" + role_id);
+		if (!isRoleId(role_id,FieldLimit.ROLE_ID_MIN,FieldLimit.ROLE_ID_MAX)) {
+			return false;
+		}
+
+		String remark = json.getString("remark");
+		System.out.println("remark：" + remark);
+		if (RegexUtil.isNotNull(remark) && !ParamValidator.isStrLength(remark, 0, FieldLimit.ROLE_REMARKS_MAX)) {
+			return false;
+		}
+
+		String menus = json.getString("menus");
+		System.out.println("menus：" + menus);
+		if (RegexUtil.isNull(menus))
+			return false;
+
+		System.out.println("验证通过");
+		return true;
+	}
+	
+	public static boolean roleMenuDelVal(JSONObject json) {
+		String role_id = json.getString("role_id");
+		System.out.println("role_id：" + role_id);
+		if (!isRoleId(role_id,FieldLimit.ROLE_ID_MIN,FieldLimit.ROLE_ID_MAX)) {
+			return false;
+		}
+		
+		System.out.println("验证通过");
+		return true;
+	}
 
 	public static boolean rolePermiQueryVal(JSONObject json) {
 		String role_id = json.getString("role_id");

@@ -18,4 +18,6 @@ public interface RolePermissionService {
 	public int queryRolePermiCount(JSONObject obj) ;
 	List<RolePermission> queryRoleMenu(JSONObject obj);
 	int addRoleMenu(JSONObject obj);
+	int updateRoleMenu(JSONObject obj);
+	int delRoleMenu(JSONObject obj);
 }
