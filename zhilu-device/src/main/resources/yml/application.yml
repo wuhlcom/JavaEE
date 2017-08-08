@@ -1,0 +1,63 @@
+spring:
+  profiles:
+    active: dev
+  jackson:
+    serialization:
+      indent-output: true
+  jpa:
+    database: MYSQL
+#显示sql语句
+#    show-sql: true
+    hibernate:
+      ddl-auto: update
+      naming:
+        strategy: org.hibernate.cfg.ImprovedNamingStrategy               
+    properties:
+      hibernate:
+        dialet: org.hibernate.dialect.MySQL5Dialect
+#格式化sql console窗口语句
+#        format_sql: true
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: false
+#spring.mvc.throw-exception-if-no-handler-found=true
+#spring.resources.add-mappings=false   
+    
+server:
+  port: 8011
+  
+
+#security.ignored=true
+#security.basic.enabled=false
+security:
+  ignored: true
+  basic:
+    enabled: false
+
+#logging
+#logging.level.org.springframework.web=INFO
+#logging.llevel.org.hibernate=INFO
+#logging.level.org.hibernate.SQL=DEBUG
+#logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE
+#logging:
+#  level:
+#    org: 
+#     springframework:
+#        web: INFO
+#    hibernate:
+#        SQL: ERROR
+#        type:
+#           descriptor:
+#              sql:
+#                 BasicBinder: TRACE
+       
+#logging:
+#  config: classpath:logbackup.xml
+#  path: /java_code/javaee/zhilu-device/log
+
+
+
+    
+  
+  

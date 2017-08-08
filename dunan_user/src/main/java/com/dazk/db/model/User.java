@@ -21,7 +21,7 @@ public class User extends BaseEntity {
 	// `email` varchar(20) NOT NULL,
 	private String email;
 	// `company` varchar(20) NOT NULL COMMENT '公司',
-	private String Company;
+	private String company;
 	// `address` varchar(20) NOT NULL COMMENT '地址',
 	private String address;
 	// `telephone` varchar(20) NOT NULL COMMENT '电话',
@@ -92,13 +92,13 @@ public class User extends BaseEntity {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-
+	
 	public String getCompany() {
-		return Company;
+		return company;
 	}
 
 	public void setCompany(String company) {
-		Company = company;
+		this.company = company;
 	}
 
 	public String getAddress() {
@@ -195,9 +195,8 @@ public class User extends BaseEntity {
 	 */
 	@Override
 	public String toString() {
-		return "User [name=" + name + ", login_name=" + login_name + "]";
+		return "User [id=" + id + ", name=" + name + ", login_name=" + login_name + ", role_id=" + role_id + "]";
 	}
 
-	
 
 }

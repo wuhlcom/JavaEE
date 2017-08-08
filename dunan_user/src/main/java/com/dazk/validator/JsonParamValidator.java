@@ -6,5 +6,5 @@ import com.dazk.common.util.ParamValidator;
 import com.dazk.common.util.RegexUtil;
 
 public class JsonParamValidator {
-	
+
 }

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.dazk.common.util.PubUtil;
 import com.dazk.db.dao.RoleMapper;
 import com.dazk.db.dao.UserMapper;
 import com.dazk.db.model.Role;
@@ -180,7 +179,6 @@ public class UserServiceImpl implements UserService {
 			roles = roleMapper.selectByExample(roleExample);
 			users = userMapper.selectByExample(userExample);
 		}
-	
 
 		if (roles == null || users == null) {
 			return null;
@@ -206,8 +204,8 @@ public class UserServiceImpl implements UserService {
 			Map<String, Object> roleMap = new HashMap<>();
 			List<Object> userList = new ArrayList<>();
 			for (User user : users) {
-				Map<String, Object> userMap = new HashMap<String, Object>();				
-				if ((user.getRole_id()!=null)&&user.getRole_id().equals(roleCode)) {
+				Map<String, Object> userMap = new HashMap<String, Object>();
+				if ((user.getRole_id() != null) && user.getRole_id().equals(roleCode)) {
 					userName = user.getName();
 					userId = user.getId();
 					userLoginName = user.getLogin_name();
@@ -236,17 +234,29 @@ public class UserServiceImpl implements UserService {
 	public int updateUser(JSONObject obj) {
 		User record = new User();
 		String login_name = obj.getString("login_name");
-		record.setLogin_name(login_name);
-		record.setIsdel(0);
-		int exist = userMapper.selectCount(record);
-		if (exist > 1) {
-			return -2;
+		if (login_name != null) {
+			record.setLogin_name(login_name);
+			record.setIsdel(0);
+			int exist = userMapper.selectCount(record);
+			if (exist > 1) {
+				return -2;
+			}
+		}
+
+		Long id = obj.getLong("id");
+		if (id != null) {
+			record.setId(id);
+			record.setIsdel(0);
+			int exist = userMapper.selectCount(record);
+			if (exist > 1) {
+				return -2;
+			}
 		}
 
 		String email = obj.getString("email");
 		record.setEmail(email);
 		record.setIsdel(0);
-		exist = userMapper.selectCount(record);
+		int exist = userMapper.selectCount(record);
 		if (exist > 1) {
 			return -2;
 		}
@@ -270,7 +280,13 @@ public class UserServiceImpl implements UserService {
 			// 创建查询条件
 			Example.Criteria criteria = example.createCriteria();
 			// 设置查询条件 多个andEqualTo串联表示 and条件查询
-			criteria.andEqualTo("login_name", login_name).andEqualTo("isdel", 0);
+			if (id != null) {
+				criteria.andEqualTo("id", id).andEqualTo("isdel", 0);
+			} else if (login_name != null) {
+				criteria.andEqualTo("login_name", login_name).andEqualTo("isdel", 0);
+			}else{
+				return 0;
+			}
 			return userMapper.updateByExampleSelective(record, example);
 		} catch (Exception e) {
 			return -1;

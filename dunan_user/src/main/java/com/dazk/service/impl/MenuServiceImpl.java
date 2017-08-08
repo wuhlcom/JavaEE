@@ -241,5 +241,5 @@ public class MenuServiceImpl implements MenuService {
 		}
 		return menuMapper.selectCountByExample(example);
 	}
-
+	
 }

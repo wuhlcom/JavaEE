@@ -62,6 +62,14 @@ public class DataPermission extends BaseEntity {
 		this.user_id = user_id;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "DataPermission [id=" + id + ", user_id=" + user_id + ", code_value=" + code_value + ", data_type="
+				+ data_type + ", code_type=" + code_type + "]";
+	}
 
 
 }

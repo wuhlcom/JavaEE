@@ -21,9 +21,11 @@ import com.dazk.common.errcode.ResultErr;
 import com.dazk.common.errcode.ResultStatusCode;
 import com.dazk.common.util.PubUtil;
 import com.dazk.db.model.User;
+import com.dazk.service.RolePermissionService;
 import com.dazk.service.UserService;
 import com.dazk.validator.FieldLimit;
 import com.dazk.validator.JsonParamValidator;
+import com.dazk.validator.TokenValidator;
 import com.dazk.validator.UserValidator;
 
 @RestController
@@ -33,13 +35,32 @@ public class UserController {
 	@Resource
 	private UserService userService;
 
+	@Resource
+	private RolePermissionService rolePermiService;
+
 	@RequestMapping(value = "/addUser", method = RequestMethod.POST, produces = PubUtil.DATA_CODE)
 	public Object addUser(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
-		// 权限验证
-		String token = request.getParameter("token");
-		// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
+
 		try {
-			System.out.println("result=" + requestBody);
+			System.out.println("Request=" + requestBody);
+
+			// 权限验证
+			// String token = request.getParameter("token");
+			// post head token
+			String token = request.getHeader("token");
+			// String token = request.getParameter("token");
+			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
+			JSONObject rsToken = TokenValidator.getRsToken(token);
+			if (rsToken.getInteger("status") == 0) {
+				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
+			}
+
+			String uri = request.getRequestURI();
+			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
+			if (!rs) {
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+			}
+
 			JSONObject parameter = JSON.parseObject(requestBody);
 			// 数据校验
 			if (!UserValidator.userVal(parameter)) {
@@ -48,6 +69,7 @@ public class UserController {
 			}
 
 			// 数据入库，成功后返回.
+			parameter.put("user_id", rsToken.getString("userid"));	
 			int res = userService.addUser(parameter);
 			if (res == 1) {
 				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
@@ -68,9 +90,21 @@ public class UserController {
 	@RequestMapping(value = "/delUser", method = RequestMethod.POST, produces = PubUtil.DATA_CODE)
 	public Object delUser(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
 		try {
+			System.out.println("Request=" + requestBody);
+
 			// 权限验证
-			String token = request.getParameter("token");
-			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
+			// post head token
+			String token = request.getHeader("token");
+			JSONObject rsToken = TokenValidator.getRsToken(token);
+			if (rsToken.getInteger("status") == 0) {
+				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
+			}
+
+			String uri = request.getRequestURI();
+			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
+			if (!rs) {
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+			}
 
 			JSONObject parameter = JSON.parseObject(requestBody);
 			if (!UserValidator.isUserId(parameter.getString("id"), FieldLimit.MENU_CODE_MIN,
@@ -92,15 +126,28 @@ public class UserController {
 			return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), ResultStatusCode.ROUTINE_ERR.getErrmsg());
 		}
 	}
-	
+
 	@RequestMapping(value = "/updateUser", method = RequestMethod.POST, produces = PubUtil.DATA_CODE)
 	public Object updateUser(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody String requestBody) {
 		try {
-			// 权限验证
-			String token = request.getParameter("token");
-			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
+			System.out.println("Request=" + requestBody);
 
+			// 权限验证
+			// post head token
+			String token = request.getHeader("token");
+			JSONObject rsToken = TokenValidator.getRsToken(token);
+			if (rsToken.getInteger("status") == 0) {
+				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
+			}
+
+			String uri = request.getRequestURI();
+			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
+			if (!rs) {
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+			}
+
+			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
 			JSONObject parameter = JSON.parseObject(requestBody);
 			// 数据校验
 			if (!UserValidator.userVal(parameter)) {
@@ -123,14 +170,27 @@ public class UserController {
 			return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), ResultStatusCode.ROUTINE_ERR.getErrmsg());
 		}
 	}
-	
 
 	@RequestMapping(value = "/queryUser", method = RequestMethod.POST, produces = PubUtil.DATA_CODE)
 	public Object queryUser(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
 		try {
+			System.out.println("Request=" + requestBody);
+
 			// 权限验证
-			String token = request.getParameter("token");
-			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续	
+			// post head token
+			String token = request.getHeader("token");
+			JSONObject rsToken = TokenValidator.getRsToken(token);
+			if (rsToken.getInteger("status") == 0) {
+				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
+			}
+
+			String uri = request.getRequestURI();
+			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
+			if (!rs) {
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+			}
+
+			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
 			JSONObject parameter = JSON.parseObject(requestBody);
 
 			if (!UserValidator.queryUserVal(parameter)) {
@@ -139,7 +199,7 @@ public class UserController {
 			}
 
 			// 数据查询，成功后返回.
-			List<User> result = (List<User>) userService.queryUser(parameter);		
+			List<User> result = (List<User>) userService.queryUser(parameter);
 			for (int i = 0; i < result.size(); i++) {
 				result.get(i).setIsdel(null);
 				result.get(i).setCreated_at(null);
@@ -155,11 +215,24 @@ public class UserController {
 
 	@RequestMapping(value = "/queryUserByRole", method = RequestMethod.POST, produces = PubUtil.DATA_CODE)
 	public Object queryUserByRole(HttpServletRequest request, HttpServletResponse response,
-			@RequestBody String requestBody) {	
+			@RequestBody String requestBody) {
 		try {
+			System.out.println("Request=" + requestBody);
+
 			// 权限验证
-			String token = request.getParameter("token");
-			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
+			// post head token
+			String token = request.getHeader("token");
+			JSONObject rsToken = TokenValidator.getRsToken(token);
+			if (rsToken.getInteger("status") == 0) {
+				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
+			}
+
+			String uri = request.getRequestURI();
+			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
+			if (!rs) {
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+			}
+
 			Object resultObj = null;
 			JSONObject parameter = JSON.parseObject(requestBody);
 

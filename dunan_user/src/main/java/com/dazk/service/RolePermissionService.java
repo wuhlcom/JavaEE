@@ -20,4 +20,5 @@ public interface RolePermissionService {
 	int addRoleMenu(JSONObject obj);
 	int updateRoleMenu(JSONObject obj);
 	int delRoleMenu(JSONObject obj);
+	boolean menuAuth(String url, Long roleId);
 }

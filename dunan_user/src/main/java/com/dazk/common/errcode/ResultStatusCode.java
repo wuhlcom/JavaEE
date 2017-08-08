@@ -2,7 +2,7 @@ package com.dazk.common.errcode;
 
 public enum ResultStatusCode {
 
-	OK(0, "OK"), 
+	OK(0, "OK"),
 	// 成功
 	// public static final String success = "10001";
 	SUCCESS(10001, "成功"),
@@ -24,7 +24,8 @@ public enum ResultStatusCode {
 	PERMISSION_ERR(10006, "无权限"),
 	// 参数错误
 	// public static final String parameErr = "10007";
-	PARAME_ERR(10007, "参数错误");
+	PARAME_ERR(10007, "参数错误"),
+	TOKEN_ERR(10008,"Token错误");
 
 	private int code;
 	private String errmsg;

@@ -39,20 +39,21 @@ public class RoleServiceImpl implements RoleService {
 	@Override
 	public int addRole(JSONObject obj) {
 		Role record = new Role();
-		record.setName(obj.getString("name"));
+		String roleName = obj.getString("name");
+		record.setName(roleName);
 		record.setIsdel(0);
 		int exist = roleMapper.selectCount(record);
 		if (exist > 0) {
 			return -1;
 		}
-		
+
 		String code = PubUtil.genCode(8);
 
 		Role record2 = new Role();
 		record2.setCode(code);
 		exist = roleMapper.selectCount(record2);
 		int i = 0;
-		//反复生成code直到得到无重复的code
+		// 反复生成code直到得到无重复的code
 		while (exist > 0) {
 			code = PubUtil.genCode(8);
 			record2.setCode(code);
@@ -62,7 +63,7 @@ public class RoleServiceImpl implements RoleService {
 			}
 			i++;
 		}
-		
+
 		record = JSON.parseObject(obj.toJSONString(), Role.class);
 		record.setDisused(0);
 		record.setCode(code);
@@ -89,7 +90,7 @@ public class RoleServiceImpl implements RoleService {
 				RolePermission permiRecord = new RolePermission();
 				permiRecord.setRole_id(role_id);
 				permiRecord.setDisused(1);
-				
+
 				Example permiExample = new Example(RolePermission.class);
 				// 创建查询条件
 				Example.Criteria permiCriteria = permiExample.createCriteria();
@@ -109,14 +110,14 @@ public class RoleServiceImpl implements RoleService {
 				// 设置查询条件 多个andEqualTo串联表示 and条件查询
 				User userRecord = new User();
 				userRecord.setRole_id(null);
-				
+
 				userCriteria.andEqualTo("role_id", role_id).andEqualTo("isdel", 0);
 				userExample.and(userCriteria);
 				return userMapper.updateByExampleSelective(userRecord, userExample);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
+
 			// 创建example
 			Example example = new Example(Role.class);
 			// 创建查询条件
@@ -159,7 +160,7 @@ public class RoleServiceImpl implements RoleService {
 			return -1;
 		}
 	}
-	
+
 	@Override
 	public List<Role> queryRole(JSONObject obj) {
 		Integer type = obj.getInteger("type");
@@ -188,6 +189,11 @@ public class RoleServiceImpl implements RoleService {
 			// 设置查询条件 多个andEqualTo串联表示 and条件查询
 			recordCriteria.andLike("name", "%" + search + "%").andEqualTo("isdel", 0);
 			example.and(recordCriteria);
+		} else if (type == 2) {
+			Example.Criteria criteria = example.createCriteria();
+			// 设置查询条件 多个andEqualTo串联表示 and条件查询
+			recordCriteria.andEqualTo("user_id", search).andEqualTo("isdel", 0);
+			example.and(recordCriteria);
 		}
 		return roleMapper.selectByExample(example);
 	}
@@ -210,6 +216,5 @@ public class RoleServiceImpl implements RoleService {
 		}
 		return roleMapper.selectCountByExample(example);
 	}
-	
 
 }

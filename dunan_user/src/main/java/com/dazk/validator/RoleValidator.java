@@ -19,6 +19,17 @@ public class RoleValidator {
 		if (!isRoleName(name)) {
 			return false;
 		}
+		
+		String user_id = json.getString("user_id");
+		System.out.println("user_id：" + user_id);	
+		System.out.println("user_id：" + user_id);
+		if (user_id == null) {
+			return false;
+		}
+
+		if (RegexUtil.isNotNull(user_id) && !RegexUtil.isDigits(user_id)) {
+			return false;
+		}
 
 		String remark = json.getString("remark");
 		System.out.println("remark：" + remark);
@@ -36,7 +47,7 @@ public class RoleValidator {
 		if (type == null)
 			return false;
 
-		if (type != null && type != 0 && type != 1) {
+		if (type != null && type != 0 && type != 1 && type != 2) {
 			return false;
 		}
 

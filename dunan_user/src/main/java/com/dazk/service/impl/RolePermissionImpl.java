@@ -6,6 +6,8 @@ package com.dazk.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
@@ -234,7 +236,6 @@ public class RolePermissionImpl implements RolePermissionService {
 			recordCriteria.andEqualTo("isdel", 0);
 			example.and(recordCriteria);
 		} else if (type == 1) {
-			Example.Criteria criteria = example.createCriteria();
 			// 设置查询条件 多个andEqualTo串联表示 and条件查询
 			recordCriteria.andEqualTo("role_id", search).andEqualTo("isdel", 0);
 			example.and(recordCriteria);
@@ -320,24 +321,19 @@ public class RolePermissionImpl implements RolePermissionService {
 	@Override
 	@Transactional()
 	public int updateRoleMenu(JSONObject obj) {
-		System.out.println("1-------updateRoleMenu--------");
 		int rsInsert = 0;
 		Long roleId = obj.getLong("role_id");
 		Role roleRecord = new Role();
 		roleRecord.setId(roleId);
 		roleRecord.setIsdel(0);
 		int exist = roleMapper.selectCount(roleRecord);
-		System.out.println("2-------updateRoleMenu--------");
-		System.out.println(exist);
 		// 角色不存在
 		if (exist == 0) {
 			return 0;
 		}
-		System.out.println("3-------updateRoleMenu--------");
+
 		// 先将角色原有菜单权限删除再重新添加菜单权限
 		int del = this.delRolePermi(roleId);
-		System.out.println("4-------updateRoleMenu--------");
-		System.out.println(del);
 		String menuIds = obj.getString("menus");
 		// 分割menu id成数组
 		String[] menuIdArray = menuIds.split(",");
@@ -374,9 +370,6 @@ public class RolePermissionImpl implements RolePermissionService {
 
 	@Override
 	public List queryRoleMenu(JSONObject obj) {
-		System.out.println("--------------queryRoleMenu------------------------");
-		System.out.println(obj.toJSONString());
-
 		Long role_id = obj.getLong("role_id");
 		List parentLs = new ArrayList();
 		JSONObject parentJson = new JSONObject();
@@ -403,16 +396,8 @@ public class RolePermissionImpl implements RolePermissionService {
 		recordCriteria.andEqualTo("role_id", role_id).andEqualTo("disused", 0);
 		recordExample.and(recordCriteria);
 		List<RolePermission> roleMenus = rolePermiMapper.selectByExample(recordExample);
-		
-		System.out.println("0--------------queryRoleMenu---------roleMenu---------------");
-		System.out.println(roleMenus);
-		
-		if (!roleMenus.isEmpty())
-			roleMenus = rolePermiMapper.selectByExample(recordExample);
 
 		for (RolePermission roleMenu : roleMenus) {
-			System.out.println("0--------------queryRoleMenu---------roleMenu---------------");
-			System.out.println(roleMenu.getRole_id());
 
 			Long menuId = roleMenu.getReso_id();
 
@@ -420,8 +405,6 @@ public class RolePermissionImpl implements RolePermissionService {
 			menuRecord.setId(menuId);
 			menuRecord.setIsdel(0);
 			int exist = roleMapper.selectCount(roleRecord);
-			System.out.println("1--------------queryRoleMenu------menuId------------------");
-			System.out.println(menuId);
 			if (exist == 0) {
 				// 菜单不存在
 				continue;
@@ -457,8 +440,6 @@ public class RolePermissionImpl implements RolePermissionService {
 						menuExample.and(menuCriteria2);
 						List<Menu> subMenus = menuMapper.selectByExample(menuExample);
 
-						System.out.println("2--------------queryRoleMenu------subMenus.size()------------------");
-						System.out.println(subMenus.size());
 						// 解析子菜单
 						if (!subMenus.isEmpty()) {
 							List subLs = new ArrayList();
@@ -473,8 +454,6 @@ public class RolePermissionImpl implements RolePermissionService {
 								}
 								subJson.put("parent_id", subMenu.getParent_id());
 								subJson.put("is_menu", subMenu.getIs_menu());
-								System.out.println("3--------------queryRoleMenu-------------subJson-----------");
-								System.out.println(subJson);
 								subLs.add(subJson);
 							}
 							// JSON.toJSONString(subLs,
@@ -489,9 +468,56 @@ public class RolePermissionImpl implements RolePermissionService {
 				}
 			}
 		}
-		System.out.println("4--------------queryRoleMenu-------------parentLs-----------");
-		System.out.println(parentLs);
 		return parentLs;
+	}
+
+	/**
+	 * 如果请求的url不在角色菜单列表则返回false
+	 * 
+	 */
+	@Override
+	public boolean menuAuth(String uri, Long roleId) {
+		System.out.println("1-----------menuAuth-----------------");
+		System.out.println(uri);
+		Pattern pattern = Pattern.compile(".*(\\/.+)\\/.+");
+		// 通配符中也要加入转移字符 (.+?)代表要查找的内容
+		Matcher matcher = pattern.matcher(uri);
+		matcher.matches();
+		String controller = matcher.group(1);
+		System.out.println(controller);
+
+		Example menuExample = new Example(Menu.class);
+		Example.Criteria menuCriteria = menuExample.createCriteria();
+		menuCriteria.andEqualTo("uri", controller).andEqualTo("isdel", 0);
+		menuExample.and(menuCriteria);
+		List<Menu> menuLs = menuMapper.selectByExample(menuExample);
+		
+		System.out.println(menuLs);
+		if (menuLs.isEmpty()) {
+			return false;
+		}
+		
+		// 查询角色菜单
+		Example recordExample = new Example(RolePermission.class);
+		// 创建查询条件
+		Example.Criteria recordCriteria = recordExample.createCriteria();
+		// 设置查询条件 多个andEqualTo串联表示 and条件查询
+		recordCriteria.andEqualTo("role_id", roleId).andEqualTo("disused", 0);
+		recordExample.and(recordCriteria);
+		List<RolePermission> roleMenus = rolePermiMapper.selectByExample(recordExample);
+		
+		ArrayList<Long> reso_ids = new ArrayList<Long>();
+		for (RolePermission rolePermission : roleMenus) {
+			reso_ids.add(rolePermission.getReso_id());
+		}
+        //打印角色菜单
+		System.out.println(reso_ids);
+		if (reso_ids.isEmpty()) {
+			return false;
+		}
+	
+		Boolean rs = reso_ids.contains(menuLs.get(0).getId());	
+		return rs;
 	}
 
 }

@@ -24,6 +24,7 @@ import com.dazk.db.model.DataPermission;
 import com.dazk.service.DataPermissionService;
 import com.dazk.validator.DataPermiValidator;
 import com.dazk.validator.JsonParamValidator;
+import com.dazk.validator.TokenValidator;
 import com.dazk.validator.DataPermiValidator;
 
 @RestController
@@ -37,10 +38,15 @@ public class DataPermiController {
 			@RequestBody String requestBody) {
 
 		try {
-			System.out.println("result=" + requestBody);
+			System.out.println("Request=" + requestBody);
 			// 权限验证
-			String token = request.getParameter("token");
+			String token = request.getHeader("token");
 			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
+			Boolean rsToken=TokenValidator.checkToken(token);			
+		    if (!rsToken){
+		    	return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
+		    }
+			
 			JSONObject parameter = JSON.parseObject(requestBody);
 			// 数据校验
 			if (!DataPermiValidator.dataPermiVal(parameter)) {
@@ -73,10 +79,16 @@ public class DataPermiController {
 	@RequestMapping(value = "/delDataPermi", method = RequestMethod.POST, produces = PubUtil.DATA_CODE)
 	public Object delDataPermi(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
 		try {
+			System.out.println("Request=" + requestBody);
 			// 权限验证
-			String token = request.getParameter("token");
+			String token = request.getHeader("token");
+//			String token = request.getParameter("token");
 			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
-
+			Boolean rsToken=TokenValidator.checkToken(token);			
+		    if (!rsToken){
+		    	return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
+		    }
+			
 			JSONObject parameter = JSON.parseObject(requestBody);
 			if (!DataPermiValidator.dataPermiDelVal(parameter)){
 					return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
@@ -102,10 +114,15 @@ public class DataPermiController {
 	public Object updateDataPermi(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody String requestBody) {
 		try {
+			System.out.println("Request=" + requestBody);
 			// 权限验证
-			String token = request.getParameter("token");
+			String token = request.getHeader("token");
 			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
-		
+			Boolean rsToken=TokenValidator.checkToken(token);			
+		    if (!rsToken){
+		    	return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
+		    }
+			
 			JSONObject parameter = JSON.parseObject(requestBody);
 			// 数据校验
 			if (!DataPermiValidator.dataPermiUpdateVal(parameter)) {
@@ -133,9 +150,15 @@ public class DataPermiController {
 	public Object queryDataPermi(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody String requestBody) {
 		try {
+			System.out.println("Request=" + requestBody);
 			// 权限验证
-			String token = request.getParameter("token");
+			String token = request.getHeader("token");
 			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
+			Boolean rsToken=TokenValidator.checkToken(token);			
+		    if (!rsToken){
+		    	return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
+		    }
+			
 			JSONObject resultObj = new JSONObject();
 			JSONObject parameter = JSON.parseObject(requestBody);
 

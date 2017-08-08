@@ -135,6 +135,10 @@ public class Menu extends BaseEntity {
 		this.front_router = front_router;
 	}
 
-	
+	@Override
+	public String toString() {
+		return "Menu [id=" + id + ", name=" + name + ", is_menu=" + is_menu + ", include_url=" + include_url
+				+ ", parent_id=" + parent_id + "]";
+	}
 
 }

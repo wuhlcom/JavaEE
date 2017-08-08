@@ -11,7 +11,7 @@ public class PubMethod {
 	// 从用户请求中解析出一组设备ID或mac或其它唯一标识,
 	public static String[] getDevids(JSONObject paramsJson) {
 		// 转化为json对象	
-		String idsStr = paramsJson.get("devices").toString();
+		String idsStr = paramsJson.getString("devices");
 		// 去首尾空格
 		idsStr = idsStr.trim();
 		String newIdsStr = idsStr;

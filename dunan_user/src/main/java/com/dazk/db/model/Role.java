@@ -30,6 +30,8 @@ public class Role extends BaseEntity{
 	
 	// `isdel` tinyint(4) NOT NULL DEFAULT '0',
 	private Integer isdel;
+	
+	private Long user_id;
 
 	public Long getId() {
 		return id;
@@ -85,6 +87,22 @@ public class Role extends BaseEntity{
 
 	public void setIsdel(Integer isdel) {
 		this.isdel = isdel;
+	}
+
+	public Long getUser_id() {
+		return user_id;
+	}
+
+	public void setUser_id(Long user_id) {
+		this.user_id = user_id;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Role [id=" + id + ", name=" + name + ", user_id=" + user_id + "]";
 	}
 
 }
