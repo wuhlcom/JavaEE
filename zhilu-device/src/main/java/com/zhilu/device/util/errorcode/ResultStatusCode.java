@@ -23,6 +23,8 @@ public enum ResultStatusCode {
 	DEVID_NOT_EXISTED(40003, "设备不存在"),
 	DEVID_EXISTED(40004, "设备存在"),//whl add
 	DEVNAME_ERR(40005, "设备名称错误"),//whl add
+	DEVTYPE_ERR(40006, "设备类型错误"),//whl add
+
 	
 	ONLINE_STATUS_ERR(60001, "查谒不到符合状态的设备"),//whl add
 	ONLINE_TIME_ERR(60002, "查询不到对应时间的设备"),//whl add
@@ -31,9 +33,30 @@ public enum ResultStatusCode {
 	PAGE_ERR(50002, "查询页码错误"),//whl add
 	ROWS_ERR(50003, "显示内容数量错误"),//whl add
 	
-	USER_NOT_EXITED(1001, "用户不存在");
-	
-	
+	USER_NOT_EXITED(1001, "用户不存在"),
+
+    // public static final String success = "10001";
+	SUCCESS(10001, "成功"),
+	// 无对应数据
+	// public static final String noData = "10002";
+	NODATA_ERR(10002, "无对应数据"),
+
+	// 数据重复插入
+	// public static final String repetition = "10003";
+	REPETITION_ERR(10003, "数据重复插入"),
+	// 未知错误
+	// public static final String unknowErr = "10004";
+	UNKNOW_ERR(10004, "未知错误"),
+	// 程序错误
+	// public static final String routineErr = "10005";
+	ROUTINE_ERR(10005, "程序错误"),
+	// 无权限
+	// public static final String noPermission = "10006";
+	PERMISSION_ERR(10006, "无权限"),
+	// 参数错误
+	// public static final String parameErr = "10007";
+	PARAME_ERR(10007, "参数错误");
+
 	private int code;
 	private String errmsg;
 	

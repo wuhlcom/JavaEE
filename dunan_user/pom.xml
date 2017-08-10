@@ -5,7 +5,7 @@
 
 	<groupId>com.dazk</groupId>
 	<artifactId>dunan_user</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0_local-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>dunan_user</name>

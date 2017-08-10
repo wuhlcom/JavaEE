@@ -66,13 +66,28 @@ public class PubMethod {
 		String base = "abcdefghijklmnopqrstuvwxyz0123456789";
 		java.util.Random random = new java.util.Random();
 		StringBuffer sb = new StringBuffer();
-		sb.append("whl");
-		for (int i = 0; i < strLen; i++) {
+		String prefix="whl";
+		sb.append(prefix);
+		for (int i = 0; i < strLen-prefix.length(); i++) {
 			int number = random.nextInt(base.length());
 			sb.append(base.charAt(number));
 		}
 		return sb.toString().toLowerCase();
 	}
+	
+	   // 生成uuid
+		public static String generateUuid(int strLen) {
+			String base = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMOPQRST";
+			java.util.Random random = new java.util.Random();
+			StringBuffer sb = new StringBuffer();
+			String prefix="whl";
+			sb.append(prefix);
+			for (int i = 0; i < strLen-prefix.length(); i++) {
+				int number = random.nextInt(base.length());
+				sb.append(base.charAt(number));
+			}
+			return sb.toString();
+		}
 
 	// 去除首尾"
 	public static String removeQuto(String str) {
@@ -87,5 +102,6 @@ public class PubMethod {
 		}
 		return newStr;
 	}
+	
 
 }

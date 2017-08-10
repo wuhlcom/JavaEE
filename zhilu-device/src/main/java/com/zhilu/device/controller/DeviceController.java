@@ -22,6 +22,7 @@ import com.zhilu.device.util.errorcode.ResultDevAdd;
 import com.zhilu.device.util.errorcode.ResultErr;
 import com.zhilu.device.util.errorcode.ResultStatusCode;
 import com.zhilu.device.util.validator.CheckParams;
+import com.zhilu.device.util.validator.DeviceValidator;
 
 @Controller
 @RestController
@@ -40,55 +41,13 @@ public class DeviceController {
 	private TblIotDevSrv tblIotDevSrv;
 
 	/**
-	 * 查询设备
-	 */
-	@RequestMapping(value = "/query", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-	public Object queryDevs(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
-		try {
-			Long page = 1L;
-			String token = request.getParameter("token");
-			Boolean rsCheckToken = CheckParams.isToken(token);
-
-			if (rsCheckToken) {
-				// 获取请求参数转为JsonObject
-				JSONObject paramsJson = JSON.parseObject(requestBody);
-				Result checkQuery = CheckParams.checkQuery(paramsJson);
-				if (checkQuery != null) {
-					return checkQuery;
-				}
-				// 通过json解析参数
-				String userid = paramsJson.get("userid").toString();
-				int type = Integer.parseInt(paramsJson.get("type").toString());
-				String search = paramsJson.get("search").toString();
-
-				if (paramsJson.get("page") != null) {
-					page = Long.parseLong(paramsJson.get("page").toString());
-				}
-
-				Long listRows = Long.parseLong(paramsJson.get("listRows").toString());
-
-				Map<String, Object> devs = new HashMap<String, Object>();
-
-				devs = tblIotDevSrv.pageInfo(type, userid, search, page, listRows);
-				return devs;
-			} else if (rsCheckToken == null) {
-				return new ResultDevAdd(ResultStatusCode.TOKEN_EMP.getCode(), ResultStatusCode.TOKEN_EMP.getErrmsg());
-			} else {
-				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResultErr(ResultStatusCode.SYSTEM_ERR.getCode(), ResultStatusCode.SYSTEM_ERR.getErrmsg());
-		}
-
-	}
-
-	/**
 	 * 添加设备
 	 */
 	@RequestMapping(value = "/add", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public Object addDev(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
+
 		try {
+			System.out.println("Request=" + requestBody);
 			Result rs = null;
 			String token = request.getParameter("token");
 			Boolean rsCheckToken = CheckParams.isToken(token);
@@ -117,7 +76,7 @@ public class DeviceController {
 				return rs;
 
 			} else if (rsCheckToken == null) {
-				return new ResultDevAdd(ResultStatusCode.TOKEN_EMP.getCode(), ResultStatusCode.TOKEN_EMP.getErrmsg());	
+				return new ResultDevAdd(ResultStatusCode.TOKEN_EMP.getCode(), ResultStatusCode.TOKEN_EMP.getErrmsg());
 			} else {
 				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
 			}
@@ -133,6 +92,7 @@ public class DeviceController {
 	@RequestMapping(value = "/delete", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public Object deleteDev(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
 		try {
+			System.out.println("Request=" + requestBody);
 			Result rs = null;
 			String token = request.getParameter("token");
 			Boolean rsCheckToken = CheckParams.isToken(token);
@@ -176,6 +136,7 @@ public class DeviceController {
 	@RequestMapping(value = "/update", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public Object updateDev(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
 		try {
+			System.out.println("Request=" + requestBody);
 			Result rs = null;
 			String token = request.getParameter("token");
 			Boolean rsCheckToken = CheckParams.isToken(token);
@@ -206,12 +167,47 @@ public class DeviceController {
 	}
 
 	/**
+	 * 查询设备
+	 */
+	@RequestMapping(value = "/query", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	public Object queryDevs(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
+		try {
+			System.out.println("Request=" + requestBody);
+			String token = request.getParameter("token");
+			Boolean rsCheckToken = CheckParams.isToken(token);
+
+			if (rsCheckToken) {
+				// 获取请求参数转为JsonObject
+				JSONObject paramsJson = JSON.parseObject(requestBody);
+				Result checkQuery = CheckParams.checkQuery(paramsJson);
+				if (checkQuery != null) {
+					return checkQuery;
+				}
+
+				Map<String, Object> devs = new HashMap<String, Object>();
+
+				devs = tblIotDevSrv.pageInfo(paramsJson);
+				return devs;
+			} else if (rsCheckToken == null) {
+				return new ResultDevAdd(ResultStatusCode.TOKEN_EMP.getCode(), ResultStatusCode.TOKEN_EMP.getErrmsg());
+			} else {
+				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultErr(ResultStatusCode.SYSTEM_ERR.getCode(), ResultStatusCode.SYSTEM_ERR.getErrmsg());
+		}
+
+	}
+
+	/**
 	 * 查询设备状态
 	 */
 	@RequestMapping(value = "/onlineStatus", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public Object onlineStatus(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody String requestBody) {
 		try {
+			System.out.println("Request=" + requestBody);
 			Result rs = null;
 			String token = request.getParameter("token");
 			Boolean rsCheckToken = CheckParams.isToken(token);
@@ -233,6 +229,26 @@ public class DeviceController {
 			} else {
 				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultErr(ResultStatusCode.SYSTEM_ERR.getCode(), ResultStatusCode.SYSTEM_ERR.getErrmsg());
+		}
+	}
+
+	/**
+	 * 获取设备id,供lora服务器使用
+	 */
+	@RequestMapping(value = "/getDevId", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	public Object getDevId(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
+		try {
+			System.out.println("Request=" + requestBody);
+				// 获取请求参数转为JsonObject
+				JSONObject paramsJson = JSON.parseObject(requestBody);				
+				// 参数检查失败直接返回错误码,参数检查成功,开始添加设备
+                if(!DeviceValidator.getDevIdValidate(paramsJson)){
+                	return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+                };
+				return tblIotDevSrv.getDevId(paramsJson);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResultErr(ResultStatusCode.SYSTEM_ERR.getCode(), ResultStatusCode.SYSTEM_ERR.getErrmsg());

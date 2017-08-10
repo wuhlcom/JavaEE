@@ -32,7 +32,7 @@ import com.zhilu.device.util.errorcode.ResultStatusCode;
 @Component
 public class CheckParams {
 
-	final static int[] PROTOCOL = { 0, 1, 2, 3 };
+	final static int[] DEV_PROTOCOL = { 0, 1, 2, 3, 4 };
 	final static int[] QUERY_TYPE = { 0, 1, 2, 3, 4, 5 };
 	final static String TOKEN_URL = "http://119.29.68.198:9080/index.php/Users";
 	final static String USER_ID = "userid";
@@ -42,9 +42,8 @@ public class CheckParams {
 	final static String LIST_ROWS = "listRows";
 	final static String DEV_ID = "devid";
 	final static String SEARCH = "search";
-	final static String PRODUCT = "product";
+	final static String PRODUCT = "productid";
 	final static String PROTOCOL_STR = "protocol";
-	final static int ID_LENGTH = 16;
 
 	private static TblIotUsrSrv tblIotUsrSrv;
 	private static TbIotProductSrv tblIotProSrv;
@@ -94,10 +93,19 @@ public class CheckParams {
 	 * @param paramsJson
 	 * @return
 	 */
-	public static Result checkAdd(JSONObject paramsJson) {
+	public static Result checkAdd(JSONObject paramsJson) {	
+		
 		Result resultMsg = null;
+		Integer type = paramsJson.getInteger("type");
+		System.out.println("type:"+type);
+		
+		//添加的类型设备类型是否正确
+		if(!FieldLimit.containCkList(FieldLimit.DEV_TYPE,type)){
+			return new ResultErr(ResultStatusCode.DEVTYPE_ERR.getCode(), ResultStatusCode.DEVTYPE_ERR.getErrmsg());
+		}
+		
 		// 通过json解析参数
-		String userid = paramsJson.get(USER_ID).toString();
+		String userid = paramsJson.getString(USER_ID);
 
 		// 用户id为空不添加
 		if (isUidNull(userid) == true) {
@@ -116,12 +124,16 @@ public class CheckParams {
 		// }
 
 		// 设备名称
-		String name = paramsJson.get(NAME).toString();
+		String name = paramsJson.getString(NAME);
+		System.out.println("name:"+name);
+		
 		if (RegexUtil.isNull(name)) {
 			return new ResultErr(ResultStatusCode.DEVNAME_ERR.getCode(), ResultStatusCode.DEVNAME_ERR.getErrmsg());
 		}
 
-		String productId = paramsJson.get(PRODUCT).toString();
+		String productId = paramsJson.getString(PRODUCT);
+		System.out.println("productId:"+productId);
+		
 		if (isProductIdNull(productId) == true) {
 			resultMsg = new ResultErr(ResultStatusCode.PROID_EMP.getCode(), ResultStatusCode.PROID_EMP.getErrmsg());
 			return resultMsg;
@@ -133,15 +145,17 @@ public class CheckParams {
 			return resultMsg;
 		}
 
-		// id不存在不添加
-		if (isProductIdAdd(productId) == false) {
-			resultMsg = new ResultErr(ResultStatusCode.PROID_NOT_EXISTED.getCode(),
-					ResultStatusCode.PROID_NOT_EXISTED.getErrmsg());
-			return resultMsg;
-		}
+		// // 产品id不存在不添加
+		// if (isProductIdAdd(productId) == false) {
+		// resultMsg = new
+		// ResultErr(ResultStatusCode.PROID_NOT_EXISTED.getCode(),
+		// ResultStatusCode.PROID_NOT_EXISTED.getErrmsg());
+		// return resultMsg;
+		// }
 
 		// 协议不正确不添加
-		int protocol = Integer.parseInt(paramsJson.get(PROTOCOL_STR).toString());
+		Integer protocol = paramsJson.getInteger(PROTOCOL_STR);
+		System.out.println("protocol:"+protocol);
 		if (isProtocol(protocol) == false) {
 			resultMsg = new ResultErr(ResultStatusCode.PROTOCOL_ERR.getCode(),
 					ResultStatusCode.PROTOCOL_ERR.getErrmsg());
@@ -163,6 +177,7 @@ public class CheckParams {
 						ResultStatusCode.DEVID_EXISTED.getErrmsg());
 			}
 		}
+		System.out.println("参数校验PASS");
 		return resultMsg;
 	}
 
@@ -345,8 +360,8 @@ public class CheckParams {
 	 */
 	public static boolean isProtocol(int protocol) {
 		boolean isExist = false;
-		for (int i = 0; i < PROTOCOL.length; i++) {
-			if (PROTOCOL[i] == protocol) {
+		for (int i = 0; i < DEV_PROTOCOL.length; i++) {
+			if (DEV_PROTOCOL[i] == protocol) {
 				isExist = true;
 			}
 		}
@@ -378,29 +393,27 @@ public class CheckParams {
 
 	// 为pid为Null返回true
 	public static boolean isProductIdNull(String productId) {
-		boolean rs = false;
 		if (productId == null || productId.length() <= 0) {
-			rs = true;
+			return true;
 		}
-		return rs;
+		return false;
 	}
 
 	// pid是错误的返回true
 	public static boolean isProductIdErr(String productId) {
-		if ((productId.length() > ID_LENGTH)) {
-			return false;
+		if ((productId.length() > FieldLimit.PRO_ID_MAX) || productId.length() < FieldLimit.PRO_ID_MIN) {
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	// pid已经添加返回true
 	public static boolean isProductIdAdd(String productId) {
-		boolean rs = true;
 		List<TblIotProductInfo> products = tblIotProSrv.findProductById(productId);
 		if ((products == null) || products.isEmpty()) {
-			rs = false;
+			return false;
 		}
-		return rs;
+		return true;
 	}
 
 	// 判断Uid输入是否合法,合法返回true
@@ -452,22 +465,28 @@ public class CheckParams {
 	}
 
 	// 转发token到token验证服务器
-	public static Boolean isToken(String token) {
-		Boolean flag = true;
-		if ((token == "") || (token.length() <= 0)) {
-			flag = null;
+	public static Boolean isToken(String token) {	
+		// lora服务器使用固定token
+		String fixToken = "zhilutyui150219547342f1b20258f8374835226fe";
+		if (token == fixToken) {
+			return true;
 		}
+
+		if ((token == "") || (token.length() <= 0)) {
+			return null;
+		}
+
 		String url = TOKEN_URL + "/check_token?token=" + token;
 		RestTemplate restTemplate = new RestTemplate();
 
-		Object result = restTemplate.getForObject(url, String.class);
-		JSONObject jsonObj = JSON.parseObject((String) result);
-		String code = jsonObj.get("code").toString();
-
-		if (code == "0") {
-			flag = true;
+		String result = restTemplate.getForObject(url, String.class);
+		JSONObject jsonObj = JSON.parseObject(result);
+		System.out.println(jsonObj);
+		Integer code = jsonObj.getInteger("code");
+		if (code == 0) {
+			return true;
 		}
-		return flag;
+		return false;
 	}
 
 }

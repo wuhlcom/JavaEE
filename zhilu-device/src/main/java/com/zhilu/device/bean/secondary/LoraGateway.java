@@ -6,6 +6,7 @@ package com.zhilu.device.bean.secondary;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,6 +15,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.GenericGenerator;
+
 @Entity()
 @Table(name = "lr_gateway")
 public class LoraGateway {
@@ -21,131 +24,166 @@ public class LoraGateway {
 	@Id
 	@GeneratedValue(strategy =GenerationType.IDENTITY)
 	private Long id;
+	
 	// `lr_user_uid` char(64) NOT NULL,
-	private String lr_user_uid;
+	@Column(name = "lr_user_uid")
+	private String userid;
+	
 	// `lr_uuid` char(16) NOT NULL,
-	private String lr_uuid;
+	@Column(name = "lr_uuid")
+	private String uuid;
+	
 	// `lr_type` varchar(32) NOT NULL COMMENT '网关型号',
-	private String lr_type;
-	// `lr_name` varchar(32) NOT NULL COMMENT '网关名称',
-	private String lr_name;
+	@Column(name = "lr_type")
+	private String type;
+	
+	// `lr_name` varchar(32) NOT NULL COMMENT '网关名称',	
+	@Column(name = "lr_name")
+	private String name;
+	
 	// `lr_mac` char(17) NOT NULL,
-	private String lr_mac;
+	@Column(name = "lr_mac")
+	private String mac;
+	
 	// `lr_city` varchar(32) NOT NULL COMMENT '城市',
-	private String lr_city;
+	@Column(name = "lr_city")
+	private String city="";
+	
 	// `lr_area` varchar(32) NOT NULL COMMENT '区域',
-	private String lr_area;
+	@Column(name = "lr_area")
+	private String area="";
+	
 	// `lr_addr` varchar(32) NOT NULL COMMENT '地址',
-	private String lr_addr;
+	@Column(name = "lr_addr")
+	private String addr="";
+	
 	// `lr_createtime` datetime NOT NULL,
+	@Column(name = "lr_createtime")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date lr_createtime;
+	private Date createtime;
+	
 	// `lr_channel_plan_id` int(15) NOT NULL COMMENT 'lora参数 信道计划id',
-	private Long lr_channel_plan_id;
+	@Column(name = "lr_channel_plan_id")
+	private Long channel_plan_id=0L;
+	
 	// `lr_secret` char(32) NOT NULL DEFAULT 'ffffffffffffffffffffffffffffffff',
-	private String lr_secret = "ffffffffffffffffffffffffffffffff";
+	@Column(name = "lr_secret")
+	private String secret = "ffffffffffffffffffffffffffffffff";
+	
 	// `lr_powe` tinyint(15) NOT NULL DEFAULT '14' COMMENT 'lora参数',
-	private Integer lr_powe = 14;
+	@Column(name = "lr_powe")
+	private Integer power = 14;
+	
 	// `lr_status` tinyint(4) NOT NULL DEFAULT '0',
-	private Integer lr_status;
+	@Column(name = "lr_status")
+	private Integer status=0;
+	
 	// `lr_coordinate` varchar(30) NOT NULL COMMENT '坐标',
-	private String lr_coordinate;
+	@Column(name = "lr_coordinate")
+	private String coordinate="";
+	
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public String getLr_user_uid() {
-		return lr_user_uid;
+	
+	public String getUserid() {
+		return userid;
 	}
-	public void setLr_user_uid(String lr_user_uid) {
-		this.lr_user_uid = lr_user_uid;
+	public void setUserid(String userid) {
+		this.userid = userid;
 	}
-	public String getLr_uuid() {
-		return lr_uuid;
+	public String getUuid() {
+		return uuid;
 	}
-	public void setLr_uuid(String lr_uuid) {
-		this.lr_uuid = lr_uuid;
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
-	public String getLr_type() {
-		return lr_type;
+	public String getType() {
+		return type;
 	}
-	public void setLr_type(String lr_type) {
-		this.lr_type = lr_type;
+	public void setType(String type) {
+		this.type = type;
 	}
-	public String getLr_name() {
-		return lr_name;
+	public String getName() {
+		return name;
 	}
-	public void setLr_name(String lr_name) {
-		this.lr_name = lr_name;
+	public void setName(String name) {
+		this.name = name;
 	}
-	public String getLr_mac() {
-		return lr_mac;
+	public String getMac() {
+		return mac;
 	}
-	public void setLr_mac(String lr_mac) {
-		this.lr_mac = lr_mac;
+	public void setMac(String mac) {
+		this.mac = mac;
 	}
-	public String getLr_city() {
-		return lr_city;
+	public String getCity() {
+		return city;
 	}
-	public void setLr_city(String lr_city) {
-		this.lr_city = lr_city;
+	public void setCity(String city) {
+		this.city = city;
 	}
-	public String getLr_area() {
-		return lr_area;
+	public String getArea() {
+		return area;
 	}
-	public void setLr_area(String lr_area) {
-		this.lr_area = lr_area;
+	public void setArea(String area) {
+		this.area = area;
 	}
-	public String getLr_addr() {
-		return lr_addr;
+	public String getAddr() {
+		return addr;
 	}
-	public void setLr_addr(String lr_addr) {
-		this.lr_addr = lr_addr;
+	public void setAddr(String addr) {
+		this.addr = addr;
 	}
-	public Date getLr_createtime() {
-		return lr_createtime;
+	public Date getCreatetime() {
+		return createtime;
 	}
-	public void setLr_createtime(Date lr_createtime) {
-		this.lr_createtime = lr_createtime;
+	public void setCreatetime(Date createtime) {
+		this.createtime = createtime;
 	}
-	public Long getLr_channel_plan_id() {
-		return lr_channel_plan_id;
+	public Long getChannel_plan_id() {
+		return channel_plan_id;
 	}
-	public void setLr_channel_plan_id(Long lr_channel_plan_id) {
-		this.lr_channel_plan_id = lr_channel_plan_id;
+	public void setChannel_plan_id(Long channel_plan_id) {
+		this.channel_plan_id = channel_plan_id;
 	}
-	public String getLr_secret() {
-		return lr_secret;
+	public String getSecret() {
+		return secret;
 	}
-	public void setLr_secret(String lr_secret) {
-		this.lr_secret = lr_secret;
+	public void setSecret(String secret) {
+		this.secret = secret;
 	}
-	public Integer getLr_powe() {
-		return lr_powe;
+	
+	public Integer getPower() {
+		return power;
 	}
-	public void setLr_powe(Integer lr_powe) {
-		this.lr_powe = lr_powe;
+	public void setPower(Integer power) {
+		this.power = power;
 	}
-	public Integer getLr_status() {
-		return lr_status;
+	public Integer getStatus() {
+		return status;
 	}
-	public void setLr_status(Integer lr_status) {
-		this.lr_status = lr_status;
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
-	public String getLr_coordinate() {
-		return lr_coordinate;
+	public String getCoordinate() {
+		return coordinate;
 	}
-	public void setLr_coordinate(String lr_coordinate) {
-		this.lr_coordinate = lr_coordinate;
+	public void setCoordinate(String coordinate) {
+		this.coordinate = coordinate;
 	}
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "LoraGateway [id=" + id + ", lr_name=" + lr_name + ", lr_mac=" + lr_mac + ", lr_addr=" + lr_addr + "]";
-	}	
+		return "LoraGateway [id=" + id + ", userid=" + userid + ", uuid=" + uuid + ", type=" + type + ", name=" + name
+				+ ", mac=" + mac + ", city=" + city + ", area=" + area + ", addr=" + addr + ", createtime=" + createtime
+				+ ", channel_plan_id=" + channel_plan_id + ", secret=" + secret + ", power=" + power + ", status="
+				+ status + ", coordinate=" + coordinate + "]";
+	}
 	
+
 }

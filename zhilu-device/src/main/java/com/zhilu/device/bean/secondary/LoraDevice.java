@@ -6,6 +6,7 @@ package com.zhilu.device.bean.secondary;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,58 +15,102 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.GenericGenerator;
+
 @Entity()
 @Table(name = "lr_device")
 public class LoraDevice {
 	// `id` int(11) NOT NULL AUTO_INCREMENT,
 	@Id
-	@GeneratedValue(strategy =GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	// `lr_uuid` char(16) NOT NULL,
-	private String lr_uuid;
+	@GenericGenerator(name = "system-uuid", strategy = "uuid")
+	@Column(name = "lr_uuid")
+	private String uuid;
+
 	// `lr_deveui` char(23) NOT NULL COMMENT '设备EUI',
-	private String lr_deveui;
+	@Column(name = "lr_deveui")
+	private String deveui;
+
 	// `lr_devaddr` char(11) NOT NULL COMMENT '设备devaddr',
-	private String lr_devaddr;
+	@Column(name = "lr_devaddr")
+	private String devaddr;
+
 	// `lr_nwkskey` char(32) NOT NULL,
-	private String lr_nwkskey;
+	@Column(name = "lr_nwkskey")
+	private String nwkskey;
+
 	// `lr_appskey` char(32) NOT NULL,
-	private String lr_appskey;
+	@Column(name = "lr_appskey")
+	private String appskey;
+
 	// `lr_appkey` char(32) NOT NULL,
-	private String lr_appkey;
+	@Column(name = "lr_appkey")
+	private String appkey;
+
 	// `lr_createtime` datetime NOT NULL,
+	@Column(name = "lr_createtime")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date lr_createtime;
+	private Date createtime;
+
 	// `lr_app_id` char(16) NOT NULL,
-	private String lr_app_id;
+	@Column(name = "lr_app_id")
+	private String app_id;
+
 	// `lr_name` varchar(15) NOT NULL COMMENT '设备名称',
-	private String lr_name;
+	@Column(name = "lr_name")
+	private String name;
+
 	// `lr_type` char(1) NOT NULL DEFAULT 'C' COMMENT '终端类型(A 或 C)',
-	private String lr_type = "C";
+	@Column(name = "lr_type")
+	private String type = "C";
+
 	// `lr_city` varchar(15) NOT NULL,
-	private String lr_city;
+	@Column(name = "lr_city")
+	private String city="";
+
 	// `lr_area` varchar(15) NOT NULL,
-	private String lr_area;
+	@Column(name = "lr_area")
+	private String area="";
+
 	// `lr_addr` varchar(15) NOT NULL,
-	private String lr_addr;
+	@Column(name = "lr_addr")
+	private String addr="";
+
 	// `lr_protocol` varchar(15) NOT NULL DEFAULT 'LoRaWAN1.0.1' COMMENT '协议版本',
-	private String lr_protocol = "LoRaWAN1.0.1";
+	@Column(name = "lr_protocol")
+	private String protocol = "LoRaWAN1.0.1";
+
 	// `lr_rxwindow` varchar(10) NOT NULL DEFAULT 'RX1' COMMENT 'lora wan参数',
-	private String lr_rxwindow = "RX1";
+	@Column(name = "lr_rxwindow")
+	private String rxwindow = "RX1";
+
 	// `lr_rx1offset` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'lorawan 参数',
-	private String lr_rx1offset = "0";
+	@Column(name = "lr_rx1offset")
+	private String rx1offset = "0";
+
 	// `lr_rxdelay` tinyint(4) NOT NULL DEFAULT '1' COMMENT 'lorawan 参数',
-	private String lr_rxdelay = "1";
+	@Column(name = "lr_rxdelay")
+	private String rxdelay = "1";
+
 	// `lr_rx2dr` tinyint(4) NOT NULL DEFAULT '3' COMMENT 'lorawan参数',
-	private String lr_rx2dr = "3";
+	@Column(name = "lr_rx2dr")
+	private String rx2dr = "3";
+
 	// `lr_rx2frequency` varchar(15) NOT NULL DEFAULT '471.3000' COMMENT
 	// 'lorawan参数',
-	private String lr_rx2frequency = "471.3000";
+	@Column(name = "lr_rx2frequency")
+	private String rx2frequency = "471.3000";
+
 	// `lr_class` char(2) NOT NULL COMMENT '设备类型(例如：水表 电表等)',
-	private String lr_class;
+	@Column(name = "lr_class")
+	private String clazz="电表";
+
 	// `lr_ism` varchar(25) NOT NULL COMMENT '频段',
-	private String lr_ism;
+	@Column(name = "lr_ism")
+	private String ism="";
 
 	public Long getId() {
 		return id;
@@ -75,183 +120,181 @@ public class LoraDevice {
 		this.id = id;
 	}
 
-	public String getLr_uuid() {
-		return lr_uuid;
+	public String getUuid() {
+		return uuid;
 	}
 
-	public void setLr_uuid(String lr_uuid) {
-		this.lr_uuid = lr_uuid;
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
-	public String getLr_deveui() {
-		return lr_deveui;
+	public String getDeveui() {
+		return deveui;
 	}
 
-	public void setLr_deveui(String lr_deveui) {
-		this.lr_deveui = lr_deveui;
+	public void setDeveui(String deveui) {
+		this.deveui = deveui;
 	}
 
-	public String getLr_devaddr() {
-		return lr_devaddr;
+	public String getDevaddr() {
+		return devaddr;
 	}
 
-	public void setLr_devaddr(String lr_devaddr) {
-		this.lr_devaddr = lr_devaddr;
+	public void setDevaddr(String devaddr) {
+		this.devaddr = devaddr;
 	}
 
-	public String getLr_nwkskey() {
-		return lr_nwkskey;
+	public String getNwkskey() {
+		return nwkskey;
 	}
 
-	public void setLr_nwkskey(String lr_nwkskey) {
-		this.lr_nwkskey = lr_nwkskey;
+	public void setNwkskey(String nwkskey) {
+		this.nwkskey = nwkskey;
 	}
 
-	public String getLr_appskey() {
-		return lr_appskey;
+	public String getAppskey() {
+		return appskey;
 	}
 
-	public void setLr_appskey(String lr_appskey) {
-		this.lr_appskey = lr_appskey;
+	public void setAppskey(String appskey) {
+		this.appskey = appskey;
 	}
 
-	public String getLr_appkey() {
-		return lr_appkey;
+	public String getAppkey() {
+		return appkey;
 	}
 
-	public void setLr_appkey(String lr_appkey) {
-		this.lr_appkey = lr_appkey;
+	public void setAppkey(String appkey) {
+		this.appkey = appkey;
 	}
 
-	public Date getLr_createtime() {
-		return lr_createtime;
+	public Date getCreatetime() {
+		return createtime;
 	}
 
-	public void setLr_createtime(Date lr_createtime) {
-		this.lr_createtime = lr_createtime;
+	public void setCreatetime(Date createtime) {
+		this.createtime = createtime;
 	}
 
-	public String getLr_app_id() {
-		return lr_app_id;
+	public String getApp_id() {
+		return app_id;
 	}
 
-	public void setLr_app_id(String lr_app_id) {
-		this.lr_app_id = lr_app_id;
+	public void setApp_id(String app_id) {
+		this.app_id = app_id;
 	}
 
-	public String getLr_name() {
-		return lr_name;
+	public String getName() {
+		return name;
 	}
 
-	public void setLr_name(String lr_name) {
-		this.lr_name = lr_name;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String getLr_type() {
-		return lr_type;
+	public String getType() {
+		return type;
 	}
 
-	public void setLr_type(String lr_type) {
-		this.lr_type = lr_type;
+	public void setType(String type) {
+		this.type = type;
 	}
 
-	public String getLr_city() {
-		return lr_city;
+	public String getCity() {
+		return city;
 	}
 
-	public void setLr_city(String lr_city) {
-		this.lr_city = lr_city;
+	public void setCity(String city) {
+		this.city = city;
 	}
 
-	public String getLr_area() {
-		return lr_area;
+	public String getArea() {
+		return area;
 	}
 
-	public void setLr_area(String lr_area) {
-		this.lr_area = lr_area;
+	public void setArea(String area) {
+		this.area = area;
 	}
 
-	public String getLr_addr() {
-		return lr_addr;
+	public String getAddr() {
+		return addr;
 	}
 
-	public void setLr_addr(String lr_addr) {
-		this.lr_addr = lr_addr;
+	public void setAddr(String addr) {
+		this.addr = addr;
 	}
 
-	public String getLr_protocol() {
-		return lr_protocol;
+	public String getProtocol() {
+		return protocol;
 	}
 
-	public void setLr_protocol(String lr_protocol) {
-		this.lr_protocol = lr_protocol;
+	public void setProtocol(String protocol) {
+		this.protocol = protocol;
 	}
 
-	public String getLr_rxwindow() {
-		return lr_rxwindow;
+	public String getRxwindow() {
+		return rxwindow;
 	}
 
-	public void setLr_rxwindow(String lr_rxwindow) {
-		this.lr_rxwindow = lr_rxwindow;
+	public void setRxwindow(String rxwindow) {
+		this.rxwindow = rxwindow;
 	}
 
-	public String getLr_rx1offset() {
-		return lr_rx1offset;
+	public String getRx1offset() {
+		return rx1offset;
 	}
 
-	public void setLr_rx1offset(String lr_rx1offset) {
-		this.lr_rx1offset = lr_rx1offset;
+	public void setRx1offset(String rx1offset) {
+		this.rx1offset = rx1offset;
 	}
 
-	public String getLr_rxdelay() {
-		return lr_rxdelay;
+	public String getRxdelay() {
+		return rxdelay;
 	}
 
-	public void setLr_rxdelay(String lr_rxdelay) {
-		this.lr_rxdelay = lr_rxdelay;
+	public void setRxdelay(String rxdelay) {
+		this.rxdelay = rxdelay;
 	}
 
-	public String getLr_rx2dr() {
-		return lr_rx2dr;
+	public String getRx2dr() {
+		return rx2dr;
 	}
 
-	public void setLr_rx2dr(String lr_rx2dr) {
-		this.lr_rx2dr = lr_rx2dr;
+	public void setRx2dr(String rx2dr) {
+		this.rx2dr = rx2dr;
 	}
 
-	public String getLr_rx2frequency() {
-		return lr_rx2frequency;
+	public String getRx2frequency() {
+		return rx2frequency;
 	}
 
-	public void setLr_rx2frequency(String lr_rx2frequency) {
-		this.lr_rx2frequency = lr_rx2frequency;
+	public void setRx2frequency(String rx2frequency) {
+		this.rx2frequency = rx2frequency;
 	}
 
-	public String getLr_class() {
-		return lr_class;
+	public String getClazz() {
+		return clazz;
 	}
 
-	public void setLr_class(String lr_class) {
-		this.lr_class = lr_class;
+	public void setClazz(String clazz) {
+		this.clazz = clazz;
 	}
 
-	public String getLr_ism() {
-		return lr_ism;
+	public String getIsm() {
+		return ism;
 	}
 
-	public void setLr_ism(String lr_ism) {
-		this.lr_ism = lr_ism;
+	public void setIsm(String ism) {
+		this.ism = ism;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "LoraDevice [id=" + id + ", lr_deveui=" + lr_deveui + ", lr_devaddr=" + lr_devaddr + ", lr_name="
-				+ lr_name + "]";
+		return "LoraDevice [id=" + id + ", deveui=" + deveui + ", devaddr=" + devaddr + ", name=" + name + "]";
 	}
 
+	
 }
