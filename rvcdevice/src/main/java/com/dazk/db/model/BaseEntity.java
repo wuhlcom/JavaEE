@@ -25,6 +25,8 @@
 package com.dazk.db.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
+import java.lang.invoke.SerializedLambda;
 
 /**
  * 基础信息
@@ -32,7 +34,9 @@ import javax.persistence.*;
  * @author liuzh
  * @since 2016-01-31 21:42
  */
-public class BaseEntity {
+public class BaseEntity implements Serializable {
+    private static final long serialVerisionUID = 1L;
+
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

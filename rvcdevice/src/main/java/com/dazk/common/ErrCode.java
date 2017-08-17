@@ -17,4 +17,17 @@ public class ErrCode {
 	public static final String noPermission = "10006";
 	//参数错误
 	public static final String parameErr = "10007";
+	//token异常
+	public static final String tokenErr = "10008";
+	//登录异常
+	public static final String loginErr = "10009";
+	//用户异常
+	public static final String userErr = "10010";
+	//开关阀失败
+	public static final String opValveErr = "10012";
+	//导入异常
+	public static final String IMPORT_ERR = "10011";
+	//接口异常
+	public static final String INTERFACE_ERR = "10014";
+
 }

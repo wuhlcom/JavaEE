@@ -15,8 +15,11 @@ public class HouseCalorimeter extends BaseEntity{
     private String pro_type;
     private Integer pipe_size;
     private String remark;
+    private String err_code;
+    private Integer online;
     private Long created_at;
     private Integer isdel;
+    private String address;
 
     public String getHouse_code() {
         return house_code;
@@ -96,5 +99,29 @@ public class HouseCalorimeter extends BaseEntity{
 
     public void setIsdel(Integer isdel) {
         this.isdel = isdel;
+    }
+
+    public String getErr_code() {
+        return err_code;
+    }
+
+    public void setErr_code(String err_code) {
+        this.err_code = err_code;
+    }
+
+    public Integer getOnline() {
+        return online;
+    }
+
+    public void setOnline(Integer online) {
+        this.online = online;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

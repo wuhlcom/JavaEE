@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dazk.db.dao.DeviceStatusMapper" >
+    <resultMap id="HouseValveDataMap" type="com.dazk.db.model.HouseValveData" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="house_code" property="house_code" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="INTEGER" />
+        <result column="period" property="period" jdbcType="INTEGER" />
+        <result column="comm_address" property="comm_address" jdbcType="VARCHAR" />
+        <result column="power_type" property="power_type" jdbcType="INTEGER" />
+        <result column="version" property="version" jdbcType="VARCHAR" />
+        <result column="unresolved" property="unresolved" jdbcType="INTEGER" />
+        <result column="open" property="open" jdbcType="INTEGER" />
+        <result column="opening" property="opening" jdbcType="INTEGER" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+        <result column="collect_time" property="collect_time" jdbcType="BIGINT" />
+        <result column="supply_temp" property="supply_temp" jdbcType="DOUBLE" />
+        <result column="return_temp" property="return_temp" jdbcType="DOUBLE" />
+        <result column="valve_state" property="valve_state" jdbcType="INTEGER" />
+        <result column="set_temper" property="set_temper" jdbcType="DOUBLE" />
+        <result column="room_temper" property="room_temper" jdbcType="DOUBLE" />
+    </resultMap>
+
+    <select id="findLatestHouseValveStatus" resultMap="HouseValveDataMap" parameterType="java.util.List">
+        select hv.id,hv.house_code,hv.type,hv.period,hv.comm_address,hv.power_type,hv.version,hv.unresolved,hv.open,hv.opening,hv.remark,hvd.collect_time,hvd.supply_temp,hvd.return_temp,hvd.valve_state,hvd.set_temper,hvd.room_temper
+        from
+        (
+            select * from t_house_valve where
+            <foreach collection="list" index="index" item="item" open="(" separator=" or " close=") and">
+                house_code like #{item}
+            </foreach>
+            isdel = 0
+        ) as hv LEFT JOIN
+        (
+            select
+            house_code,collect_time,supply_temp,return_temp,valve_state,set_temper,room_temper
+            from t_house_valve_data as hvd1
+            where isdel = 0 and
+            collect_time =
+            (
+                SELECT hvd2.collect_time from latest_house_valve_date as hvd2 where hvd1.house_code = hvd2.house_code
+            )
+        ) as hvd on hv.house_code = hvd.house_code GROUP BY hv.house_code
+    </select>
+
+    <select id="findLatestHouseValveStatusCount" resultType="java.lang.Integer" parameterType="java.util.List">
+        select count(*) from
+        (
+            select hv.id,hv.house_code,hv.type,hv.period,hv.comm_address,hv.power_type,hv.version,hv.unresolved,hv.open,hv.opening,hv.remark,hvd.collect_time,hvd.supply_temp,hvd.return_temp,hvd.valve_state,hvd.set_temper,hvd.room_temper
+            from
+            (
+            select * from t_house_valve where
+            <foreach collection="list" index="index" item="item" open="(" separator=" or " close=") and">
+                house_code like #{item}
+            </foreach>
+            isdel = 0
+            ) as hv LEFT JOIN
+            (
+            select
+            house_code,collect_time,supply_temp,return_temp,valve_state,set_temper,room_temper
+            from t_house_valve_data as hvd1
+            where isdel = 0 and
+            collect_time =
+            (
+            SELECT hvd2.collect_time from latest_house_valve_date as hvd2 where hvd1.house_code = hvd2.house_code
+            )
+            ) as hvd on hv.house_code = hvd.house_code GROUP BY hv.house_code
+        ) as t
+    </select>
+
+</mapper>

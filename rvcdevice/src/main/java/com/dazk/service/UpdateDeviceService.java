@@ -17,4 +17,6 @@ public interface UpdateDeviceService {
     public int updateBuildingValve(JSONObject obj);
 
     public int updateBuildingCalorimeter(JSONObject obj);
+
+    public int setValveState(String house_code,Integer open,Integer opening,Integer islock);
 }

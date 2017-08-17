@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dazk.db.dao.DatePermissionMapper" >
+
+    <select id="getPerm" resultType="String" parameterType="java.lang.Integer">
+        select code_value from data_permission where user_id = #{userid,jdbcType=INTEGER}
+        <if test="datatype != null">
+            and data_type &gt;= #{datatype,jdbcType=INTEGER}
+        </if>
+        <if test="codes != null">
+            <foreach collection="codes" item="item" open="and (" separator=" or " close=")">
+                code_value like '${item}%'
+            </foreach>
+        </if>
+        or (user_id = #{userid,jdbcType=INTEGER} and code_value = '')
+        order by code_value asc
+    </select>
+
+</mapper>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dazk.db.dao.StealHeatDataMapper" >
+
+    <!--<select id="getByCodes" resultType="com.dazk.db.param.StealHeatData">
+
+
+        select hh.code,hh.name,hh.mes_status,hh.id_card,hv.type,hv.comm_address,hv.open,hv.opening,hv.err_code,hv.online from
+        (
+        select * from t_householder where isdel = 0
+        <if test="mes_status != null">
+            and mes_status = #{mes_status,jdbcType=INTEGER}
+        </if>
+        <if test="id_card != null">
+            and id_card like '${id_card}%'
+        </if>
+        <if test="codes != null">
+            <foreach collection="codes" item="item" open="and (" separator=" or " close=")">
+                code like '${item}%'
+            </foreach>
+        </if>
+        ) as hh left join
+        (
+        select * from t_house_valve where isdel = 0
+        <if test="opening != null">
+            and opening = #{opening,jdbcType=INTEGER}
+        </if>
+        <if test="err_code != null">
+            and err_code = #{err_code,jdbcType=VARCHAR}
+        </if>
+        <if test="err_code == null and error == 1">
+            and err_code > 0
+        </if>
+        ) as hv on hh.code = hv.house_code
+        <if test="listRows != null">
+            limit #{start,jdbcType=INTEGER},#{listRows,jdbcType=INTEGER}
+        </if>
+    </select>-->
+</mapper>

@@ -175,4 +175,20 @@ public class UpdateDeviceServiceImpl implements UpdateDeviceService {
             return -1;
         }
     }
+
+    @Override
+    public int setValveState(String house_code, Integer open, Integer opening,Integer islock) {
+        if(house_code == null) return -1;
+        HouseValve record = new HouseValve();
+        record.setHouse_code(house_code);
+        record.setIsdel(0);
+        Example example = new Example(HouseValve.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo(record);
+        HouseValve houseValve = new HouseValve();
+        houseValve.setOpening(opening);
+        houseValve.setOpen(open);
+        houseValve.setIslock(islock);
+        return houseValveMapper.updateByExampleSelective(houseValve,example);
+    }
 }

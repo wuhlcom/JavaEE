@@ -41,7 +41,7 @@ public class RegexUtil {
         if(objs==null||objs.length==0) return true;
         return false;
     }
- 
+
     public final static boolean isNull(Integer integer){
         if(integer==null||integer==0) return true;
         return false;
@@ -214,7 +214,7 @@ public class RegexUtil {
      * @author jiqinlin
      */
     public final static boolean isPhone(String text){
-        return match(text, "^(\\d{3,4}-?)?\\d{7,9}$");
+        return match(text, "^1[3|4|5|7|8][0-9]{9}$");
     }
  
     /**
@@ -499,8 +499,18 @@ public class RegexUtil {
         }
     }
 
+    /**
+     * 前缀匹配
+     * @param 判断per是否为comple的前缀
+     * @return
+     * @author jiqinlin
+     */
+    public final static boolean isStartAs(String comple,String per){
+        String rexp = "^"+per+".*";
+        return match(comple,rexp);
+    }
 
-// 参考地址：http://www.cnblogs.com/yansheng/archive/2010/05/07/1730188.html    
+// 参考地址：http://www.cnblogs.com/yansheng/archive/2010/05/07/1730188.html
  
 // 附 ： 常用的正则表达式：
 //    匹配特定数字：

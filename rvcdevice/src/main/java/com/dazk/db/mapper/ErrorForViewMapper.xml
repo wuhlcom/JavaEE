@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dazk.db.dao.ErrorForViewMapper" >
+
+    <select id="getDeviceFault" resultType="com.dazk.db.model.ErrorForViewParam">
+        select efv.device_type,efv.device_code,efv.occur_time,efv.recover_time,efv.error_type,efv.build_code,d.address from
+        (
+        select device_type,device_code,occur_time,recover_time,error_type,build_code from t_error_for_view where 1=1
+        <if test="start_time != null and end_time != null">
+            and (occur_time >= #{start_time,jdbcType=INTEGER} and occur_time <![CDATA[ <= ]]> #{end_time,jdbcType=BIGINT})
+        </if>
+        <if test="device_type != null">
+            and device_type = #{device_type,jdbcType=VARCHAR}
+        </if>
+        <if test="device_code != null">
+            and device_code = #{device_code,jdbcType=VARCHAR}
+        </if>
+        <if test="error_type != null">
+            and error_type = #{error_type,jdbcType=VARCHAR}
+        </if>
+        <if test="codes != null">
+            <foreach collection="codes" item="item" open="and (" separator=" or " close=")">
+                build_code like '${item}%'
+            </foreach>
+        </if>
+        ) as efv
+        <if test="device_type != null and device_type == '01'">
+            left join
+            t_building_calorimeter as d on d.comm_address = efv.device_code
+        </if>
+        <if test="device_type != null and device_type == '02'">
+            left join
+            t_house_valve as d on d.house_code = efv.build_code
+        </if>
+        <if test="device_type != null and device_type == '03'">
+            left join
+            t_building_valve as d on d.comm_address = efv.device_code
+        </if>
+        <if test="device_type != null and device_type == '04'">
+            left join
+            t_thermostat as d on d.house_code = efv.build_code
+        </if>
+        <if test="device_type != null and device_type == '05'">
+            left join
+            t_thermostat as d on d.code = efv.device_code
+        </if>
+        <if test="device_type != null and device_type == '06'">
+            left join
+            t_thermostat as d on d.mac = efv.mac
+        </if>
+        <if test="device_type != null and device_type == '07'">
+            left join
+            t_thermostat as d on d.house_code = efv.build_code
+        </if>
+        <if test="listRows != null">
+            limit #{start,jdbcType=INTEGER},#{listRows,jdbcType=INTEGER}
+        </if>
+    </select>
+
+    <select id="getDeviceFaultCount" resultType="java.lang.Integer">
+        select count (*) from (
+        select efv.device_type,efv.device_code,efv.occur_time,efv.recover_time,efv.error_type,efv.build_code,d.address from
+        (
+        select device_type,device_code,occur_time,recover_time,error_type,build_code from t_error_for_view where 1=1
+        <if test="start_time != null and end_time != null">
+            and (occur_time >= #{start_time,jdbcType=INTEGER} and occur_time <![CDATA[ <= ]]> #{end_time,jdbcType=BIGINT})
+        </if>
+        <if test="device_type != null">
+            and device_type = #{device_type,jdbcType=VARCHAR}
+        </if>
+        <if test="device_code != null">
+            and device_code = #{device_code,jdbcType=VARCHAR}
+        </if>
+        <if test="error_type != null">
+            and error_type = #{error_type,jdbcType=VARCHAR}
+        </if>
+        <if test="codes != null">
+            <foreach collection="codes" item="item" open="and (" separator=" or " close=")">
+                build_code like '${item}%'
+            </foreach>
+        </if>
+        ) as efv
+        <if test="device_type != null and device_type == '01'">
+            left join
+            t_building_calorimeter as d on d.comm_address = efv.device_code
+        </if>
+        <if test="device_type != null and device_type == '02'">
+            left join
+            t_house_valve as d on d.house_code = efv.build_code
+        </if>
+        <if test="device_type != null and device_type == '03'">
+            left join
+            t_building_valve as d on d.comm_address = efv.device_code
+        </if>
+        <if test="device_type != null and device_type == '04'">
+            left join
+            t_thermostat as d on d.house_code = efv.build_code
+        </if>
+        <if test="device_type != null and device_type == '05'">
+            left join
+            t_thermostat as d on d.code = efv.device_code
+        </if>
+        <if test="device_type != null and device_type == '06'">
+            left join
+            t_thermostat as d on d.mac = efv.mac
+        </if>
+        <if test="device_type != null and device_type == '07'">
+            left join
+            t_thermostat as d on d.house_code = efv.build_code
+        </if>
+        ) as c
+    </select>
+
+</mapper>

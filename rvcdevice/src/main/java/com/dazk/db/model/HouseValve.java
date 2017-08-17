@@ -17,8 +17,12 @@ public class HouseValve extends BaseEntity{
     private Integer open;
     private Integer opening;
     private String remark;
+    private String err_code;
+    private Integer online;
     private Long created_at;
     private Integer isdel;
+    private Integer islock;
+    private String address;
 
     public String getHouse_code() {
         return house_code;
@@ -114,5 +118,37 @@ public class HouseValve extends BaseEntity{
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public String getErr_code() {
+        return err_code;
+    }
+
+    public void setErr_code(String err_code) {
+        this.err_code = err_code;
+    }
+
+    public Integer getOnline() {
+        return online;
+    }
+
+    public void setOnline(Integer online) {
+        this.online = online;
+    }
+
+    public Integer getIslock() {
+        return islock;
+    }
+
+    public void setIslock(Integer islock) {
+        this.islock = islock;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

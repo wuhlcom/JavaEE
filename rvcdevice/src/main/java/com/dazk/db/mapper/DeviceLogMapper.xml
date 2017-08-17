@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dazk.db.dao.DeviceLogMapper" >
+
+    <select id="queryOpenLog" resultType="com.dazk.db.model.OpenLog" parameterType="com.dazk.db.param.OpenLogParam">
+        select ol.id,ol.house_code,ol.record_time,ol.user_id,ol.record,ol.logstatus,ol.created_at,ol.isdel,ol.address,ol.operate,ol.name,u.username
+        from
+        (
+        select * from t_open_log where isdel=0
+        <if test="start_time != null and end_time != null">
+            and (record_time >= #{start_time,jdbcType=INTEGER} and record_time <![CDATA[ <= ]]> #{end_time,jdbcType=BIGINT})
+        </if>
+        <if test="operate != null">
+            and operate = #{operate,jdbcType=INTEGER}
+        </if>
+        <if test="username != null">
+            and username like '%${username}%'
+        </if>
+        <if test="codes != null">
+            <foreach collection="codes" item="item" open="and (" separator=" or " close=")">
+                house_code like '${item}%'
+            </foreach>
+        </if>
+        <if test="listRows != null">
+            limit #{start,jdbcType=INTEGER},#{listRows,jdbcType=INTEGER}
+        </if>
+        ) as ol left join
+        (
+        select * from user where 1=1
+        <if test="name != null">and name like '%${name}%'
+        </if>
+        ) as u on ol.user_id = u.id
+    </select>
+
+    <select id="queryOpenLogCount" resultType="java.lang.Integer" parameterType="com.dazk.db.param.OpenLogParam">
+        select count(*)
+        from
+        (
+        select * from t_open_log where isdel = 0
+        <if test="start_time != null and end_time != null">
+            and (record_time >= #{start_time,jdbcType=INTEGER} and record_time <![CDATA[ <= ]]> #{end_time,jdbcType=BIGINT})
+        </if>
+        <if test="operate != null">
+            and operate = #{operate,jdbcType=INTEGER}
+        </if>
+        <if test="username != null">
+            and username like '%${username}%'
+        </if>
+        <if test="codes != null">
+            <foreach collection="codes" item="item" open="and (" separator=" or " close=")">
+                house_code like '${item}%'
+            </foreach>
+        </if>
+        <if test="listRows != null">
+            limit #{start,jdbcType=INTEGER},#{listRows,jdbcType=INTEGER}
+        </if>
+        ) as ol left join
+        (
+        select * from user where 1=1
+        <if test="name != null">
+            and name like '%${name}%'
+        </if>
+        ) as u on ol.user_id = u.id
+    </select>
+
+    <select id="queryBuildingValveLog" resultType="com.dazk.db.model.BuildingValveLog" parameterType="com.dazk.db.param.BuildingValveLogParam">
+        select bvl.id,bvl.building_unique_code,bvl.record_time,bvl.user_id,bvl.record,bvl.logstatus,bvl.created_at,bvl.isdel,bvl.kp,bvl.ki,bvl.kd,bvl.target,bvl.max_target,bvl.min_target,u.username
+        from
+        (
+        select * from t_building_valve_log where 1=1
+        <if test="start_time != null and end_time != null">
+            and (record_time >= #{start_time,jdbcType=INTEGER} and record_time <![CDATA[ <= ]]> #{end_time,jdbcType=BIGINT})
+        </if>
+        <if test="codes != null">
+            <foreach collection="codes" item="item" open="and (" separator=" or " close=")">
+                building_unique_code like '${item}%'
+            </foreach>
+        </if>
+        <if test="listRows != null">
+            limit #{start,jdbcType=INTEGER},#{listRows,jdbcType=INTEGER}
+        </if>
+        ) as bvl left join user as u on bvl.user_id = u.id
+    </select>
+
+    <select id="queryBuildingValveLogCount" resultType="java.lang.Integer" parameterType="com.dazk.db.param.BuildingValveLogParam">
+        select count(*)
+        from
+        (
+        select * from t_building_valve_log where 1=1
+        <if test="start_time != null and end_time != null">
+            and (record_time >= #{start_time,jdbcType=INTEGER} and record_time <![CDATA[ <= ]]> #{end_time,jdbcType=BIGINT})
+        </if>
+        <if test="codes != null">
+            <foreach collection="codes" item="item" open="and (" separator=" or " close=")">
+                building_unique_code like '${item}%'
+            </foreach>
+        </if>
+        ) as bvl left join user as u on bvl.user_id = u.id
+    </select>
+
+</mapper>

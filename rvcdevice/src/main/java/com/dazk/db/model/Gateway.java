@@ -1,13 +1,14 @@
 package com.dazk.db.model;
 
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  * Created by Administrator on 2017/7/20.
  */
 @Table(name = "t_gateway")
 public class Gateway extends BaseEntity{
-    private Integer company_id;
+    private String company_code;
     private String name;
     private String mac;
     private String sim_code;
@@ -22,18 +23,27 @@ public class Gateway extends BaseEntity{
     private Integer latency;
     private String ip;
     private Integer status;
+    private Integer debug_status;
+    private Integer anti_freeze_temper;
     private Long lastOn;
     private Long lastOff;
     private Long created_at;
     private String remark;
     private Integer isdel;
+    private String err_code;
+    private Integer online;
 
-    public Integer getCompany_id() {
-        return company_id;
+    @Transient
+    private String err_state;
+    @Transient
+    private Long err_time;
+
+    public String getCompany_code() {
+        return company_code;
     }
 
-    public void setCompany_id(Integer company_id) {
-        this.company_id = company_id;
+    public void setCompany_code(String company_code) {
+        this.company_code = company_code;
     }
 
     public String getName() {
@@ -186,5 +196,53 @@ public class Gateway extends BaseEntity{
 
     public void setIsdel(Integer isdel) {
         this.isdel = isdel;
+    }
+
+    public Integer getDebug_status() {
+        return debug_status;
+    }
+
+    public void setDebug_status(Integer debug_status) {
+        this.debug_status = debug_status;
+    }
+
+    public Integer getAnti_freeze_temper() {
+        return anti_freeze_temper;
+    }
+
+    public void setAnti_freeze_temper(Integer anti_freeze_temper) {
+        this.anti_freeze_temper = anti_freeze_temper;
+    }
+
+    public String getErr_state() {
+        return err_state;
+    }
+
+    public void setErr_state(String err_state) {
+        this.err_state = err_state;
+    }
+
+    public Long getErr_time() {
+        return err_time;
+    }
+
+    public void setErr_time(Long err_time) {
+        this.err_time = err_time;
+    }
+
+    public String getErr_code() {
+        return err_code;
+    }
+
+    public void setErr_code(String err_code) {
+        this.err_code = err_code;
+    }
+
+    public void setOnline(Integer online) {
+        this.online = online;
+    }
+
+    public Integer getOnline() {
+        return online;
     }
 }

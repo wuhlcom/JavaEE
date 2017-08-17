@@ -54,7 +54,7 @@ public class test {
         System.out.println("Concentrator="+JSON.toJSONString(obj3));
 
         Gateway obj4 = new Gateway();
-        obj4.setCompany_id(1);
+        obj4.setCompany_code("");
         obj4.setMac("30-52-CB-04-D3-F8");
         obj4.setAddress("深圳知路");
         obj4.setCreated_at(System.currentTimeMillis()/1000);

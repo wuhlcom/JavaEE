@@ -11,5 +11,7 @@ public class ValidatorTest {
         boolean bol = JsonParamValidator.isHouseCode("0010010101010101");
         System.out.println(bol);
         System.out.println(RegexUtil.isMac(""));
+        System.out.println(RegexUtil.isDigits(""));
+        System.out.println(8%6%2);
     }
 }

@@ -29,6 +29,7 @@ import tk.mybatis.mapper.common.Mapper;
 import tk.mybatis.mapper.common.MySqlMapper;
 import tk.mybatis.mapper.common.base.select.SelectCountMapper;
 import tk.mybatis.mapper.common.base.select.SelectMapper;
+import tk.mybatis.mapper.common.special.InsertListMapper;
 
 /**
  * 继承自己的MyMapper
@@ -36,7 +37,7 @@ import tk.mybatis.mapper.common.base.select.SelectMapper;
  * @author liuzh
  * @since 2015-09-06 21:53
  */
-public interface DeviceMapper<T> extends Mapper<T>, MySqlMapper<T> ,SelectMapper<T> ,SelectCountMapper<T> ,ExampleMapper<T> {
+public interface DeviceMapper<T> extends Mapper<T>, MySqlMapper<T> ,SelectMapper<T> ,SelectCountMapper<T> ,ExampleMapper<T>,InsertListMapper<T> {
     //TODO
     //FIXME 特别注意，该接口不能被扫描到，否则会出错
 }

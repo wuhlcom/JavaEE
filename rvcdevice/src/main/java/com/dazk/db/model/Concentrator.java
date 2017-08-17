@@ -19,7 +19,10 @@ public class Concentrator extends BaseEntity{
     private String sim_code;
     private Integer protocol_type;
     private Integer debug_status;
+    private Integer anti_freeze_temper;
     private String remark;
+    private String err_code;
+    private Integer online;
     private Long created_at;
     private Integer isdel;
 
@@ -141,5 +144,29 @@ public class Concentrator extends BaseEntity{
 
     public void setIsdel(Integer isdel) {
         this.isdel = isdel;
+    }
+
+    public Integer getAnti_freeze_temper() {
+        return anti_freeze_temper;
+    }
+
+    public void setAnti_freeze_temper(Integer anti_freeze_temper) {
+        this.anti_freeze_temper = anti_freeze_temper;
+    }
+
+    public String getErr_code() {
+        return err_code;
+    }
+
+    public void setErr_code(String err_code) {
+        this.err_code = err_code;
+    }
+
+    public Integer getOnline() {
+        return online;
+    }
+
+    public void setOnline(Integer online) {
+        this.online = online;
     }
 }

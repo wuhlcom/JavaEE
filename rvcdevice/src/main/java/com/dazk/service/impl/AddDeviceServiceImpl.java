@@ -5,6 +5,7 @@ import com.dazk.common.ErrCode;
 import com.dazk.db.dao.*;
 import com.dazk.db.model.*;
 import com.dazk.service.AddDeviceService;
+import com.dazk.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +32,26 @@ public class AddDeviceServiceImpl implements AddDeviceService {
     @Autowired
     private BuildingCalorimeterMapper buildingCalorimeterMapper;
 
+    @Autowired
+    private CompanyMapper companyMapper;
+
+    @Autowired
+    private BuildingMapper buildingMapper;
+
+    @Autowired
+    private HouseHolderMapper houseHolderMapper;
+
+    @Autowired
+    private RedisService redisService;
+
 	public int addValve(JSONObject obj){
+	    HouseHolder houseHolder = new HouseHolder();
+	    houseHolder.setCode(obj.getString("house_code"));
+        int houseNum = houseHolderMapper.selectCount(houseHolder);
+        if(houseNum == 0){
+            return -2;
+        }
+
 		HouseValve record = new HouseValve();
         record.setHouse_code(obj.getString("house_code"));
         record.setIsdel(0);
@@ -101,5 +121,45 @@ public class AddDeviceServiceImpl implements AddDeviceService {
         record = JSON.parseObject(obj.toJSONString(), BuildingCalorimeter.class);
         record.setCreated_at(System.currentTimeMillis()/1000);
         return buildingCalorimeterMapper.insertSelective(record);
+    }
+
+    public void addInRedis(String key,String code,String json){
+        redisService.hmSet(key,code,json);
+    }
+
+    @Override
+    public int addHouseValve(HouseValve record) {
+        record.setCreated_at(System.currentTimeMillis()/1000);
+        return houseValveMapper.insertSelective(record);
+    }
+
+    @Override
+    public int addHouseCalorimeterByObj(HouseCalorimeter record) {
+        record.setCreated_at(System.currentTimeMillis()/1000);
+        return houseCalorimeterMapper.insertSelective(record);
+    }
+
+    @Override
+    public int addBuildingValveByObj(BuildingValve record) {
+        record.setCreated_at(System.currentTimeMillis()/1000);
+        return buildingValveMapper.insertSelective(record);
+    }
+
+    @Override
+    public int addBuildingCalorimeterByObj(BuildingCalorimeter record) {
+        record.setCreated_at(System.currentTimeMillis()/1000);
+        return buildingCalorimeterMapper.insertSelective(record);
+    }
+
+    @Override
+    public int addConcentratorByObj(Concentrator record) {
+        record.setCreated_at(System.currentTimeMillis()/1000);
+        return concentratorMapper.insertSelective(record);
+    }
+
+    @Override
+    public int addGatewayByObj(Gateway record) {
+        record.setCreated_at(System.currentTimeMillis()/1000);
+        return gatewayMapper.insertSelective(record);
     }
 }
