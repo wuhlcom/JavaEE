@@ -52,21 +52,21 @@ public class RoleController {
 				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
 			}
 
-			String uri = request.getRequestURI();
-			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
-			if (!rs) {
-				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
-			}
+//			String uri = request.getRequestURI();
+//			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
+//			if (!rs) {
+//				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+//			}
 
-			JSONObject parameter = JSON.parseObject(requestBody);					
+			JSONObject parameter = JSON.parseObject(requestBody);	
+			parameter.put("user_id", rsToken.getString("userid"));	
 			// 数据校验
 			if (!RoleValidator.roleVal(parameter)) {
 				// 非法数据，返回错误码
 				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
 			}
 
-			// 数据入库，成功后返回.
-			parameter.put("user_id", rsToken.getString("userid"));	
+			// 数据入库，成功后返回.			
 			int res = roleService.addRole(parameter);
 			if (res == 1) {
 				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
@@ -96,15 +96,16 @@ public class RoleController {
 				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
 			}
 
-			String uri = request.getRequestURI();
-			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
-			if (!rs) {
-				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
-			}
+//			String uri = request.getRequestURI();
+//			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
+//			if (!rs) {
+//				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+//			}
 
 			JSONObject parameter = JSON.parseObject(requestBody);
-			if (!RoleValidator.isRoleCode(parameter.getString("code"), FieldLimit.ROLE_CODE_MIN,
-					FieldLimit.ROLE_CODE_MAX)) {
+			parameter.put("user_id", rsToken.getString("userid"));
+			if (!RoleValidator.isRoleCode(parameter.getString("id"), FieldLimit.ROLE_ID_MIN,
+					FieldLimit.ROLE_ID_MAX)) {
 				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "非法角色编号");
 			}
 			// 数据入库，成功后返回.
@@ -136,13 +137,14 @@ public class RoleController {
 				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
 			}
 
-			String uri = request.getRequestURI();
-			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
-			if (!rs) {
-				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
-			}
+//			String uri = request.getRequestURI();
+//			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
+//			if (!rs) {
+//				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+//			}
 
 			JSONObject parameter = JSON.parseObject(requestBody);
+			parameter.put("user_id", rsToken.getString("userid"));
 			// 数据校验
 			if (!RoleValidator.roleVal(parameter)) {
 				// 非法数据，返回错误码
@@ -177,15 +179,15 @@ public class RoleController {
 				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
 			}
 
-			String uri = request.getRequestURI();
-			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
-			if (!rs) {
-				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
-			}
+//			String uri = request.getRequestURI();
+//			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
+//			if (!rs) {
+//				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+//			}
 
 			JSONObject resultObj = new JSONObject();
 			JSONObject parameter = JSON.parseObject(requestBody);
-
+			parameter.put("user_id", rsToken.getString("userid"));
 			// 数据校验
 			if (!RoleValidator.roleQueryVal(parameter)) {
 				// 非法数据，返回错误码

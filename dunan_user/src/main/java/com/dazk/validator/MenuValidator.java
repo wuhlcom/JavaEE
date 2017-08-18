@@ -61,8 +61,7 @@ public class MenuValidator {
 	 *         json @param @return @return boolean @throws
 	 */
 	public static boolean menuQueryVal(JSONObject json) {
-		Integer type = json.getInteger("type");
-		String search = json.getString("search");
+		Integer type = json.getInteger("type");	
 		System.out.println("type：" + type);
 		if (type == null)
 			return false;
@@ -70,7 +69,8 @@ public class MenuValidator {
 		if (type != null && type != 0 && type != 1 && type != 2 && type != 3) {
 			return false;
 		}
-
+		
+		String search = json.getString("search");
 		if (type == 2) {
 			System.out.println("search：" + search);
 			if (!isMenuName(search)) {

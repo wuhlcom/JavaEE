@@ -55,6 +55,7 @@ public class FieldLimit {
 	public static final int DATA_ID_MAX = 11;
 	public static final int DATA_CODE_MIN = 1;
 	public static final int DATA_CODE_MAX = 32;
+	//数据权限code类型
 	public static final Integer[] CODE_TYPE_ARR = { 1, 2, 3 };
 	public static final Integer[] SEARCH_TYPE_ARR= { 0,1 };
 	public static final Integer[] DATA_SEARCH_TYPE_ARR= { 0,1,2 };

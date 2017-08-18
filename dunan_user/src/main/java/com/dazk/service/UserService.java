@@ -14,11 +14,13 @@ public interface UserService {
 
 	public int delUser(JSONObject obj);
 
-	public Object queryUser(JSONObject obj);
 
-	public int updateUser(JSONObject obj);
-	
-	public int queryUserCount(JSONObject obj);
+	public int updateUser(JSONObject obj);	
+
 
 	Object queryUserByRole(JSONObject obj);
+
+	List<User> queryUser(JSONObject obj);
+
+	int queryUserCount(JSONObject obj);
 }

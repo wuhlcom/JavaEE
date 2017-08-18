@@ -22,6 +22,7 @@ import com.dazk.common.errcode.ResultStatusCode;
 import com.dazk.common.util.PubUtil;
 import com.dazk.db.model.DataPermission;
 import com.dazk.service.DataPermissionService;
+import com.dazk.service.RolePermissionService;
 import com.dazk.validator.DataPermiValidator;
 import com.dazk.validator.JsonParamValidator;
 import com.dazk.validator.TokenValidator;
@@ -32,6 +33,8 @@ import com.dazk.validator.DataPermiValidator;
 public class DataPermiController {
 	@Resource
 	private DataPermissionService dataPermiService;
+	@Resource
+	private RolePermissionService rolePermiService;
 
 	@RequestMapping(value = "/addDataPermi", method = RequestMethod.POST, produces = PubUtil.DATA_CODE)
 	public Object addDataPermi(HttpServletRequest request, HttpServletResponse response,
@@ -40,32 +43,39 @@ public class DataPermiController {
 		try {
 			System.out.println("Request=" + requestBody);
 			// 权限验证
-			String token = request.getHeader("token");
+			// String token = request.getParameter("token");
+			// post head token
+			String token = request.getHeader("token");		
 			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
-			Boolean rsToken=TokenValidator.checkToken(token);			
-		    if (!rsToken){
-		    	return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
-		    }
-			
+			JSONObject rsToken = TokenValidator.getRsToken(token);
+			if (rsToken.getInteger("status") == 0) {
+				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
+			}
+
+//			String uri = request.getRequestURI();
+//			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
+//			if (!rs) {
+//				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+//			}
+
 			JSONObject parameter = JSON.parseObject(requestBody);
+			parameter.put("user_id", rsToken.getString("userid"));
 			// 数据校验
 			if (!DataPermiValidator.dataPermiVal(parameter)) {
 				// 非法数据，返回错误码
 				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
 			}
 
-			// 数据入库，成功后返回.
+			// 数据入库，成功后返回.			
 			int res = dataPermiService.addDataPermi(parameter);
 			if (res == 1) {
 				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
 			} else if (res == 0) {
-				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "找不到用户信息");
+				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "添加数据失败");
 			} else if (res == -1) {
 				return new ResultErr(ResultStatusCode.REPETITION_ERR.getCode(),
 						ResultStatusCode.REPETITION_ERR.getErrmsg());
-			} else if (res == -2) {
-				return new ResultErr(ResultStatusCode.UNKNOW_ERR.getCode(), "用户信息数据异常");
-			}
+			} 
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -77,23 +87,40 @@ public class DataPermiController {
 	}
 
 	@RequestMapping(value = "/delDataPermi", method = RequestMethod.POST, produces = PubUtil.DATA_CODE)
-	public Object delDataPermi(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
+	public Object delDataPermi(HttpServletRequest request, HttpServletResponse response,
+			@RequestBody String requestBody) {
 		try {
 			System.out.println("Request=" + requestBody);
 			// 权限验证
+			// String token = request.getParameter("token");
+			// post head token
 			String token = request.getHeader("token");
-//			String token = request.getParameter("token");
+			// String token = request.getParameter("token");
 			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
-			Boolean rsToken=TokenValidator.checkToken(token);			
-		    if (!rsToken){
-		    	return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
-		    }
-			
-			JSONObject parameter = JSON.parseObject(requestBody);
-			if (!DataPermiValidator.dataPermiDelVal(parameter)){
-					return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+			JSONObject rsToken = TokenValidator.getRsToken(token);
+			if (rsToken.getInteger("status") == 0) {
+				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
 			}
-			// 数据入库，成功后返回.
+
+//			String uri = request.getRequestURI();
+//			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
+//			if (!rs) {
+//				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+//			}
+
+			JSONObject parameter = JSON.parseObject(requestBody);
+			parameter.put("user_id", rsToken.getString("userid"));
+			// 数据校验		
+			if (!DataPermiValidator.dataPermiVal(parameter)) {
+				// 非法数据，返回错误码
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+			}
+	
+			if (!DataPermiValidator.dataPermiDelVal(parameter)) {
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+			}
+			
+			// 数据入库，成功后返回.			
 			int res = dataPermiService.delDataPermi(parameter);
 			if (res >= 1) {
 				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
@@ -108,29 +135,35 @@ public class DataPermiController {
 			return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), ResultStatusCode.ROUTINE_ERR.getErrmsg());
 		}
 	}
-	
-	
+
 	@RequestMapping(value = "/updateDataPermi", method = RequestMethod.POST, produces = PubUtil.DATA_CODE)
 	public Object updateDataPermi(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody String requestBody) {
 		try {
 			System.out.println("Request=" + requestBody);
-			// 权限验证
 			String token = request.getHeader("token");
+			// String token = request.getParameter("token");
 			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
-			Boolean rsToken=TokenValidator.checkToken(token);			
-		    if (!rsToken){
-		    	return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
-		    }
-			
+			JSONObject rsToken = TokenValidator.getRsToken(token);
+			if (rsToken.getInteger("status") == 0) {
+				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
+			}
+
+//			String uri = request.getRequestURI();
+//			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
+//			if (!rs) {
+//				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+//			}
+
 			JSONObject parameter = JSON.parseObject(requestBody);
+			parameter.put("user_id", rsToken.getString("userid"));
 			// 数据校验
 			if (!DataPermiValidator.dataPermiUpdateVal(parameter)) {
 				// 非法数据，返回错误码
 				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
 			}
 
-			// 数据入库，成功后返回.
+			// 数据入库，成功后返回.		
 			int res = dataPermiService.updateDataPermi(parameter);
 			if (res >= 1) {
 				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
@@ -151,17 +184,25 @@ public class DataPermiController {
 			@RequestBody String requestBody) {
 		try {
 			System.out.println("Request=" + requestBody);
-			// 权限验证
 			String token = request.getHeader("token");
+			// String token = request.getParameter("token");
 			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
-			Boolean rsToken=TokenValidator.checkToken(token);			
-		    if (!rsToken){
-		    	return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
-		    }
+			JSONObject rsToken = TokenValidator.getRsToken(token);
+			if (rsToken.getInteger("status") == 0) {
+				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
+			}
+
+			// String uri = request.getRequestURI();
+			// Boolean rs = rolePermiService.menuAuth(uri,
+			// rsToken.getLong("role"));
+			// if (!rs) {
+			// return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(),
+			// ResultStatusCode.PARAME_ERR.getErrmsg());
+			// }
 			
 			JSONObject resultObj = new JSONObject();
 			JSONObject parameter = JSON.parseObject(requestBody);
-
+			parameter.put("user_id", rsToken.getString("userid"));
 			if (!DataPermiValidator.dataPermiQueryVal(parameter)) {
 				// 非法数据，返回错误码
 				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
@@ -173,6 +214,7 @@ public class DataPermiController {
 				result.get(i).setListRows(null);
 				result.get(i).setPage(null);
 			}
+						
 			int totalRows = dataPermiService.queryDataPermiCount(parameter);
 			resultObj.put("errcode", ResultStatusCode.SUCCESS.getCode());
 			resultObj.put("totalRows", totalRows);

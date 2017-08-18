@@ -13,17 +13,17 @@ public class UserValidator {
 	public static boolean userVal(JSONObject json) {
 		String user_id = json.getString("user_id");
 		System.out.println("user_id：" + user_id);		
-		if (!isUserId(user_id,FieldLimit.USER_ID_MIN,FieldLimit.USER_ID_MAX)) {
+//		if (!isUserId(user_id,FieldLimit.USER_ID_MIN,FieldLimit.USER_ID_MAX)) {
+//			return false;
+//		}
+
+		String userName = json.getString("userName");
+		System.out.println("userName：" + userName);
+		if (userName == null) {
 			return false;
 		}
 
-		String login_name = json.getString("login_name");
-		System.out.println("login_name：" + login_name);
-		if (login_name == null) {
-			return false;
-		}
-
-		if (!isLogin_name(login_name))
+		if (!isLogin_name(userName))
 			return false;
 
 		String password = json.getString("password");
@@ -105,21 +105,29 @@ public class UserValidator {
 	}
 
 	public static boolean queryUserVal(JSONObject json) {
-		String login_name = json.getString("login_name");
-		String id = json.getString("id");
-		System.out.println("login_name：" + login_name);
-		if (login_name == null && id == null) {
+		Integer type = json.getInteger("type");	
+		System.out.println("type：" + type);
+		if (type == null)
+			return false;
+
+		if (type != null && type != 0 && type != 1) {
 			return false;
 		}
-
-		if (!isLogin_name(login_name))
-			return false;
-
-		System.out.println("id：" + id);
-		if (!isUserId(id, FieldLimit.USER_ID_MIN, FieldLimit.USER_ID_MAX)) {
+		
+		//按角色名查询
+		if (type==1) {
+			String search = json.getString("search");
+			System.out.println("roleName：" + search);
+			if (!isLogin_name(search))
+				return false;
+		}	
+		
+		String parentUser = json.getString("parentUser");
+		System.out.println("parentUser：" + parentUser);
+		if (parentUser == null) {
 			return false;
 		}
-
+		
 		String page = json.getString("page");
 		System.out.println("page：" + page);
 		if (page != null && !RegexUtil.isDigits(page)) {
@@ -164,14 +172,14 @@ public class UserValidator {
 	/**
 	 * 用户账号是否合法
 	 */
-	public static boolean isLogin_name(String login_name) {
+	public static boolean isLogin_name(String userName) {
 
-		if (login_name != null) {
-			if (!ParamValidator.isStrLength(login_name, FieldLimit.LOGIN_NAME_MIN, FieldLimit.LOGIN_NAME_MAX)) {
+		if (userName != null) {
+			if (!ParamValidator.isStrLength(userName, FieldLimit.LOGIN_NAME_MIN, FieldLimit.LOGIN_NAME_MAX)) {
 				return false;
 			}
 
-			if (!RegexUtil.isLoginName(login_name)) {
+			if (!RegexUtil.isLoginName(userName)) {
 				return false;
 			}
 		}

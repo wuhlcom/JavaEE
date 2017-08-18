@@ -32,7 +32,8 @@ import com.zhilu.device.util.errorcode.ResultStatusCode;
 @Component
 public class CheckParams {
 
-	final static int[] DEV_PROTOCOL = { 0, 1, 2, 3, 4 };
+	// '协议 0:HTTP,1:HTTPS,2:MQTT,3:COAP,4:LORA,5:MBUS,6:GPRS'
+	final static int[] DEV_PROTOCOL = { 0, 1, 2, 3, 4, 5, 6 };
 	final static int[] QUERY_TYPE = { 0, 1, 2, 3, 4, 5 };
 	final static String TOKEN_URL = "http://119.29.68.198:9080/index.php/Users";
 	final static String USER_ID = "userid";
@@ -93,17 +94,17 @@ public class CheckParams {
 	 * @param paramsJson
 	 * @return
 	 */
-	public static Result checkAdd(JSONObject paramsJson) {	
-		
+	public static Result checkAdd(JSONObject paramsJson) {
+
 		Result resultMsg = null;
 		Integer type = paramsJson.getInteger("type");
-		System.out.println("type:"+type);
-		
-		//添加的类型设备类型是否正确
-		if(!FieldLimit.containCkList(FieldLimit.DEV_TYPE,type)){
+		System.out.println("type:" + type);
+
+		// 添加的类型设备类型是否正确
+		if (!FieldLimit.containCkList(FieldLimit.DEV_TYPE, type)) {
 			return new ResultErr(ResultStatusCode.DEVTYPE_ERR.getCode(), ResultStatusCode.DEVTYPE_ERR.getErrmsg());
 		}
-		
+
 		// 通过json解析参数
 		String userid = paramsJson.getString(USER_ID);
 
@@ -125,15 +126,15 @@ public class CheckParams {
 
 		// 设备名称
 		String name = paramsJson.getString(NAME);
-		System.out.println("name:"+name);
-		
+		System.out.println("name:" + name);
+
 		if (RegexUtil.isNull(name)) {
 			return new ResultErr(ResultStatusCode.DEVNAME_ERR.getCode(), ResultStatusCode.DEVNAME_ERR.getErrmsg());
 		}
 
 		String productId = paramsJson.getString(PRODUCT);
-		System.out.println("productId:"+productId);
-		
+		System.out.println("productId:" + productId);
+
 		if (isProductIdNull(productId) == true) {
 			resultMsg = new ResultErr(ResultStatusCode.PROID_EMP.getCode(), ResultStatusCode.PROID_EMP.getErrmsg());
 			return resultMsg;
@@ -155,7 +156,7 @@ public class CheckParams {
 
 		// 协议不正确不添加
 		Integer protocol = paramsJson.getInteger(PROTOCOL_STR);
-		System.out.println("protocol:"+protocol);
+		System.out.println("protocol:" + protocol);
 		if (isProtocol(protocol) == false) {
 			resultMsg = new ResultErr(ResultStatusCode.PROTOCOL_ERR.getCode(),
 					ResultStatusCode.PROTOCOL_ERR.getErrmsg());
@@ -465,7 +466,7 @@ public class CheckParams {
 	}
 
 	// 转发token到token验证服务器
-	public static Boolean isToken(String token) {	
+	public static Boolean isToken(String token) {
 		// lora服务器使用固定token
 		String fixToken = "zhilutyui150219547342f1b20258f8374835226fe";
 		if (token == fixToken) {

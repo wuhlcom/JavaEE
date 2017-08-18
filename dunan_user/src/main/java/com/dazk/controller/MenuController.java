@@ -45,13 +45,14 @@ public class MenuController {
 				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
 			}
 
-			String uri = request.getRequestURI();
-			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
-			if (!rs) {
-				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
-			}
+//			String uri = request.getRequestURI();
+//			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
+//			if (!rs) {
+//				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+//			}
 
 			JSONObject parameter = JSON.parseObject(requestBody);
+			parameter.put("user_id", rsToken.getString("userid"));
 			// 数据校验
 			if (!MenuValidator.menuVal(parameter)) {
 				// 非法数据，返回错误码
@@ -90,14 +91,14 @@ public class MenuController {
 				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
 			}
 
-			String uri = request.getRequestURI();
-			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
-			if (!rs) {
-				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
-			}
+//			String uri = request.getRequestURI();
+//			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
+//			if (!rs) {
+//				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+//			}
 
 			JSONObject parameter = JSON.parseObject(requestBody);
-
+			parameter.put("user_id", rsToken.getString("userid"));
 			if (!MenuValidator.isMenuId(parameter.getString("id"), FieldLimit.MENU_ID_MIN, FieldLimit.MENU_ID_MAX)) {
 				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "非法菜单ID");
 			}
@@ -130,13 +131,14 @@ public class MenuController {
 				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
 			}
 
-			String uri = request.getRequestURI();
-			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
-			if (!rs) {
-				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
-			}
+//			String uri = request.getRequestURI();
+//			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
+//			if (!rs) {
+//				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+//			}
 
 			JSONObject parameter = JSON.parseObject(requestBody);
+			parameter.put("user_id", rsToken.getString("userid"));
 			// 数据校验
 			if (!MenuValidator.menuVal(parameter)) {
 				// 非法数据，返回错误码
@@ -172,14 +174,17 @@ public class MenuController {
 				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
 			}
 
-			String uri = request.getRequestURI();
-			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
-			if (!rs) {
-				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
-			}
+			// String uri = request.getRequestURI();
+			// Boolean rs = rolePermiService.menuAuth(uri,
+			// rsToken.getLong("role"));
+			// if (!rs) {
+			// return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(),
+			// ResultStatusCode.PARAME_ERR.getErrmsg());
+			// }
 
 			JSONObject resultObj = new JSONObject();
 			JSONObject parameter = JSON.parseObject(requestBody);
+			parameter.put("user_id", rsToken.getString("userid"));
 
 			if (!MenuValidator.menuQueryVal(parameter)) {
 				// 非法数据，返回错误码

@@ -20,6 +20,9 @@ public class BaseEntity {
 
     @Transient
     private Integer page;
+    
+    @Transient
+    private String name;
 
     @Transient
     private Integer listRows;
@@ -47,5 +50,14 @@ public class BaseEntity {
     public void setListRows(Integer listRows) {
         this.listRows = listRows;
     }
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}    
+    
 }
 

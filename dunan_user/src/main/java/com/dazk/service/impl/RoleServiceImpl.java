@@ -183,14 +183,11 @@ public class RoleServiceImpl implements RoleService {
 			// 设置查询条件 多个andEqualTo串联表示 and条件查询
 			recordCriteria.andEqualTo("isdel", 0);
 			example.and(recordCriteria);
-
-		} else if (type == 1) {
-			Example.Criteria criteria = example.createCriteria();
+		} else if (type == 1) {		
 			// 设置查询条件 多个andEqualTo串联表示 and条件查询
 			recordCriteria.andLike("name", "%" + search + "%").andEqualTo("isdel", 0);
 			example.and(recordCriteria);
-		} else if (type == 2) {
-			Example.Criteria criteria = example.createCriteria();
+		} else if (type == 2) {		
 			// 设置查询条件 多个andEqualTo串联表示 and条件查询
 			recordCriteria.andEqualTo("user_id", search).andEqualTo("isdel", 0);
 			example.and(recordCriteria);

@@ -12,7 +12,7 @@ import com.alibaba.fastjson.JSONObject;
 
 public class TokenValidator {
 
-	private static String token_url = "http://192.168.10.166:9990/entry/islogin";
+	private static String token_url = "http://118.31.102.18:9990/entry/islogin";
 
 	public static JSONObject getRsToken(String token) {
 		JSONObject jsonObj =new JSONObject();
@@ -27,7 +27,7 @@ public class TokenValidator {
 		HttpEntity<String> formEntity = new HttpEntity<String>(jsonObj.toString(), headers);
 		String result = restTemplate.postForObject(token_url, formEntity, String.class);
 		
-		System.out.println("result="+result);		
+		System.out.println("Check token result="+result);		
 		JSONObject rs = JSONObject.parseObject(result);	
 		return rs;
 	}

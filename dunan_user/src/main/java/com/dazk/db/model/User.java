@@ -4,16 +4,18 @@
 */
 package com.dazk.db.model;
 
+import javax.persistence.Column;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Table(name = "user")
 public class User extends BaseEntity {
 	// `id` int(11) NOT NULL AUTO_INCREMENT,
 	private Long id;
 	// `name` varchar(64) NOT NULL,
-	private String name;
+	private String nickname;
 	// `name` varchar(32) NOT NULL,
-	private String login_name;
+	private String username;
 	// `sex` tinyint(4) NOT NULL COMMENT '性别',
 	private Integer sex = 0;
 	// `age` tinyint(4) NOT NULL COMMENT '年龄',
@@ -43,6 +45,21 @@ public class User extends BaseEntity {
 	
 	private String idcard;
 	private String position;
+	
+//	@Transient
+//	private String name;
+	
+	@Column(name="parent_user")
+	private Long parent_user;
+	
+	
+//	public String getName() {
+//		return name;
+//	}
+//
+//	public void setName(String name) {
+//		this.name = name;
+//	}
 
 	public Long getId() {
 		return id;
@@ -52,21 +69,22 @@ public class User extends BaseEntity {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
 	
 
-	public String getLogin_name() {
-		return login_name;
+	public String getNickname() {
+		return nickname;
 	}
 
-	public void setLogin_name(String login_name) {
-		this.login_name = login_name;
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public Integer getSex() {
@@ -189,14 +207,24 @@ public class User extends BaseEntity {
 	public void setPosition(String position) {
 		this.position = position;
 	}
+	
+
+	public Long getParent_user() {
+		return parent_user;
+	}
+
+	public void setParent_user(Long parent_user) {
+		this.parent_user = parent_user;
+	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", name=" + name + ", login_name=" + login_name + ", role_id=" + role_id + "]";
+		return "User [id=" + id + ", nickname=" + nickname + ", username=" + username + ", email=" + email + "]";
 	}
+
 
 
 }

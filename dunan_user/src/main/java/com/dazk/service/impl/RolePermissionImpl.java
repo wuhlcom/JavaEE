@@ -446,8 +446,7 @@ public class RolePermissionImpl implements RolePermissionService {
 							for (Menu subMenu : subMenus) {
 								subJson = new JSONObject();
 								subJson.put("id", subMenu.getId());
-								subJson.put("name", subMenu.getName());
-								System.out.println(subMenu.getName());
+								subJson.put("name", subMenu.getName());								
 								subJson.put("uri", subMenu.getUri());
 								if (menu.getFront_router() != null) {
 									subJson.put("front_router", subMenu.getFront_router());
@@ -478,7 +477,7 @@ public class RolePermissionImpl implements RolePermissionService {
 	@Override
 	public boolean menuAuth(String uri, Long roleId) {
 		System.out.println("1-----------menuAuth-----------------");
-		System.out.println(uri);
+      	System.out.println(uri);
 		Pattern pattern = Pattern.compile(".*(\\/.+)\\/.+");
 		// 通配符中也要加入转移字符 (.+?)代表要查找的内容
 		Matcher matcher = pattern.matcher(uri);
@@ -490,9 +489,8 @@ public class RolePermissionImpl implements RolePermissionService {
 		Example.Criteria menuCriteria = menuExample.createCriteria();
 		menuCriteria.andEqualTo("uri", controller).andEqualTo("isdel", 0);
 		menuExample.and(menuCriteria);
-		List<Menu> menuLs = menuMapper.selectByExample(menuExample);
-		
-		System.out.println(menuLs);
+		List<Menu> menuLs = menuMapper.selectByExample(menuExample);		
+
 		if (menuLs.isEmpty()) {
 			return false;
 		}
@@ -511,11 +509,12 @@ public class RolePermissionImpl implements RolePermissionService {
 			reso_ids.add(rolePermission.getReso_id());
 		}
         //打印角色菜单
+		System.out.println("------role menus------------------");
 		System.out.println(reso_ids);
 		if (reso_ids.isEmpty()) {
 			return false;
 		}
-	
+		System.out.println(menuLs.get(0).getId());	
 		Boolean rs = reso_ids.contains(menuLs.get(0).getId());	
 		return rs;
 	}

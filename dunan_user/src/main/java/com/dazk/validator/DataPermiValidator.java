@@ -27,18 +27,14 @@ public class DataPermiValidator {
 			return false;
 		}
 
-		if (!ParamValidator.isCode(code_value, FieldLimit.DATA_CODE_MIN, FieldLimit.DATA_CODE_MIN)) {
+		if (!ParamValidator.isCode(code_value, FieldLimit.DATA_CODE_MIN, FieldLimit.DATA_CODE_MAX)) {
 			return false;
 		}
 
 		Integer data_type = json.getInteger("data_type");
-		System.out.println("data_type：" + data_type);
-		if (data_type == null) {
-			return false;
-		}
-
-		Integer data_typeInt = json.getInteger("data_type");
-		if (RegexUtil.isNotNull(data_type) && data_typeInt != 0 && data_typeInt != 1) {
+		System.out.println("data_type：" + data_type);	
+		
+		if (RegexUtil.isNotNull(data_type) && data_type != 0 && data_type != 1) {
 			return false;
 		}
 
@@ -46,8 +42,8 @@ public class DataPermiValidator {
 		System.out.println("code_type：" + code_type);
 		if (code_type == null) {
 			return false;
-		}
-
+		}	
+		
 		if (!FieldLimit.containCkList(FieldLimit.CODE_TYPE_ARR, code_type)) {
 			return false;
 		}
@@ -80,15 +76,14 @@ public class DataPermiValidator {
 
 		String code_value = json.getString("code_value");
 		System.out.println("code_value：" + code_value);		
-		if (RegexUtil.isNotNull(code_value) && !ParamValidator.isCode(code_value, FieldLimit.DATA_CODE_MIN, FieldLimit.DATA_CODE_MIN)) {
+		if (RegexUtil.isNotNull(code_value) && !ParamValidator.isCode(code_value, FieldLimit.DATA_CODE_MIN, FieldLimit.DATA_CODE_MAX)) {
 			return false;
 		}
 
 		Integer data_type = json.getInteger("data_type");
 		System.out.println("data_type：" + data_type);	
-
-		Integer data_typeInt = json.getInteger("data_type");
-		if (RegexUtil.isNotNull(data_type) && data_typeInt != 0 && data_typeInt != 1) {
+		
+		if (RegexUtil.isNotNull(data_type) && data_type != 0 && data_type != 1) {
 			return false;
 		}
 
@@ -115,13 +110,13 @@ public class DataPermiValidator {
 
 		String user_id = json.getString("user_id");
 		System.out.println("user_id：" + user_id);
-		if (RegexUtil.isNotNull(user_id) && RegexUtil.isDigits(user_id)) {
+		if (RegexUtil.isNotNull(user_id) && !RegexUtil.isDigits(user_id)) {
 			return false;
 		}
 
 		String id = json.getString("id");
 		System.out.println("id：" + id);
-		if (RegexUtil.isNotNull(id) && RegexUtil.isDigits(id)) {
+		if (RegexUtil.isNotNull(id) && !RegexUtil.isDigits(id)) {
 			return false;
 		}
 
@@ -139,6 +134,10 @@ public class DataPermiValidator {
 		if (type == null) {
 			return false;
 		}
+	
+		if (RegexUtil.isNotNull(type) && type != 0 && type != 1  && type != 2) {
+			return false;
+		}
 
 		if (!FieldLimit.containCkList(FieldLimit.DATA_SEARCH_TYPE_ARR, type)) {
 			return false;
@@ -146,20 +145,15 @@ public class DataPermiValidator {
 		
 		String user_id = json.getString("user_id");
 		System.out.println("user_id：" + user_id);
-		if (RegexUtil.isNotNull(user_id) && RegexUtil.isDigits(user_id)) {
-			return false;
-		}
+		// if (RegexUtil.isNotNull(user_id) && !RegexUtil.isDigits(user_id)) {
+		// return false;
+		// }
 
 		String id = json.getString("id");
 		System.out.println("id：" + id);
-		if (RegexUtil.isNotNull(id) && RegexUtil.isDigits(id)) {
+		if (RegexUtil.isNotNull(id) && !RegexUtil.isDigits(id)) {
 			return false;
 		}		
-
-		if (!ParamValidator.isStrLength(id, FieldLimit.DATA_ID_MIN, FieldLimit.DATA_ID_MAX)) {
-			return false;
-		}
-		
 
 		String page = json.getString("page");
 		System.out.println("page：" + page);
