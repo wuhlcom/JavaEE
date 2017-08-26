@@ -42,9 +42,6 @@ import com.zhilu.device.service.secondary.LoraGwSrv;
 
 @Service
 public class TblIotDevSrv {
-
-	public final static String ADDED = "add";
-	public final static String EXISITED = "existed";
 	public final static int LOOP = 100;
 	public final static int DEV_ID_LEN = 13;
 
@@ -165,7 +162,7 @@ public class TblIotDevSrv {
 		// tblIotDevDynSrv.saveDevicesDyn(addDevsDyn);
 		if ((exsitedDevs == null) || exsitedDevs.isEmpty()) {
 			ArrayList<String> devMacs = saveDevices(addDevs);
-			devMacMap.put(ADDED, devMacs);
+			devMacMap.put("add", devMacs);
 			tblIotDevBasicSrv.saveDevicesBasic(addDevsBasic);
 			tblIotDevDynSrv.saveDevicesDyn(addDevsDyn);
 
@@ -178,7 +175,7 @@ public class TblIotDevSrv {
 			}
 
 		} else {
-			devMacMap.put(EXISITED, exsitedDevs);
+			devMacMap.put("existed", exsitedDevs);
 		}
 		return devMacMap;
 	}

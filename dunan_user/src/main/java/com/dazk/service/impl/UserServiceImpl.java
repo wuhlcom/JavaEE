@@ -16,6 +16,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dazk.db.dao.RoleMapper;
 import com.dazk.db.dao.UserMapper;
+import com.dazk.db.dao.UserMapperMy;
 import com.dazk.db.model.Menu;
 import com.dazk.db.model.Role;
 import com.dazk.db.model.User;
@@ -30,6 +31,9 @@ public class UserServiceImpl implements UserService {
 	final static String ENCRY_KEY = "q1w2e3r7i7o4i3uu";
 	@Autowired
 	private UserMapper userMapper;
+	
+	@Autowired
+	private UserMapperMy userMapperMy;
 
 	@Autowired
 	private RoleMapper roleMapper;
@@ -39,29 +43,31 @@ public class UserServiceImpl implements UserService {
 		User record = new User();
 		// 用户名已存在则不添加
 		record.setUsername(obj.getString("username"));
+		record.setSex(null);
 		record.setIsdel(0);
-		record.setDisused(0);
+		record.setDisused(1);
 		int exist = userMapper.selectCount(record);
 		if (exist > 0) {
 			return -1;
 		}
 
-		// 邮箱已存在则不添加
-		User record1 = new User();
-		record1.setEmail(obj.getString("email"));
-		record1.setIsdel(0);
-		record1.setDisused(0);
-		exist = userMapper.selectCount(record1);
+		// 邮箱已存在则不添加	
+		record.setUsername(null);
+		record.setEmail(obj.getString("email"));
+		record.setIsdel(0);
+		record.setDisused(1);
+		exist = userMapper.selectCount(record);
 		if (exist > 0) {
 			return -1;
 		}
 
 		// 电话号码已存在则不添加
-		User record2 = new User();
-		record2.setTelephone(obj.getString("telephone"));
-		record2.setIsdel(0);
-		record2.setDisused(0);
-		exist = userMapper.selectCount(record2);
+		record.setUsername(null);
+		record.setEmail(null);
+		record.setTelephone(obj.getString("telephone"));
+		record.setIsdel(0);
+		record.setDisused(0);
+		exist = userMapper.selectCount(record);
 		if (exist > 0) {
 			return -1;
 		}
@@ -87,6 +93,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public int delUser(JSONObject obj) {
 		User record = new User();
+		record.setSex(null);
 		String username = obj.getString("username");
 		Long parent_user = obj.getLong("parent_user");
 		Long id = obj.getLong("id");
@@ -94,13 +101,12 @@ public class UserServiceImpl implements UserService {
 		int exist = 0;
 		if (username != null) {
 			record.setUsername(username);
-			record.setIsdel(1);
-			exist = userMapper.selectCount(record);
+			record.setIsdel(1);	
 		} else if (id != null) {
 			record.setId(id);
-			record.setIsdel(1);
-			exist = userMapper.selectCount(record);
+			record.setIsdel(1);			
 		}
+		exist = userMapper.selectCount(record);
 
 		if (exist != 0) {
 			return 1;
@@ -333,8 +339,10 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public int updateUser(JSONObject obj) {
 		User record = new User();
+		record.setSex(null);
 		Long parent_user = obj.getLong("parent_user");
 		String username = obj.getString("username");
+		Long id = obj.getLong("id");
 		if (username != null) {
 			record.setUsername(username);
 			record.setIsdel(0);
@@ -342,10 +350,7 @@ public class UserServiceImpl implements UserService {
 			if (exist > 1) {
 				return -2;
 			}
-		}
-
-		Long id = obj.getLong("id");
-		if (id != null) {
+		}else if (id != null) {		
 			record.setId(id);
 			record.setIsdel(0);
 			int exist = userMapper.selectCount(record);
@@ -418,14 +423,14 @@ public class UserServiceImpl implements UserService {
 	public List<User> queryUser(JSONObject obj) {
 		UserParam paramBean = js2UesrParam(obj);
 		System.out.println(paramBean);
-		return userMapper.queryUser(paramBean);
+		return userMapperMy.queryUser(paramBean);
 	}
 	
 
 	@Override
 	public int queryUserCount(JSONObject obj) {
 		UserParam paramBean = js2UesrParam(obj);		
-		return userMapper.queryUserCount(paramBean);
+		return userMapperMy.queryUserCount(paramBean);
 	}
 
 }

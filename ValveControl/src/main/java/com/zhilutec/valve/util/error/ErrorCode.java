@@ -7,6 +7,8 @@ public enum ErrorCode {
 	JSON_FORMAT_ERROR(1001, "JSON消息格式错误"),
 	PARAM_ERROR(1002, "参数错误"),
 	PARAM_INCOMPLETE(1003, "参数不完整"),
+	DEV_NOTFOUND(1004, "找不到该设备"),
+	UNKNOW_ERR(1005, "未知错误"),
     
 	DB_ERROR(2001, "数据库错误");
 	

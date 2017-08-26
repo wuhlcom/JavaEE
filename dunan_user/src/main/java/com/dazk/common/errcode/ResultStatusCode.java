@@ -25,7 +25,8 @@ public enum ResultStatusCode {
 	// 参数错误
 	// public static final String parameErr = "10007";
 	PARAME_ERR(10007, "参数错误"),
-	TOKEN_ERR(10008,"Token错误");
+	TOKEN_ERR(10008,"Token错误"),
+	ROLE_NOT_EXIST(10009,"角色不存在");
 
 	private int code;
 	private String errmsg;

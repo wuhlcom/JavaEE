@@ -20,11 +20,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.dazk.common.errcode.ResultErr;
 import com.dazk.common.errcode.ResultStatusCode;
 import com.dazk.common.util.PubUtil;
+import com.dazk.common.util.RegexUtil;
 import com.dazk.db.model.User;
 import com.dazk.service.RolePermissionService;
 import com.dazk.service.UserService;
 import com.dazk.validator.FieldLimit;
-import com.dazk.validator.JsonParamValidator;
+import com.dazk.validator.PubParamValidator;
 import com.dazk.validator.TokenValidator;
 import com.dazk.validator.UserValidator;
 
@@ -55,16 +56,14 @@ public class UserController {
 				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
 			}
 
-			// String uri = request.getRequestURI();
-			// Boolean rs = rolePermiService.menuAuth(uri,
-			// rsToken.getLong("role"));
-			// if (!rs) {
-			// return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(),
-			// ResultStatusCode.PARAME_ERR.getErrmsg());
-			// }
-
 			JSONObject parameter = JSON.parseObject(requestBody);
-			parameter.put("parent_user", rsToken.getString("userid"));
+			if (RegexUtil.isNull(parameter.getString("parent_user"))) {
+				parameter.put("parent_user", rsToken.getString("userid"));
+			}
+			
+			if (RegexUtil.isNull(parameter.getString("role_id"))) {
+				parameter.put("role_id", rsToken.getString("role"));
+			}
 			// 数据校验
 			if (!UserValidator.userVal(parameter)) {
 				// 非法数据，返回错误码
@@ -204,7 +203,7 @@ public class UserController {
 
 			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
 			JSONObject parameter = JSON.parseObject(requestBody);
-			parameter.put("parentUser", rsToken.getLong("userid"));
+			parameter.put("parent_user", rsToken.getLong("userid"));
 			if (!UserValidator.queryUserVal(parameter)) {
 				// 非法数据，返回错误码
 				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
@@ -214,12 +213,12 @@ public class UserController {
 			// 数据查询，成功后返回.
 			List<User> result = userService.queryUser(parameter);
 			for (int i = 0; i < result.size(); i++) {
-				result.get(i).setIsdel(null);	
-				result.get(i).setDisused(null);			
-				result.get(i).setSex(null);			
+				result.get(i).setIsdel(null);
+				result.get(i).setDisused(null);
+				result.get(i).setSex(null);
 			}
-            Integer totalRows = userService.queryUserCount(parameter);		
-            resultObj.put("errcode", ResultStatusCode.SUCCESS.getCode());
+			Integer totalRows = userService.queryUserCount(parameter);
+			resultObj.put("errcode", ResultStatusCode.SUCCESS.getCode());
 			resultObj.put("totalRows", totalRows);
 			resultObj.put("result", result);
 			return resultObj.toJSONString();

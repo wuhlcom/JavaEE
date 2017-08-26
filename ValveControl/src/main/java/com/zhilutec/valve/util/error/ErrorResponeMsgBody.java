@@ -5,6 +5,12 @@ public class ErrorResponeMsgBody {
 	private int errcode;
 	private String errdesc;
 	
+	public ErrorResponeMsgBody() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+
 	public ErrorResponeMsgBody(ErrorCode errcode) {
 		this.errcode = errcode.getCode();
 		this.errdesc = errcode.getErrdesc();
@@ -31,4 +37,15 @@ public class ErrorResponeMsgBody {
 	public void setErrmsg(String errmsg) {
 		this.errdesc = errmsg;
 	}
+
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "ErrorResponeMsgBody [errcode=" + errcode + ", errdesc=" + errdesc + "]";
+	}
+	
+	
 }

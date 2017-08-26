@@ -29,14 +29,6 @@ import com.zhilu.device.util.validator.DeviceValidator;
 
 @RequestMapping("device")
 public class DeviceController {
-
-	public final static String USER_ID = "userid";
-	public final static String PRODUCT = "product";
-	public final static String NAME = "name";
-	public final static String ID = "id";
-	public final static String DEV_ID = "devid";
-	public final static String PROTOCOL = "protocol";
-
 	@Autowired
 	private TblIotDevSrv tblIotDevSrv;
 
@@ -65,7 +57,7 @@ public class DeviceController {
 				Map<String, List> rsAddInfo = tblIotDevSrv.addDevices(paramsJson);
 
 				// 添加成功
-				if (rsAddInfo.containsKey(TblIotDevSrv.ADDED)) {
+				if (rsAddInfo.containsKey("add")) {
 					rs = new ResultDevAdd(ResultStatusCode.OK.getCode(), rsAddInfo.values());
 				} else {
 					// 设备已存在

@@ -11,9 +11,16 @@ public class RolePermission extends BaseEntity {
 	// id` int(11) NOT NULL AUTO_INCREMENT,
 	private Long id;
 	private Long reso_id;
-	private Integer disused=0;
-	private Long role_id;
-
+	private Integer disused=1;
+	private Long role_id;	
+	/**
+	 * 
+	 */
+	public RolePermission() {
+		super();
+		// TODO Auto-generated constructor stub
+	}	
+	
 	public Long getId() {
 		return id;
 	}

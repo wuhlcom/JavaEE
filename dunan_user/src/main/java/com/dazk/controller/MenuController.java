@@ -99,7 +99,7 @@ public class MenuController {
 
 			JSONObject parameter = JSON.parseObject(requestBody);
 			parameter.put("user_id", rsToken.getString("userid"));
-			if (!MenuValidator.isMenuId(parameter.getString("id"), FieldLimit.MENU_ID_MIN, FieldLimit.MENU_ID_MAX)) {
+			if (!MenuValidator.isMenuId(parameter.getString("id"))) {
 				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "非法菜单ID");
 			}
 			// 数据入库，成功后返回.
@@ -140,7 +140,7 @@ public class MenuController {
 			JSONObject parameter = JSON.parseObject(requestBody);
 			parameter.put("user_id", rsToken.getString("userid"));
 			// 数据校验
-			if (!MenuValidator.menuVal(parameter)) {
+			if (!MenuValidator.menuUpdateVal(parameter)) {
 				// 非法数据，返回错误码
 				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
 			}
@@ -196,12 +196,13 @@ public class MenuController {
 			if (type == 0 || type == 1 || type == 2) {
 				List<Menu> result = menuService.queryMenu(parameter);
 				for (int i = 0; i < result.size(); i++) {
-					result.get(i).setIsdel(null);
-					result.get(i).setCode(null);
-					result.get(i).setRole_id(null);
-					result.get(i).setCreated_at(null);
-					result.get(i).setListRows(null);
-					result.get(i).setPage(null);
+					Menu menu =result.get(i);
+					menu.setIsdel(null);
+					menu.setCode(null);
+					menu.setRole_id(null);
+					menu.setCreated_at(null);
+					menu.setListRows(null);
+					menu.setPage(null);
 				}
 
 				int totalRows = menuService.queryMenuCount(parameter);
@@ -212,6 +213,7 @@ public class MenuController {
 				List<?> result = menuService.queryMenu(parameter);
 				resultObj.put("errcode", ResultStatusCode.SUCCESS.getCode());
 				resultObj.put("result", result);
+				return resultObj;
 			}
 			return resultObj.toJSONString();
 		} catch (Exception e) {

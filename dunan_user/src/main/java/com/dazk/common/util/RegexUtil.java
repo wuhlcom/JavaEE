@@ -505,7 +505,8 @@ public class RegexUtil {
      */
     public static boolean isUri(String val) {
         String regex = "(/\\w+){1,}(/\\w+\\.\\w+)*"; 
-        if (val.matches(regex)) {
+        String regex2 = "/"; 
+        if (val.matches(regex)||val.matches(regex2)) {
             return true;
         } else {
             return false;

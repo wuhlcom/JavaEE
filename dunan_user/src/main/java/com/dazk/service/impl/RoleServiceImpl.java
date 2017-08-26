@@ -4,10 +4,12 @@
 */
 package com.dazk.service.impl;
 
+import java.beans.Transient;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -15,7 +17,6 @@ import com.dazk.common.util.PubUtil;
 import com.dazk.db.dao.RoleMapper;
 import com.dazk.db.dao.RolePermissionMapper;
 import com.dazk.db.dao.UserMapper;
-import com.dazk.db.model.Menu;
 import com.dazk.db.model.Role;
 import com.dazk.db.model.RolePermission;
 import com.dazk.db.model.User;
@@ -72,6 +73,7 @@ public class RoleServiceImpl implements RoleService {
 	}
 
 	@Override
+	@Transactional
 	public int delRole(JSONObject obj) {
 		Role record = new Role();
 		Long role_id = obj.getLong("id");
@@ -82,63 +84,53 @@ public class RoleServiceImpl implements RoleService {
 		if (exist == 1) {
 			return 1;
 		}
+	
+		//删除角色菜单权限
+		RolePermission permiRecord = new RolePermission();
+		permiRecord.setRole_id(role_id);
+		permiRecord.setDisused(0);
+		Example permiExample = new Example(RolePermission.class);
+		// 创建查询条件
+		Example.Criteria permiCriteria = permiExample.createCriteria();
+		// 设置查询条件 多个andEqualTo串联表示 and条件查询
+		permiCriteria.andEqualTo("role_id", role_id).andEqualTo("disused", 1);
+		int rs = rolePermiMapper.updateByExampleSelective(permiRecord, permiExample);
+		
+		//删除用户角色
+		Example userExample = new Example(User.class);
+		// 创建查询条件
+		Example.Criteria userCriteria = userExample.createCriteria();
+		// 设置查询条件 多个andEqualTo串联表示 and条件查询
+		User userRecord = new User();
+		userRecord.setSex(null);
+		userRecord.setDisused(null);
+		userRecord.setRole_id(null);
 
-		try {
-
-			// 删除角色菜单关系
-			try {
-				RolePermission permiRecord = new RolePermission();
-				permiRecord.setRole_id(role_id);
-				permiRecord.setDisused(1);
-
-				Example permiExample = new Example(RolePermission.class);
-				// 创建查询条件
-				Example.Criteria permiCriteria = permiExample.createCriteria();
-				// 设置查询条件 多个andEqualTo串联表示 and条件查询
-				permiCriteria.andEqualTo("role_id", role_id).andEqualTo("disused", 1);
-				return rolePermiMapper.updateByExampleSelective(permiRecord, permiExample);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			// 删除用户角色菜单关系
-			try {
-				// 创建example
-				Example userExample = new Example(User.class);
-				// 创建查询条件
-				Example.Criteria userCriteria = userExample.createCriteria();
-				// 设置查询条件 多个andEqualTo串联表示 and条件查询
-				User userRecord = new User();
-				userRecord.setRole_id(null);
-
-				userCriteria.andEqualTo("role_id", role_id).andEqualTo("isdel", 0);
-				userExample.and(userCriteria);
-				return userMapper.updateByExampleSelective(userRecord, userExample);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			// 创建example
-			Example example = new Example(Role.class);
-			// 创建查询条件
-			Example.Criteria criteria = example.createCriteria();
-			// 设置查询条件 多个andEqualTo串联表示 and条件查询
-			criteria.andEqualTo("id", role_id).andEqualTo("isdel", 0);
-			return roleMapper.updateByExampleSelective(record, example);
-
-		} catch (Exception e) {
-			return -1;
-		}
+		userCriteria.andEqualTo("role_id", role_id).andEqualTo("isdel", 0);
+		userExample.and(userCriteria);
+		rs = userMapper.updateByExampleSelective(userRecord, userExample);
+		
+		//删除角色
+		// 创建example
+		Example example = new Example(Role.class);
+		// 创建查询条件
+		Example.Criteria criteria = example.createCriteria();
+		// 设置查询条件 多个andEqualTo串联表示 and条件查询
+		criteria.andEqualTo("id", role_id).andEqualTo("isdel", 0);
+		rs= roleMapper.updateByExampleSelective(record, example);
+		if(rs==0){
+			  throw new NumberFormatException();
+		}		
+		return rs;
 	}
 
 	@Override
 	public int updateRole(JSONObject obj) {
 		Role record = new Role();
-		Long id = obj.getLong("id");
+		Long id = obj.getLong("id");	
 		record.setId(id);
 		record.setIsdel(0);
-		int exist = roleMapper.selectCount(record);
-
+		int exist = roleMapper.selectCount(record);   
 		if (exist > 1) {
 			return -2;
 		}
@@ -155,6 +147,7 @@ public class RoleServiceImpl implements RoleService {
 			Example.Criteria criteria = example.createCriteria();
 			// 设置查询条件 多个andEqualTo串联表示 and条件查询
 			criteria.andEqualTo("id", id).andEqualTo("isdel", 0);
+			example.and(criteria);
 			return roleMapper.updateByExampleSelective(record, example);
 		} catch (Exception e) {
 			return -1;
@@ -183,11 +176,11 @@ public class RoleServiceImpl implements RoleService {
 			// 设置查询条件 多个andEqualTo串联表示 and条件查询
 			recordCriteria.andEqualTo("isdel", 0);
 			example.and(recordCriteria);
-		} else if (type == 1) {		
+		} else if (type == 1) {
 			// 设置查询条件 多个andEqualTo串联表示 and条件查询
 			recordCriteria.andLike("name", "%" + search + "%").andEqualTo("isdel", 0);
 			example.and(recordCriteria);
-		} else if (type == 2) {		
+		} else if (type == 2) {
 			// 设置查询条件 多个andEqualTo串联表示 and条件查询
 			recordCriteria.andEqualTo("user_id", search).andEqualTo("isdel", 0);
 			example.and(recordCriteria);
@@ -197,18 +190,19 @@ public class RoleServiceImpl implements RoleService {
 
 	@Override
 	public int queryRoleCount(JSONObject obj) {
-		String type = obj.getString("type");
-		String search = obj.getString("search");
-		Role record = new Role();
-		record = JSON.parseObject(obj.toJSONString(), Role.class);
-		Example example = new Example(Role.class);
-		// 设置查询条件 多个andEqualTo串联表示 and条件查询
+		String type = obj.getString("type");	
+		Example example = new Example(Role.class);		
 		Example.Criteria recordCriteria = example.createCriteria();
-		if (type == "0") {
+		if (type.equals("0")){
 			recordCriteria.andEqualTo("isdel", 0);
 			example.and(recordCriteria);
-		} else if (type == "1") {
-			recordCriteria.andEqualTo("name", search).andEqualTo("isdel", 0);
+		} else if (type.equals("1")) {
+			String search = obj.getString("search");
+			recordCriteria.andLike("name", "%" + search + "%").andEqualTo("isdel", 0);
+			example.and(recordCriteria);
+		}else if (type.equals("2")) {	
+			Long search = obj.getLong("search");
+			recordCriteria.andEqualTo("user_id", search).andEqualTo("isdel", 0);
 			example.and(recordCriteria);
 		}
 		return roleMapper.selectCountByExample(example);

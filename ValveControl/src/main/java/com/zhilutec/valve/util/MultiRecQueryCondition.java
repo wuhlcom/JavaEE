@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
-import com.zhilutec.valve.service.HouseHolderService;
+import com.zhilutec.valve.service.HouseHolderHistoryService;
 import com.zhilutec.valve.util.error.ErrorCode;
 import com.zhilutec.valve.util.error.GlobalErrorException;
 
@@ -21,7 +21,7 @@ public class MultiRecQueryCondition {
 	private int MAX_COMM_ADDR = 16;
 	private int INVALID_TIME  = 0;
 	
-	public final static Logger logger = LoggerFactory.getLogger(HouseHolderService.class);
+	public final static Logger logger = LoggerFactory.getLogger(HouseHolderHistoryService.class);
 	
 	public ErrorCode getMultiRecCondition(JSONObject object) {
 		try {

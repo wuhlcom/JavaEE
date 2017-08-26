@@ -29,7 +29,7 @@ public class TblIotDeviceBasic {
 	// `deviceid` varchar(16) NOT NULL,
 	@Id
 	@Column(name = "deviceid")
-	private String deviceid = "";
+	private String deviceid;
 
 	// `userid` varchar(64) DEFAULT NULL,
 	private String userid;

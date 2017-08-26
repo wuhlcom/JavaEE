@@ -16,19 +16,26 @@ public class RolePermiValidator {
 	public static boolean rolePermiVal(JSONObject json) {
 		String role_id = json.getString("role_id");
 		System.out.println("role_id：" + role_id);
+		if (RegexUtil.isNull(role_id)) {
+			return false;
+		}
 		if (!isRoleId(role_id, FieldLimit.ROLE_ID_MIN, FieldLimit.ROLE_ID_MAX)) {
 			return false;
 		}
 
 		String reso_id = json.getString("reso_id");
 		System.out.println("reso_id：" + reso_id);
+		if (RegexUtil.isNull(reso_id)) {
+			return false;
+		}
+
 		if (!isMenuId(reso_id, FieldLimit.MENU_ID_MIN, FieldLimit.MENU_ID_MAX)) {
 			return false;
 		}
 
-		Integer disused = json.getInteger("disused");
+		String disused = json.getString("disused");
 		System.out.println("disused：" + disused);
-		if (disused != null && disused != 0 && disused != 1) {
+		if (RegexUtil.isNotNull(disused) && !disused.equals("0") && !disused.equals("1")) {
 			return false;
 		}
 
@@ -57,11 +64,15 @@ public class RolePermiValidator {
 		System.out.println("验证通过");
 		return true;
 	}
-	
+
 	public static boolean roleMenuUpdateVal(JSONObject json) {
 		String role_id = json.getString("role_id");
 		System.out.println("role_id：" + role_id);
-		if (!isRoleId(role_id,FieldLimit.ROLE_ID_MIN,FieldLimit.ROLE_ID_MAX)) {
+		if (RegexUtil.isNull(role_id)) {
+			return false;
+		}
+
+		if (!isRoleId(role_id, FieldLimit.ROLE_ID_MIN, FieldLimit.ROLE_ID_MAX)) {
 			return false;
 		}
 
@@ -79,14 +90,18 @@ public class RolePermiValidator {
 		System.out.println("验证通过");
 		return true;
 	}
-	
+
 	public static boolean roleMenuDelVal(JSONObject json) {
 		String role_id = json.getString("role_id");
 		System.out.println("role_id：" + role_id);
-		if (!isRoleId(role_id,FieldLimit.ROLE_ID_MIN,FieldLimit.ROLE_ID_MAX)) {
+		if (RegexUtil.isNull(role_id)) {
 			return false;
 		}
-		
+
+		if (!isRoleId(role_id, FieldLimit.ROLE_ID_MIN, FieldLimit.ROLE_ID_MAX)) {
+			return false;
+		}
+
 		System.out.println("验证通过");
 		return true;
 	}
@@ -94,7 +109,7 @@ public class RolePermiValidator {
 	public static boolean rolePermiQueryVal(JSONObject json) {
 		String role_id = json.getString("role_id");
 		System.out.println("role_id：" + role_id);
-		if (role_id == null) {
+		if (RegexUtil.isNull(role_id)) {
 			return false;
 		}
 
@@ -104,32 +119,20 @@ public class RolePermiValidator {
 
 		String reso_id = json.getString("reso_id");
 		System.out.println("reso_id：" + reso_id);
-		if (reso_id != null) {
-			if (!isMenuId(reso_id, FieldLimit.MENU_ID_MIN, FieldLimit.MENU_ID_MAX)) {
-				return false;
-			}
+		if (RegexUtil.isNotNull(reso_id) && !isMenuId(reso_id, FieldLimit.MENU_ID_MIN, FieldLimit.MENU_ID_MAX)) {
+			return false;
 		}
 
-		Integer disused = json.getInteger("disused");
+		String disused = json.getString("disused");
 		System.out.println("disused：" + disused);
-		if (disused != null && disused != 0 && disused != 1) {
+		if (RegexUtil.isNotNull(disused) && !disused.equals("0") && !disused.equals("1")) {
 			return false;
 		}
 
 		String page = json.getString("page");
-		System.out.println("page：" + page);
-		if (page != null && !RegexUtil.isDigits(page)) {
-			return false;
-		}
-
-		if (page != null && json.getInteger("page") == 0) {
-			return false;
-		}
-
 		String listRows = json.getString("listRows");
-		if (listRows != null && !RegexUtil.isDigits(listRows)) {
+		if (!PubParamValidator.pageVal(page, listRows))
 			return false;
-		}
 
 		System.out.println("验证通过");
 		return true;
@@ -139,10 +142,7 @@ public class RolePermiValidator {
 	 * 角色Id
 	 */
 	public static boolean isRoleId(String id, int min, int max) {
-		if (RegexUtil.isNull(id) || !ParamValidator.isStrLength(id, min, max)) {
-			return false;
-		}
-		if (!RegexUtil.isDigits(id)) {
+		if (RegexUtil.isNotNull(id) && (!ParamValidator.isStrLength(id, min, max) || !RegexUtil.isDigits(id))) {
 			return false;
 		}
 		return true;
@@ -152,10 +152,7 @@ public class RolePermiValidator {
 	 * 角色Id
 	 */
 	public static boolean isMenuId(String id, int min, int max) {
-		if (RegexUtil.isNull(id) || !ParamValidator.isStrLength(id, min, max)) {
-			return false;
-		}
-		if (!RegexUtil.isDigits(id)) {
+		if (RegexUtil.isNotNull(id) && (!ParamValidator.isStrLength(id, min, max) || !RegexUtil.isDigits(id))) {
 			return false;
 		}
 		return true;

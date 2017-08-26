@@ -8,7 +8,7 @@ public class Test1 {
 		System.out.println("aaaaaaaaa");
 	 }
 	 */
-	 //Êý×Ö×Ö·û×ªInteger
+	 //ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½×ªInteger
 	//Integer in= Integer.parseInt("111");
 	//System.out.println(in);
 	//System.out.println(in.getClass());
@@ -18,7 +18,7 @@ public class Test1 {
 	System.out.println(str1);	 
 	System.out.println(str1.trim());
 
-    //È¥Ê×Î²¿Õ¸ñ
+    //È¥ï¿½ï¿½Î²ï¿½Õ¸ï¿½
 	String sourceStr="[\"wu005\",\"wu002\"]".trim();
 	System.out.println(sourceStr);
 
@@ -28,13 +28,13 @@ public class Test1 {
 	String newstr1 = sourceStr.substring(1,sourceStr.length()-1);
 	System.out.println(str1);	
 
-    //·Ö¸î
+    //ï¿½Ö¸ï¿½
 	String[] sourceStrArray = newstr1.split(",");
         for (int i = 0; i < sourceStrArray.length; i++) {
             System.out.println(sourceStrArray[i]);
         }
 		*/
-     1 instan
+//     1 instan
 	}
 
 	

@@ -36,8 +36,8 @@ public class User extends BaseEntity {
 	private String password;
 	// `lv` tinyint(4) DEFAULT NULL COMMENT '账号等级',
 	private String lv;
-	// `disused` tinyint(4) NOT NULL COMMENT '是否废弃',
-	private Integer disused = 0;
+	// `disused` tinyint(4) NOT NULL COMMENT '是否废弃',1表示使用
+	private Integer disused = 1;
 	// `remark` varchar(255) NOT NULL DEFAULT '' COMMENT '说明',
 	private String remark;
 
@@ -45,21 +45,20 @@ public class User extends BaseEntity {
 	
 	private String idcard;
 	private String position;
-	
-//	@Transient
-//	private String name;
+
+	private String name;
 	
 	@Column(name="parent_user")
 	private Long parent_user;
 	
 	
-//	public String getName() {
-//		return name;
-//	}
-//
-//	public void setName(String name) {
-//		this.name = name;
-//	}
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 
 	public Long getId() {
 		return id;

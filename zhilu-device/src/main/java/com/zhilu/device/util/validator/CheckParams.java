@@ -36,16 +36,6 @@ public class CheckParams {
 	final static int[] DEV_PROTOCOL = { 0, 1, 2, 3, 4, 5, 6 };
 	final static int[] QUERY_TYPE = { 0, 1, 2, 3, 4, 5 };
 	final static String TOKEN_URL = "http://119.29.68.198:9080/index.php/Users";
-	final static String USER_ID = "userid";
-	final static String NAME = "name";
-	final static String TYPE = "type";
-	final static String PAGE = "page";
-	final static String LIST_ROWS = "listRows";
-	final static String DEV_ID = "devid";
-	final static String SEARCH = "search";
-	final static String PRODUCT = "productid";
-	final static String PROTOCOL_STR = "protocol";
-
 	private static TblIotUsrSrv tblIotUsrSrv;
 	private static TbIotProductSrv tblIotProSrv;
 	private static TblIotDevSrv tblIotDevSrv;
@@ -62,13 +52,6 @@ public class CheckParams {
 	public CheckParams(TblIotUsrSrv tblIotUsrSrv) {
 		CheckParams.tblIotUsrSrv = tblIotUsrSrv;
 	}
-
-	// 无法使用
-	// @Autowired
-	// public CheckParams(TbIotProductSrv tblIotProSrv) {
-	// this.tblIotProSrv = tblIotProSrv;
-	// }
-	//
 
 	// @autowired+postConsturc结合实现多个srv注解
 	@Autowired
@@ -106,7 +89,7 @@ public class CheckParams {
 		}
 
 		// 通过json解析参数
-		String userid = paramsJson.getString(USER_ID);
+		String userid = paramsJson.getString("userid");
 
 		// 用户id为空不添加
 		if (isUidNull(userid) == true) {
@@ -117,25 +100,17 @@ public class CheckParams {
 			return new ResultErr(ResultStatusCode.UID_ERR.getCode(), ResultStatusCode.UID_ERR.getErrmsg());
 		}
 
-		// // 用户ID不存在不添加
-		// if (isUidAdd(userid) == false) {
-		// resultMsg = new ResultErr(ResultStatusCode.UID_NOT_EXISTED.getCode(),
-		// ResultStatusCode.UID_NOT_EXISTED.getErrmsg());
-		// return resultMsg;
-		// }
-
 		// 设备名称
-		String name = paramsJson.getString(NAME);
+		String name = paramsJson.getString("name");
 		System.out.println("name:" + name);
-
 		if (RegexUtil.isNull(name)) {
 			return new ResultErr(ResultStatusCode.DEVNAME_ERR.getCode(), ResultStatusCode.DEVNAME_ERR.getErrmsg());
 		}
 
-		String productId = paramsJson.getString(PRODUCT);
+		String productId = paramsJson.getString("productid");
 		System.out.println("productId:" + productId);
 
-		if (isProductIdNull(productId) == true) {
+		if (isProductIdNull(productId)) {
 			resultMsg = new ResultErr(ResultStatusCode.PROID_EMP.getCode(), ResultStatusCode.PROID_EMP.getErrmsg());
 			return resultMsg;
 		}
@@ -155,21 +130,21 @@ public class CheckParams {
 		// }
 
 		// 协议不正确不添加
-		Integer protocol = paramsJson.getInteger(PROTOCOL_STR);
+		Integer protocol = paramsJson.getInteger("protocol");
 		System.out.println("protocol:" + protocol);
-		if (isProtocol(protocol) == false) {
+		if (!isProtocol(protocol)) {
 			resultMsg = new ResultErr(ResultStatusCode.PROTOCOL_ERR.getCode(),
 					ResultStatusCode.PROTOCOL_ERR.getErrmsg());
 		}
 
 		// 得到Id数组
 		String[] macsArray = PubMethod.getDevids(paramsJson);
-		if (isIds(macsArray) == false) {
+		if (isIds(macsArray)) {
 			resultMsg = new ResultErr(ResultStatusCode.DEVID_EMP.getCode(), ResultStatusCode.DEVID_EMP.getErrmsg());
 		}
 
 		for (String mac : macsArray) {
-			if (isIdNull(mac) == true) {
+			if (isIdNull(mac)) {
 				resultMsg = new ResultErr(ResultStatusCode.DEVID_EMP.getCode(), ResultStatusCode.DEVID_EMP.getErrmsg());
 				return resultMsg;
 			}
@@ -185,8 +160,8 @@ public class CheckParams {
 	// id可能是mac imei id,检查输入是否合法
 	public static Result checkDelete(JSONObject paramsJson) {
 		Result resultMsg = null;
-		String userid = paramsJson.get(USER_ID).toString();
-		String id = paramsJson.get(DEV_ID).toString();
+		String userid = paramsJson.get("userid").toString();
+		String id = paramsJson.get("devid").toString();
 		// 用户ID输入不合法
 		if (isUid(userid) == false) {
 			resultMsg = new ResultErr(ResultStatusCode.UID_EMP.getCode(), ResultStatusCode.UID_EMP.getErrmsg());
@@ -217,11 +192,11 @@ public class CheckParams {
 
 	public static Result checkQuery(JSONObject paramsJson) {
 		Result resultMsg = null;
-		String userid = paramsJson.get(USER_ID).toString();
-		int type = Integer.parseInt(paramsJson.get(TYPE).toString());
-		String search = paramsJson.get(SEARCH).toString();
-		Long page = Long.parseLong(paramsJson.get(PAGE).toString());
-		Long rows = Long.parseLong(paramsJson.get(LIST_ROWS).toString());
+		String userid = paramsJson.get("userid").toString();
+		int type = Integer.parseInt(paramsJson.get("type").toString());
+		String search = paramsJson.get("search").toString();
+		Long page = Long.parseLong(paramsJson.get("page").toString());
+		Long rows = Long.parseLong(paramsJson.get("listRows").toString());
 		// 用户ID输入不合法
 		if (isUid(userid) == false) {
 			resultMsg = new ResultErr(ResultStatusCode.UID_EMP.getCode(), ResultStatusCode.UID_EMP.getErrmsg());
@@ -394,7 +369,7 @@ public class CheckParams {
 
 	// 为pid为Null返回true
 	public static boolean isProductIdNull(String productId) {
-		if (productId == null || productId.length() <= 0) {
+		if (RegexUtil.isNull(productId)) {
 			return true;
 		}
 		return false;

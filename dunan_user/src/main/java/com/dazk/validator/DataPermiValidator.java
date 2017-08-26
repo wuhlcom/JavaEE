@@ -13,7 +13,7 @@ public class DataPermiValidator {
 	public static boolean dataPermiVal(JSONObject json) {
 		String user_id = json.getString("user_id");
 		System.out.println("user_id：" + user_id);
-		if (user_id == null) {
+		if (RegexUtil.isNull(user_id)) {
 			return false;
 		}
 
@@ -23,50 +23,71 @@ public class DataPermiValidator {
 
 		String code_value = json.getString("code_value");
 		System.out.println("code_value：" + code_value);
-		if (code_value == null) {
+		if (RegexUtil.isNull(code_value)) {
 			return false;
 		}
 
-		if (!ParamValidator.isCode(code_value, FieldLimit.DATA_CODE_MIN, FieldLimit.DATA_CODE_MAX)) {
+		if (RegexUtil.isNotNull(code_value)
+				&& !ParamValidator.isCode(code_value, FieldLimit.DATA_CODE_MIN, FieldLimit.DATA_CODE_MAX)) {
 			return false;
 		}
 
 		Integer data_type = json.getInteger("data_type");
-		System.out.println("data_type：" + data_type);	
-		
+		System.out.println("data_type：" + data_type);
+
 		if (RegexUtil.isNotNull(data_type) && data_type != 0 && data_type != 1) {
 			return false;
 		}
 
-		Integer code_type = json.getInteger("code_type");
-		System.out.println("code_type：" + code_type);
-		if (code_type == null) {
+		String code_typeStr = json.getString("code_type");
+		System.out.println("code_type：" + code_typeStr);
+		if (RegexUtil.isNull(code_typeStr)) {
 			return false;
-		}	
-		
-		if (!FieldLimit.containCkList(FieldLimit.CODE_TYPE_ARR, code_type)) {
+		}
+		Integer code_type = json.getInteger("code_type");
+		if (RegexUtil.isNotNull(code_typeStr) && !FieldLimit.containCkList(FieldLimit.CODE_TYPE_ARR, code_type)) {
 			return false;
 		}
 
 		System.out.println("验证通过");
 		return true;
 	}
-	
-	
+
+	public static boolean dataPermiBatchVal(JSONObject json) {
+		String user_id = json.getString("userid");
+		System.out.println("userid：" + user_id);
+		if (RegexUtil.isNull(user_id)) {
+			return false;
+		}
+
+		if (RegexUtil.isNotNull(user_id) && !RegexUtil.isDigits(user_id)) {
+			return false;
+		}
+
+		String data = json.getString("data");
+		System.out.println("data：" + data);
+		if (RegexUtil.isNull(data)) {
+			return false;
+		}
+
+		System.out.println("验证通过");
+		return true;
+	}
+
 	public static boolean dataPermiUpdateVal(JSONObject json) {
 		String id = json.getString("id");
 		System.out.println("id：" + id);
-		if (id == null) {
+		if (RegexUtil.isNull(id)) {
 			return false;
 		}
-		
+
 		if (RegexUtil.isNotNull(id) && !RegexUtil.isDigits(id)) {
 			return false;
 		}
-		
+
 		String user_id = json.getString("user_id");
 		System.out.println("user_id：" + user_id);
-		if (user_id == null) {
+		if (RegexUtil.isNull(user_id)) {
 			return false;
 		}
 
@@ -75,21 +96,22 @@ public class DataPermiValidator {
 		}
 
 		String code_value = json.getString("code_value");
-		System.out.println("code_value：" + code_value);		
-		if (RegexUtil.isNotNull(code_value) && !ParamValidator.isCode(code_value, FieldLimit.DATA_CODE_MIN, FieldLimit.DATA_CODE_MAX)) {
+		System.out.println("code_value：" + code_value);
+		if (RegexUtil.isNotNull(code_value)
+				&& !ParamValidator.isCode(code_value, FieldLimit.DATA_CODE_MIN, FieldLimit.DATA_CODE_MAX)) {
 			return false;
 		}
 
-		Integer data_type = json.getInteger("data_type");
-		System.out.println("data_type：" + data_type);	
-		
-		if (RegexUtil.isNotNull(data_type) && data_type != 0 && data_type != 1) {
+		String data_type = json.getString("data_type");
+		System.out.println("data_type：" + data_type);
+
+		if (RegexUtil.isNotNull(data_type) && !data_type.equals("0") && !data_type.equals("1")) {
 			return false;
 		}
 
 		Integer code_type = json.getInteger("code_type");
-		System.out.println("code_type：" + code_type);		
-		if (RegexUtil.isNotNull(code_type)&&!FieldLimit.containCkList(FieldLimit.CODE_TYPE_ARR, code_type)) {
+		System.out.println("code_type：" + code_type);
+		if (RegexUtil.isNotNull(code_type) && !FieldLimit.containCkList(FieldLimit.CODE_TYPE_ARR, code_type)) {
 			return false;
 		}
 
@@ -98,13 +120,14 @@ public class DataPermiValidator {
 	}
 
 	public static boolean dataPermiDelVal(JSONObject json) {
-		Integer type = json.getInteger("type");
-		System.out.println("type：" + type);
-		if (type == null) {
+		String typeStr = json.getString("type");
+		System.out.println("type：" + typeStr);
+		if (RegexUtil.isNull(typeStr)) {
 			return false;
 		}
 
-		if (!FieldLimit.containCkList(FieldLimit.SEARCH_TYPE_ARR, type)) {
+		Integer type = json.getInteger("type");
+		if (RegexUtil.isNotNull(typeStr) && !FieldLimit.containCkList(FieldLimit.SEARCH_TYPE_ARR, type)) {
 			return false;
 		}
 
@@ -120,58 +143,52 @@ public class DataPermiValidator {
 			return false;
 		}
 
-		if (!ParamValidator.isStrLength(id, FieldLimit.DATA_ID_MIN, FieldLimit.DATA_ID_MAX)) {
+		if (RegexUtil.isNotNull(id)
+				&& !ParamValidator.isStrLength(id, FieldLimit.DATA_ID_MIN, FieldLimit.DATA_ID_MAX)) {
 			return false;
-		}		
+		}
 
 		System.out.println("验证通过");
 		return true;
 	}
 
-	public static boolean dataPermiQueryVal(JSONObject json) {
-		Integer type = json.getInteger("type");
+	public static boolean dataQueryVal(JSONObject json) {
+		String type = json.getString("type");
 		System.out.println("type：" + type);
-		if (type == null) {
+		if (RegexUtil.isNull(type))
 			return false;
-		}
-	
-		if (RegexUtil.isNotNull(type) && type != 0 && type != 1  && type != 2) {
-			return false;
-		}
 
-		if (!FieldLimit.containCkList(FieldLimit.DATA_SEARCH_TYPE_ARR, type)) {
+		if (RegexUtil.isNotNull(type) && !type.equals("0") && !type.equals("1") && !type.equals("2")) {
 			return false;
-		}
+		}    
 		
-		String user_id = json.getString("user_id");
-		System.out.println("user_id：" + user_id);
-		// if (RegexUtil.isNotNull(user_id) && !RegexUtil.isDigits(user_id)) {
-		// return false;
-		// }
-
-		String id = json.getString("id");
-		System.out.println("id：" + id);
-		if (RegexUtil.isNotNull(id) && !RegexUtil.isDigits(id)) {
+		String search = json.getString("search");
+		System.out.println("search：" + search);		
+		if (RegexUtil.isNotNull(search) && (type.equals("1")||type.equals("2"))&& !RegexUtil.isDigits(search)) {
 			return false;
-		}		
+		}
 
 		String page = json.getString("page");
-		System.out.println("page：" + page);
-		if (page != null && !RegexUtil.isDigits(page)) {
-			return false;
-		}
-
-		if (page != null && json.getInteger("page") == 0) {
-			return false;
-		}
-
 		String listRows = json.getString("listRows");
-		if (listRows != null && !RegexUtil.isDigits(listRows)) {
+		if (!PubParamValidator.pageVal(page, listRows))
 			return false;
-		}
 
-		
 		System.out.println("验证通过");
 		return true;
 	}
+	
+	public static boolean dataPermiQueryVal(JSONObject json) {
+		String user_id = json.getString("user_id");
+		System.out.println("user_id：" + user_id);
+		if (RegexUtil.isNull(user_id))
+			return false;
+		
+		if (RegexUtil.isNotNull(user_id) && !RegexUtil.isDigits(user_id)) {
+			return false;
+		}
+
+		System.out.println("验证通过");
+		return true;
+	}
+	
 }

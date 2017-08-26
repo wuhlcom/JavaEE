@@ -10,7 +10,7 @@ public class FieldLimit {
 	// Menu restriction
 	public static final int MENU_NAME_MIN = 1;
 	public static final int MENU_NAME_MAX = 16;
-	public static final int URI_LEN_MIN = 2;
+	public static final int URI_LEN_MIN = 1;
 	public static final int URI_LEN_MAX = 45;
 	public static final int MENU_CODE_MIN = 1;
 	public static final int MENU_CODE_MAX = 20;

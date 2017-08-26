@@ -20,10 +20,11 @@ public class TokenValidator {
 		RestTemplate restTemplate = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
 		MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
+		
 		headers.setContentType(type);
 		headers.add("Accept", MediaType.APPLICATION_JSON.toString());
 		jsonObj.put("token", token);	
-
+		
 		HttpEntity<String> formEntity = new HttpEntity<String>(jsonObj.toString(), headers);
 		String result = restTemplate.postForObject(token_url, formEntity, String.class);
 		

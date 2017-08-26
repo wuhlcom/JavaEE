@@ -6,6 +6,7 @@ package com.dazk.service;
 
 import java.util.List;
 import com.alibaba.fastjson.JSONObject;
+import com.dazk.db.model.Menu;
 import com.dazk.db.model.Role;
 import com.dazk.db.model.RolePermission;
 
@@ -21,4 +22,6 @@ public interface RolePermissionService {
 	int updateRoleMenu(JSONObject obj);
 	int delRoleMenu(JSONObject obj);
 	boolean menuAuth(String url, Long roleId);
+	List<Menu> queryRoleMenus(JSONObject obj);
+	int queryRoleMenusCount(JSONObject obj);
 }

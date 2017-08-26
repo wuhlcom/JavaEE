@@ -16,6 +16,10 @@ public class RoleValidator {
 	public static boolean roleVal(JSONObject json) {
 		String name = json.getString("name");
 		System.out.println("name：" + name);
+		if (RegexUtil.isNull(name)) {
+			return false;
+		}
+		
 		if (!isRoleName(name)) {
 			return false;
 		}
@@ -41,37 +45,30 @@ public class RoleValidator {
 	}
 
 	public static boolean roleQueryVal(JSONObject json) {
-		Integer type = json.getInteger("type");
+		String type = json.getString("type");
 		System.out.println("type：" + type);
-		if (type == null)
+		if (RegexUtil.isNull(type))
 			return false;
 
-		if (type != null && type != 0 && type != 1 && type != 2) {
+		if (RegexUtil.isNotNull(type)&& !type.equals("0") && !type.equals("1")&& !type.equals("2")) {
 			return false;
 		}
 
-		if (type == 1) {
+		if (type.equals("1")){
 			String search = json.getString("search");
 			System.out.println("search：" + search);
+			if (RegexUtil.isNull(search))
+				return false;
+			
 			if (!isRoleName(search)) {
 				return false;
 			}
 		}
 
 		String page = json.getString("page");
-		System.out.println("page：" + page);
-		if (page != null && !RegexUtil.isDigits(page)) {
-			return false;
-		}
-
-		if (page != null && json.getInteger("page") == 0) {
-			return false;
-		}
-		// listRows可以为空
 		String listRows = json.getString("listRows");
-		if (listRows != null && !RegexUtil.isDigits(listRows)) {
+		if (!PubParamValidator.pageVal(page, listRows))
 			return false;
-		}
 
 		System.out.println("验证通过");
 		return true;
@@ -91,10 +88,7 @@ public class RoleValidator {
 	 * 角色名是否合法
 	 */
 	public static boolean isRoleName(String name) {
-		if (RegexUtil.isNull(name) || !ParamValidator.isStrLength(name, FieldLimit.ROLE_NAME_MIN, FieldLimit.ROLE_NAME_MAX)) {
-			return false;
-		}
-		if (!RegexUtil.stringCheck(name)) {
+		if (RegexUtil.isNotNull(name) && (!ParamValidator.isStrLength(name, FieldLimit.ROLE_NAME_MIN, FieldLimit.ROLE_NAME_MAX)||!RegexUtil.stringCheck(name))) {
 			return false;
 		}
 
@@ -105,12 +99,10 @@ public class RoleValidator {
 	 * 角色Code
 	 */
 	public static boolean isRoleCode(String code, int min, int max) {
-		if (RegexUtil.isNull(code) || !ParamValidator.isStrLength(code, min, max)) {
+		if (RegexUtil.isNotNull(code)&&(!ParamValidator.isStrLength(code, min, max)||!RegexUtil.isDigits(code))) {
 			return false;
 		}
-		if (!RegexUtil.isDigits(code)) {
-			return false;
-		}
+
 		return true;
 	}
 }

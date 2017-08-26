@@ -4,18 +4,28 @@
 */
 package com.dazk.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.dazk.common.util.RegexUtil;
 import com.dazk.db.dao.DataPermissionMapper;
+import com.dazk.db.dao.UserMapper;
 import com.dazk.db.model.DataPermission;
+import com.dazk.db.model.Menu;
 import com.dazk.service.DataPermissionService;
+import com.dazk.service.RolePermissionService;
+import com.dazk.service.UserService;
 import com.github.pagehelper.PageHelper;
-
+import com.dazk.db.model.User;
 import tk.mybatis.mapper.entity.Example;
 
 @Service
@@ -24,6 +34,26 @@ public class DataPermissionServiceImpl implements DataPermissionService {
 	@Autowired
 	private DataPermissionMapper dataPermiMapper;
 
+	@Autowired
+	private UserMapper userMapper;
+
+	@Resource
+	private RolePermissionService rolePermiService;
+
+	public final static Integer COMPANY_CODE = 1;
+	public final static String COMPANY_ADD = "/company/add";
+	public final static String COMPANY_UPDATE = "/company/update";
+	public final static String COMPANY_DELETE = "/company/delete";
+
+	public final static Integer STATION_CODE = 2;
+	public final static String STATION_ADD = "/hotStation/add";
+	public final static String STATION_UPDATE = "/hotStation/update";
+	public final static String STATION_DELETE = "/hotStation/delete";
+
+	public final static Integer COMMUNITY_CODE = 3;
+	public final static String COMMUNITY_ADD = "/community/add";
+	public final static String COMMUNITY_UPDATE = "/community/update";
+	public final static String COMMUNITY_DELETE = "/community/delete";
 
 	@Override
 	public int addDataPermi(JSONObject obj) {
@@ -39,8 +69,74 @@ public class DataPermissionServiceImpl implements DataPermissionService {
 			return -1;
 		}
 
-		record = JSON.parseObject(obj.toJSONString(), DataPermission.class);	
-		return dataPermiMapper.insertSelective(record);	
+		record = JSON.parseObject(obj.toJSONString(), DataPermission.class);
+		return dataPermiMapper.insertSelective(record);
+	}
+
+	private int getDataType(Long userid, Integer codeType) {
+		Integer dateType = 0;
+		Example example = new Example(User.class);
+		// 创建查询条件
+		Example.Criteria recordCriteria = example.createCriteria();
+		recordCriteria.andEqualTo("isdel", 0).andEqualTo("id", userid);
+		example.and(recordCriteria);
+		List<User> user = userMapper.selectByExample(example);
+		Long userRoleId = user.get(0).getRole_id();
+
+		JSONObject obj = new JSONObject();
+		obj.put("role_id", userRoleId);
+		List<Menu> menus = rolePermiService.queryRoleMenus(obj);
+		if (menus.size() == 0) {
+			return dateType;
+		}
+
+		List<String> uris = new ArrayList<>();
+		for (Menu menu : menus) {
+			String uri = menu.getUri();
+			uris.add(uri);
+		}
+
+		if (codeType == COMPANY_CODE) {
+			if (uris.contains(COMPANY_ADD) || uris.contains(COMPANY_UPDATE) || uris.contains(COMPANY_DELETE)) {
+				dateType = 1;
+			}
+		} else if (codeType == STATION_CODE) {
+			if (uris.contains(STATION_ADD) || uris.contains(STATION_UPDATE) || uris.contains(STATION_DELETE)) {
+				dateType = 1;
+			}
+		} else if (codeType == COMMUNITY_CODE) {
+			if (uris.contains(COMMUNITY_ADD) || uris.contains(COMMUNITY_UPDATE) || uris.contains(COMMUNITY_DELETE)) {
+				dateType = 1;
+			}
+		}
+		return dateType;
+	}
+
+	// 批量添加数据权限
+	@Override
+	public int addDataPermiBatch(JSONObject obj) {
+		List<DataPermission> dataList = new ArrayList<>();
+		Long user_id = obj.getLong("userid");
+		JSONArray datas = obj.getJSONArray("data");
+
+		for (Object data : datas) {
+			JSONObject jsonTemp = (JSONObject) data;
+			Integer code_type = jsonTemp.getInteger("code_type");
+			Integer data_type = getDataType(user_id, code_type);
+
+			jsonTemp.put("user_id", user_id);
+			jsonTemp.put("data_type", data_type);
+			DataPermission record = new DataPermission();
+
+			record = JSON.parseObject(jsonTemp.toJSONString(), DataPermission.class);
+
+			// int exist = dataPermiMapper.selectCount(record);
+			// if (exist != 0) {
+			// return -1;
+			// }
+			dataList.add(record);
+		}
+		return dataPermiMapper.insertList(dataList);
 	}
 
 	/**
@@ -117,14 +213,15 @@ public class DataPermissionServiceImpl implements DataPermissionService {
 	}
 
 	/**
-	 * type 0 所有， type 1 user_id type 2 id+user_id
+	 * type 0 所有， type 1 user_id type 2 user_id
 	 */
 	@Override
-	public List<DataPermission> queryDataPermi(JSONObject obj) {		
+	public List<DataPermission> queryData(JSONObject obj) {
 		Integer type = obj.getInteger("type");
 		Long id = obj.getLong("id");
 		Long user_id = obj.getLong("user_id");
-
+		List<DataPermission> rs=new ArrayList<>();
+		
 		DataPermission record = new DataPermission();
 		record = JSON.parseObject(obj.toJSONString(), DataPermission.class);
 
@@ -137,22 +234,41 @@ public class DataPermissionServiceImpl implements DataPermissionService {
 		}
 
 		Example example = new Example(DataPermission.class);
-		// 创建查询条件	
+		// 创建查询条件
 		Example.Criteria recordCriteria = example.createCriteria();
 		if (type == 0) {
-			return dataPermiMapper.selectAll();
+			rs = dataPermiMapper.selectAll();
 		} else if (type == 1) {
 			recordCriteria.andEqualTo("user_id", user_id);
 			example.and(recordCriteria);
-			return dataPermiMapper.selectByExample(example);
+			rs = dataPermiMapper.selectByExample(example);
 		} else if (type == 2) {
-			recordCriteria.andEqualTo("id", id).andEqualTo("user_id", user_id);
+			recordCriteria.andEqualTo("id", id);
 			example.and(recordCriteria);
-			return dataPermiMapper.selectByExample(example);
-		} else {
-			return null;
-		}
+			rs = dataPermiMapper.selectByExample(example);
+		} 
+		return rs;
+	}
 
+	@Override
+	public List<String> queryDataPermi(JSONObject obj) {
+		Long user_id = obj.getLong("user_id");
+		List<String> dataLs = new ArrayList<>();
+		Example example = new Example(DataPermission.class);	
+		Example.Criteria recordCriteria = example.createCriteria();
+		recordCriteria.andEqualTo("user_id", user_id);
+		example.and(recordCriteria);
+		List<DataPermission> datas = dataPermiMapper.selectByExample(example);
+		for (DataPermission data : datas) {
+			String code = data.getCode_value();
+			if (RegexUtil.isNotNull(code)) {
+				dataLs.add(code);
+			}
+		}	
+		// if (dataLs.size()==0) {
+		// return null;
+		// }
+		return dataLs;	
 	}
 
 	@Override
@@ -174,7 +290,7 @@ public class DataPermissionServiceImpl implements DataPermissionService {
 		} else if (type == 2) {
 			recordCriteria.andEqualTo("id", id).andEqualTo("user_id", user_id);
 			example.and(recordCriteria);
-		}		
+		}
 		return dataPermiMapper.selectCountByExample(example);
 	}
 
