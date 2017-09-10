@@ -10,6 +10,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,6 +26,7 @@ import com.dazk.common.util.RegexUtil;
 import com.dazk.db.model.DataPermission;
 import com.dazk.service.DataPermissionService;
 import com.dazk.service.RolePermissionService;
+import com.dazk.service.impl.MenuServiceImpl;
 import com.dazk.validator.DataPermiValidator;
 import com.dazk.validator.PubParamValidator;
 import com.dazk.validator.TokenValidator;
@@ -32,6 +35,8 @@ import com.dazk.validator.DataPermiValidator;
 @RestController
 @RequestMapping("/data")
 public class DataPermiController {
+	public final static Logger logger = LoggerFactory.getLogger(DataPermiController.class);
+	
 	@Resource
 	private DataPermissionService dataPermiService;
 	@Resource
@@ -277,7 +282,7 @@ public class DataPermiController {
 			resultObj.put("errcode", ResultStatusCode.SUCCESS.getCode());
 			resultObj.put("totalRows", totalRows);
 			resultObj.put("result", result);
-			return resultObj.toJSONString();
+			return resultObj.toString();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "查询用户数据权限时出现异常");

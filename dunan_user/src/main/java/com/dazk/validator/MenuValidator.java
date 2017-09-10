@@ -5,95 +5,86 @@
 package com.dazk.validator;
 
 import com.alibaba.fastjson.JSONObject;
+import com.dazk.common.errcode.Result;
+import com.dazk.common.errcode.ResultErr;
+import com.dazk.common.errcode.ResultStatusCode;
 import com.dazk.common.util.ParamValidator;
 import com.dazk.common.util.RegexUtil;
 
 public class MenuValidator {
 	/**
 	 * 添加菜单时校验参数
-	 * 
-	 * @Title: menuVal @Description: TODO @param @param
-	 *         json @param @return @return boolean @throws
+	 * 	
 	 */
-	public static boolean menuVal(JSONObject json) {
+	public static ResultErr menuVal(JSONObject json) {
 		String name = json.getString("name");
 		System.out.println("name：" + name);
-		if (RegexUtil.isNull(name))
-			return false;
-
-		if (!isMenuName(name)) {
-			return false;
-		}
+		if (RegexUtil.isNull(name)||!isMenuName(name))
+		    return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "菜单名输入错误");
+		
 
 		String is_menu = json.getString("is_menu");
 		System.out.println("is_menu：" + is_menu);
-		if (RegexUtil.isNull(is_menu))
-			return false;
-
-		if (RegexUtil.isNotNull(is_menu) && !is_menu.equals("0") && !is_menu.equals("1") && !is_menu.equals("2")) {
-			return false;
-		}
+		if (RegexUtil.isNull(is_menu)||(RegexUtil.isNotNull(is_menu) && !is_menu.equals("0") && !is_menu.equals("1") && !is_menu.equals("2")))
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "菜单类型错误");
+		
 
 		String parent_id = json.getString("parent_id");
 		System.out.println("parent_id：" + parent_id);
 		if (RegexUtil.isNotNull(parent_id) && !RegexUtil.isDigits(parent_id)) {
-			return false;
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "父菜单名类型ID错误");
 		}
 
 		String uri = json.getString("uri");
 		System.out.println("uri：" + uri);
 		if (!isUriParam(uri))
-			return false;
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "菜单Url错误");
 
 		String front_router = json.getString("front_router");
 		System.out.println("front_router：" + front_router);
 		if (!isUriParam(front_router))
-			return false;
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "前置路由Url错误");
 
 		System.out.println("验证通过");
-		return true;
+		return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
 	}
 
-	public static boolean menuUpdateVal(JSONObject json) {
+	public static ResultErr menuUpdateVal(JSONObject json) {
 		String id = json.getString("id");
 		System.out.println("id：" + id);
-		if (RegexUtil.isNull(id))
-			return false;
-
-		if (!isMenuId(id)) {
-			return false;
-		}
+		if (RegexUtil.isNull(id)||!isMenuId(id))
+			  return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "菜单ID错误");
 
 		String name = json.getString("name");
 		System.out.println("name：" + name);
 		if (!isMenuName(name)) {
-			return false;
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "菜单名错误");
 		}
 
 		String is_menu = json.getString("is_menu");
 		System.out.println("is_menu：" + is_menu);
 		if (RegexUtil.isNotNull(is_menu) && !is_menu.equals("0") && !is_menu.equals("1") && !is_menu.equals("2")) {
-			return false;
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "菜单类型错误");
 		}
 
 		String parent_id = json.getString("parent_id");
 		System.out.println("parent_id：" + parent_id);
 		if (RegexUtil.isNotNull(parent_id) && !RegexUtil.isDigits(parent_id)) {
-			return false;
+			  return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "父菜单ID错误");
 		}
 
 		String uri = json.getString("uri");
 		System.out.println("uri：" + uri);
 		if (!isUriParam(uri))
-			return false;
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "菜单Url错误");
 
 		String front_router = json.getString("front_router");
 		System.out.println("front_router：" + front_router);
 		if (!isUriParam(front_router))
-			return false;
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "前置路由Url错误");
 
 		System.out.println("验证通过");
-		return true;
+		return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
 	}
 
 	/**

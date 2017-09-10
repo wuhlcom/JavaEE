@@ -5,6 +5,8 @@
 package com.dazk.validator;
 
 import com.alibaba.fastjson.JSONObject;
+import com.dazk.common.errcode.ResultErr;
+import com.dazk.common.errcode.ResultStatusCode;
 import com.dazk.common.util.ParamValidator;
 import com.dazk.common.util.RegexUtil;
 
@@ -13,16 +15,12 @@ public class RoleValidator {
 	 * 角色参数校验 @Title: RoleVal @Description: TODO @param @param
 	 * json @param @return @return boolean @throws
 	 */
-	public static boolean roleVal(JSONObject json) {
+	public static ResultErr roleVal(JSONObject json) {
 		String name = json.getString("name");
 		System.out.println("name：" + name);
-		if (RegexUtil.isNull(name)) {
-			return false;
-		}
-		
-		if (!isRoleName(name)) {
-			return false;
-		}
+		if (RegexUtil.isNull(name)||!isRoleName(name)) {		
+			    return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "角色名有错误");
+		}		
 		
 		String user_id = json.getString("user_id");
 		System.out.println("user_id：" + user_id);		
@@ -37,11 +35,11 @@ public class RoleValidator {
 		String remark = json.getString("remark");
 		System.out.println("remark：" + remark);
 		if (RegexUtil.isNotNull(remark) && !ParamValidator.isStrLength(remark, 0, FieldLimit.ROLE_REMARKS_MAX)) {
-			return false;
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "角色描述有错误");
 		}
 
 		System.out.println("验证通过");
-		return true;
+		return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
 	}
 
 	public static boolean roleQueryVal(JSONObject json) {

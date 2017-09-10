@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.dazk.db.dao.UserMapperMy">
+<mapper namespace="com.dazk.db.dao.UserMapper">    
 	<select id="queryUser" resultType="com.dazk.db.model.User"
 		parameterType="com.dazk.db.param.UserParam">
-		select u.id,u.nickname,u.username,r.name
+		select u.id,u.username,u.name,u.nickname,r.name as roleName,u.age,u.lv,u.email,u.telephone,u.sex,u.company,u.address,u.position,u.idcard,u.remark
 		from
 		(
-		select * from user where
-		isdel=0
+		select * from user where isdel=0
 		<if test="userName != null">
 			and username like '%${userName}%'
 		</if>
@@ -17,10 +16,9 @@
 		</if>
 
 		<if test="listRows != null">
-			limit
-			#{start,jdbcType=INTEGER},#{listRows,jdbcType=INTEGER}
+			limit #{start,jdbcType=INTEGER},#{listRows,jdbcType=INTEGER}
 		</if>
-		) as u left join
+		) as u inner join
 		(
 		select * from role where 1=1
 		<if test="roleName != null">

@@ -13,9 +13,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.codec.binary.Base64;
 
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -25,12 +22,7 @@ import java.util.Random;
 import java.util.Scanner;
 import java.security.Key;
 
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.commons.codec.binary.Base64;
 
 public class PubUtil {
 	public final static String DATA_CODE = "application/json;charset=UTF-8";
@@ -140,7 +132,8 @@ public class PubUtil {
 			// 解决办法：
 			// 在项目的Build path中先移除JRE System Library，再添加库JRE System
 			// Library，重新编译后就一切正常了。
-			String AES_encode = new String(new BASE64Encoder().encode(byte_AES));
+//			String AES_encode = new String(new BASE64Encoder().encode(byte_AES));
+			String AES_encode = null;
 			// 11.将字符串返回
 			return AES_encode;
 		} catch (NoSuchAlgorithmException e) {
@@ -182,7 +175,8 @@ public class PubUtil {
 			// 7.初始化密码器，第一个参数为加密(Encrypt_mode)或者解密(Decrypt_mode)操作，第二个参数为使用的KEY
 			cipher.init(Cipher.DECRYPT_MODE, key);
 			// 8.将加密并编码后的内容解码成字节数组
-			byte[] byte_content = new BASE64Decoder().decodeBuffer(content);
+//			byte[] byte_content = new BASE64Decoder().decodeBuffer(content);
+			byte[] byte_content ={'a'};
 			/*
 			 * 解密
 			 */

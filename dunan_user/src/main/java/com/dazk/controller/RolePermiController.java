@@ -10,6 +10,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,6 +27,7 @@ import com.dazk.common.util.RegexUtil;
 import com.dazk.db.model.RolePermission;
 import com.dazk.service.RolePermissionService;
 import com.dazk.validator.FieldLimit;
+import com.dazk.validator.MenuValidator;
 import com.dazk.validator.RolePermiValidator;
 import com.dazk.validator.RoleValidator;
 import com.dazk.validator.TokenValidator;
@@ -32,6 +35,8 @@ import com.dazk.validator.TokenValidator;
 @RestController
 @RequestMapping("/role")
 public class RolePermiController {
+	public final static Logger logger = LoggerFactory.getLogger(RolePermiController.class);
+	
 	@Resource
 	private RolePermissionService rolePermiService;
 
@@ -252,10 +257,12 @@ public class RolePermiController {
 
 			JSONObject parameter = JSON.parseObject(requestBody);
 			parameter.put("user_id", rsToken.getString("userid"));
+
 			// 数据校验
-			if (!RolePermiValidator.roleMenuVal(parameter)) {
+			ResultErr paramsVal = RolePermiValidator.roleMenuVal(parameter);
+			if (paramsVal.getErrcode() != 10001) {
 				// 非法数据，返回错误码
-				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+				return paramsVal;
 			}
 
 			// 数据入库，成功后返回.
@@ -305,7 +312,7 @@ public class RolePermiController {
 			} else if (res == -1) {
 				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "删除时程序出错");
 			} else if (res == 0) {
-				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "删除数据不存在");
+				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "要删除的数据不存在");
 			}
 			return new ResultErr(ResultStatusCode.UNKNOW_ERR.getCode(), ResultStatusCode.UNKNOW_ERR.getErrmsg());
 		} catch (Exception e) {

@@ -5,6 +5,8 @@
 package com.dazk.validator;
 
 import com.alibaba.fastjson.JSONObject;
+import com.dazk.common.errcode.ResultErr;
+import com.dazk.common.errcode.ResultStatusCode;
 import com.dazk.common.util.ParamValidator;
 import com.dazk.common.util.RegexUtil;
 
@@ -43,26 +45,26 @@ public class RolePermiValidator {
 		return true;
 	}
 
-	public static boolean roleMenuVal(JSONObject json) {
+	public static ResultErr roleMenuVal(JSONObject json) {
 		String name = json.getString("name");
 		System.out.println("name：" + name);
-		if (!RoleValidator.isRoleName(name)) {
-			return false;
+		if (RegexUtil.isNull(name) || !RoleValidator.isRoleName(name)) {
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "角色名错误");
 		}
 
 		String remark = json.getString("remark");
 		System.out.println("remark：" + remark);
 		if (RegexUtil.isNotNull(remark) && !ParamValidator.isStrLength(remark, 0, FieldLimit.ROLE_REMARKS_MAX)) {
-			return false;
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "备注信息错误");
 		}
 
 		String menus = json.getString("menus");
 		System.out.println("menus：" + menus);
-		if (RegexUtil.isNull(menus))
-			return false;
+		// if (RegexUtil.isNull(menus))
+		// return false;
 
 		System.out.println("验证通过");
-		return true;
+		return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
 	}
 
 	public static boolean roleMenuUpdateVal(JSONObject json) {
@@ -76,16 +78,21 @@ public class RolePermiValidator {
 			return false;
 		}
 
+		String name = json.getString("name");
+		System.out.println("name：" + name);
+		if (!RoleValidator.isRoleName(name)) {
+			return false;
+		}
+
 		String remark = json.getString("remark");
 		System.out.println("remark：" + remark);
 		if (RegexUtil.isNotNull(remark) && !ParamValidator.isStrLength(remark, 0, FieldLimit.ROLE_REMARKS_MAX)) {
 			return false;
 		}
 
+		// 可以为空或null
 		String menus = json.getString("menus");
 		System.out.println("menus：" + menus);
-		if (RegexUtil.isNull(menus))
-			return false;
 
 		System.out.println("验证通过");
 		return true;
@@ -99,6 +106,18 @@ public class RolePermiValidator {
 		}
 
 		if (!isRoleId(role_id, FieldLimit.ROLE_ID_MIN, FieldLimit.ROLE_ID_MAX)) {
+			return false;
+		}
+
+		String menus = json.getString("menus");
+		System.out.println("menus：" + menus);
+		if (RegexUtil.isNull(menus)) {
+			return false;
+		}
+
+		boolean isMatched = menus.matches("^\\d+");
+		System.out.println(isMatched);
+		if (!isMatched) {
 			return false;
 		}
 

@@ -12,7 +12,7 @@ import javax.persistence.Table;
 
 //注意Menu对应的表名为resource
 @Table(name = "resource")
-public class Menu extends BaseEntity {
+public class Menu extends BaseEntity implements Comparable<Menu> {
 	// `id` int(11) NOT NULL AUTO_INCREMENT,
 	private Long id;
 	// `name` varchar(20) NOT NULL COMMENT '名称',
@@ -33,6 +33,57 @@ public class Menu extends BaseEntity {
 	// `isdel` tinyint(4) NOT NULL DEFAULT '0',
 	private Integer isdel;
 	
+	
+	
+	/**
+	 * 
+	 */
+	public Menu() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	
+		
+
+	/**
+	 * @param id
+	 * @param name
+	 * @param code
+	 * @param uri
+	 * @param is_menu
+	 * @param lv
+	 * @param role_id
+	 * @param include_url
+	 * @param created_at
+	 * @param isdel
+	 * @param parent_id
+	 * @param front_router
+	 */
+	public Menu(Long id, String name, String code, String uri, Integer is_menu, Long lv, Long role_id,
+			Integer include_url, Long created_at, Integer isdel, Long parent_id, String front_router) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.code = code;
+		this.uri = uri;
+		this.is_menu = is_menu;
+		this.lv = lv;
+		this.role_id = role_id;
+		this.include_url = include_url;
+		this.created_at = created_at;
+		this.isdel = isdel;
+		this.parent_id = parent_id;
+		this.front_router = front_router;
+	}
+
+	 public int compareTo(Menu menu) {
+	        if (this.id > menu.getId()) {
+	            return 1;
+	        } else {
+	            return -1;
+	        }
+	    }
+
 	// parent
 	private Long parent_id=0L;
 	

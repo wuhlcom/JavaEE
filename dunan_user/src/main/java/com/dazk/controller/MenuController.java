@@ -6,14 +6,18 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.dazk.common.errcode.Result;
 import com.dazk.common.errcode.ResultErr;
 import com.dazk.common.errcode.ResultStatusCode;
 
 import com.dazk.common.util.PubUtil;
+import com.dazk.common.util.RegexUtil;
 import com.dazk.db.model.Menu;
 import com.dazk.service.MenuService;
 import com.dazk.service.RolePermissionService;
@@ -24,6 +28,8 @@ import com.dazk.validator.TokenValidator;
 @RestController
 @RequestMapping("/menu")
 public class MenuController {
+	public final static Logger logger = LoggerFactory.getLogger(MenuController.class);
+	
 	@Resource
 	private MenuService menuService;
 
@@ -34,7 +40,7 @@ public class MenuController {
 	public Object addMenu(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
 
 		try {
-			System.out.println("Request=" + requestBody);
+			logger.debug("Request=" + requestBody);
 			// 权限验证
 			// post head token
 			String token = request.getHeader("token");
@@ -53,10 +59,15 @@ public class MenuController {
 
 			JSONObject parameter = JSON.parseObject(requestBody);
 			parameter.put("user_id", rsToken.getString("userid"));
+			String roleId = parameter.getString("role_id");
+			if (RegexUtil.isNull(roleId)) {
+				parameter.put("role_id", rsToken.getString("role"));
+			}
 			// 数据校验
-			if (!MenuValidator.menuVal(parameter)) {
+			ResultErr paramsVal =MenuValidator.menuVal(parameter);
+			if (paramsVal.getErrcode()!=10001) {
 				// 非法数据，返回错误码
-				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+				return paramsVal;
 			}
 
 			// 数据入库，成功后返回.
@@ -80,7 +91,7 @@ public class MenuController {
 	@RequestMapping(value = "/delMenu", method = RequestMethod.POST, produces = PubUtil.DATA_CODE)
 	public Object delMenu(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
 		try {
-			System.out.println("Request=" + requestBody);
+			logger.debug("Request=" + requestBody);
 
 			// 权限验证
 			// String token = request.getParameter("token");
@@ -110,6 +121,8 @@ public class MenuController {
 				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "删除时程序出错");
 			} else if (res == 0) {
 				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "删除数据不存在");
+			} else if (res ==-2){
+				return new ResultErr(ResultStatusCode.REPETITION_ERR.getCode(), "当前菜单有子菜单无法直接删除");
 			}
 			return new ResultErr(ResultStatusCode.UNKNOW_ERR.getCode(), ResultStatusCode.UNKNOW_ERR.getErrmsg());
 		} catch (Exception e) {
@@ -122,7 +135,7 @@ public class MenuController {
 	public Object updateMenu(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody String requestBody) {
 		try {
-			System.out.println("Request=" + requestBody);
+			logger.debug("Request=" + requestBody);
 			/// 权限验证
 			// post head token
 			String token = request.getHeader("token");
@@ -139,10 +152,11 @@ public class MenuController {
 
 			JSONObject parameter = JSON.parseObject(requestBody);
 			parameter.put("user_id", rsToken.getString("userid"));
-			// 数据校验
-			if (!MenuValidator.menuUpdateVal(parameter)) {
+			// 数据校验			
+			ResultErr paramsVal =MenuValidator.menuUpdateVal(parameter);
+			if (paramsVal.getErrcode()!=10001) {
 				// 非法数据，返回错误码
-				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+				return paramsVal;
 			}
 
 			// 数据入库，成功后返回.
@@ -165,7 +179,7 @@ public class MenuController {
 	public Object queryMenu(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
 		try {
 
-			System.out.println("Request=" + requestBody);
+			logger.debug("Request=" + requestBody);
 			// 权限验证
 			// post head token
 			String token = request.getHeader("token");

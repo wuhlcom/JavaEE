@@ -20,5 +20,9 @@ public interface RoleService {
 
 	public List<Role> queryRole(JSONObject obj);
 
+	Role queryRoleOne(JSONObject obj);
+
+	int addSuperRole(JSONObject obj);
+
 
 }

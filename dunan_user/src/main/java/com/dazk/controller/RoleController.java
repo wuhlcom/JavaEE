@@ -10,6 +10,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +34,7 @@ import com.dazk.validator.TokenValidator;
 @RestController
 @RequestMapping("/role")
 public class RoleController {
+	public final static Logger logger = LoggerFactory.getLogger(RoleController.class);
 
 	@Resource
 	private RoleService roleService;
@@ -60,10 +63,11 @@ public class RoleController {
 
 			JSONObject parameter = JSON.parseObject(requestBody);	
 			parameter.put("user_id", rsToken.getString("userid"));	
-			// 数据校验
-			if (!RoleValidator.roleVal(parameter)) {
+			// 数据校验					
+			ResultErr paramsVal =RoleValidator.roleVal(parameter);
+			if (paramsVal.getErrcode()!=10001) {
 				// 非法数据，返回错误码
-				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+				return paramsVal;
 			}
 
 			// 数据入库，成功后返回.			
@@ -146,9 +150,10 @@ public class RoleController {
 			JSONObject parameter = JSON.parseObject(requestBody);
 			parameter.put("user_id", rsToken.getString("userid"));
 			// 数据校验
-			if (!RoleValidator.roleVal(parameter)) {
+			ResultErr paramsVal =RoleValidator.roleVal(parameter);
+			if (paramsVal.getErrcode()!=10001) {
 				// 非法数据，返回错误码
-				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+				return paramsVal;
 			}
 
 			// 数据入库，成功后返回.

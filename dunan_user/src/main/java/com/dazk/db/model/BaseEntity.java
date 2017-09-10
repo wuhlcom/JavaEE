@@ -23,6 +23,9 @@ public class BaseEntity {
     
     @Transient
     private String name;
+    
+    @Transient
+    private String roleName;
 
     @Transient
     private Integer listRows;
@@ -57,7 +60,15 @@ public class BaseEntity {
 
 	public void setName(String name) {
 		this.name = name;
-	}    
+	}
+
+	public String getRoleName() {
+		return roleName;
+	}
+
+	public void setRoleName(String roleName) {
+		this.roleName = roleName;
+	}  		
     
 }
 

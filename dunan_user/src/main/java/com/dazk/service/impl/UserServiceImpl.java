@@ -17,8 +17,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.dazk.db.dao.RoleMapper;
 import com.dazk.db.dao.UserMapper;
 import com.dazk.db.dao.UserMapperMy;
-import com.dazk.db.model.Menu;
-import com.dazk.db.model.Role;
 import com.dazk.db.model.User;
 import com.dazk.db.param.UserParam;
 import com.dazk.service.UserService;
@@ -31,7 +29,7 @@ public class UserServiceImpl implements UserService {
 	final static String ENCRY_KEY = "q1w2e3r7i7o4i3uu";
 	@Autowired
 	private UserMapper userMapper;
-	
+
 	@Autowired
 	private UserMapperMy userMapperMy;
 
@@ -51,14 +49,14 @@ public class UserServiceImpl implements UserService {
 			return -1;
 		}
 
-		// 邮箱已存在则不添加	
+		// 邮箱已存在则不添加
 		record.setUsername(null);
 		record.setEmail(obj.getString("email"));
 		record.setIsdel(0);
 		record.setDisused(1);
 		exist = userMapper.selectCount(record);
 		if (exist > 0) {
-			return -1;
+			return -3;
 		}
 
 		// 电话号码已存在则不添加
@@ -69,7 +67,18 @@ public class UserServiceImpl implements UserService {
 		record.setDisused(0);
 		exist = userMapper.selectCount(record);
 		if (exist > 0) {
-			return -1;
+			return -4;
+		}
+
+		// 身份证已存在则不添加
+		record.setUsername(null);
+		record.setEmail(null);
+		record.setIdcard(obj.getString("idcard"));
+		record.setIsdel(0);
+		record.setDisused(0);
+		exist = userMapper.selectCount(record);
+		if (exist > 0) {
+			return -5;
 		}
 
 		record = JSON.parseObject(obj.toJSONString(), User.class);
@@ -101,10 +110,10 @@ public class UserServiceImpl implements UserService {
 		int exist = 0;
 		if (username != null) {
 			record.setUsername(username);
-			record.setIsdel(1);	
+			record.setIsdel(1);
 		} else if (id != null) {
 			record.setId(id);
-			record.setIsdel(1);			
+			record.setIsdel(1);
 		}
 		exist = userMapper.selectCount(record);
 
@@ -132,210 +141,9 @@ public class UserServiceImpl implements UserService {
 			return -1;
 		}
 	}
+		
 
-	public List<User> queryUserOld(JSONObject obj) {
-		User record = new User();
-		String username = obj.getString("username");
-		Long parent_user = obj.getLong("parent_user");
-		Long id = obj.getLong("id");
-
-		if (record.getPage() != null && record.getListRows() != null) {
-			PageHelper.startPage(record.getPage(), record.getListRows());
-		} else if (record.getPage() == null && record.getListRows() != null) {
-			PageHelper.startPage(1, record.getListRows());
-		} else if (record.getListRows() == null) {
-			PageHelper.startPage(1, 0);
-		}
-
-		Example example = new Example(User.class);
-		// 创建查询条件
-		Example.Criteria recordCriteria = example.createCriteria();
-		if (username != null) {
-			recordCriteria.andEqualTo("username", username).andEqualTo("parent_user", parent_user).andEqualTo("isdel",
-					0);
-			example.and(recordCriteria);
-		} else if (id != null) {
-			recordCriteria.andEqualTo("id", id).andEqualTo("parent_user", parent_user).andEqualTo("isdel", 0);
-			example.and(recordCriteria);
-		}
-
-		return userMapper.selectByExample(example);
-	}
-
-	// 根据条件查询用户信息
-	public Object query(JSONObject obj) {
-		Integer type = obj.getInteger("type");
-		String search = obj.getString("search");
-		Long parent_user = obj.getLong("parent_user");
-
-		User record = new User();
-		record = JSON.parseObject(obj.toJSONString(), User.class);
-		if (record.getPage() != null && record.getListRows() != null) {
-			PageHelper.startPage(record.getPage(), record.getListRows());
-		} else if (record.getPage() == null && record.getListRows() != null) {
-			PageHelper.startPage(1, record.getListRows());
-		} else if (record.getListRows() == null) {
-			PageHelper.startPage(1, 0);
-		}
-
-		Example userExample = new Example(User.class);
-		// 创建查询条件
-		Example.Criteria userCriteria = userExample.createCriteria();
-		List<User> users = null;
-		if (type == 0) {
-			userCriteria.andEqualTo("isdel", 0).andEqualTo("disused", 0).andEqualTo("parent_user", parent_user);
-			userExample.and(userCriteria);
-
-			users = userMapper.selectByExample(userExample);
-		} else if (type == 1) {
-			userCriteria.andLike("username", "%" + search + "%").andEqualTo("isdel", 0).andEqualTo("disused", 0)
-					.andEqualTo("parent_user", parent_user);
-			;
-			userExample.and(userCriteria);
-			users = userMapper.selectByExample(userExample);
-		}
-
-		if (users == null) {
-			return null;
-		}
-		return userRole(users);
-	}
-
-	/**
-	 * 生成用户和角色信息
-	 * 
-	 */
-	private Object userRole(List<User> users) {
-		List<Object> list = new ArrayList<>();
-		List<Role> roleRecored;
-		Map<String, Object> userMap = new HashMap<>();
-		Role role = new Role();
-		String nickName;
-		String userName;
-		String roleName;
-		Long userId;
-		Long role_id;
-		for (User user : users) {
-			role_id = user.getRole_id();
-			role.setId(role_id);
-			role.setIsdel(0);
-			int exist = roleMapper.selectCount(role);
-			if (exist == 0) {
-				return -2;
-			}
-
-			Example example = new Example(Role.class);
-			// 创建查询条件
-			Example.Criteria recordCriteria = example.createCriteria();
-			// 设置查询条件 多个andEqualTo串联表示 and条件查询
-			recordCriteria.andEqualTo("id", role_id).andEqualTo("isdel", 0);
-			example.and(recordCriteria);
-			roleRecored = roleMapper.selectByExample(example);
-			roleName = roleRecored.get(0).getName();
-			nickName = user.getNickname();
-			userName = user.getUsername();
-			userId = user.getId();
-			userMap.put("id", userId);
-			userMap.put("nickName", nickName);
-			userMap.put("username", userName);
-			userMap.put("roleName", roleName);
-			list.add(userMap);
-		}
-		return list;
-	}
-
-	@Override
-	public Object queryUserByRole(JSONObject obj) {
-		Integer type = obj.getInteger("type");
-		String search = obj.getString("search");
-		Long parent_user = obj.getLong("parent_user");
-
-		Role record = new Role();
-		record = JSON.parseObject(obj.toJSONString(), Role.class);
-		if (record.getPage() != null && record.getListRows() != null) {
-			PageHelper.startPage(record.getPage(), record.getListRows());
-		} else if (record.getPage() == null && record.getListRows() != null) {
-			PageHelper.startPage(1, record.getListRows());
-		} else if (record.getListRows() == null) {
-			PageHelper.startPage(1, 0);
-		}
-
-		Example roleExample = new Example(Role.class);
-		Example userExample = new Example(User.class);
-		// 创建查询条件
-		Example.Criteria roleCriteria = roleExample.createCriteria();
-		Example.Criteria userCriteria = userExample.createCriteria();
-		List<Role> roles = null;
-		List<User> users = null;
-		if (type == 0) {
-			roleCriteria.andEqualTo("isdel", 0).andEqualTo("disused", 0);
-			roleExample.and(roleCriteria);
-
-			userCriteria.andEqualTo("isdel", 0).andEqualTo("disused", 0).andEqualTo("parent_user", parent_user);
-			userExample.and(userCriteria);
-
-			roles = roleMapper.selectByExample(roleExample);
-			users = userMapper.selectByExample(userExample);
-		} else if (type == 1) {
-			roleCriteria.andLike("username", "%" + search + "%").andEqualTo("isdel", 0).andEqualTo("disused", 0)
-					.andEqualTo("parent_user", parent_user);
-			roleExample.and(roleCriteria);
-
-			userCriteria.andEqualTo("isdel", 0).andEqualTo("disused", 0);
-			userExample.and(userCriteria);
-			roles = roleMapper.selectByExample(roleExample);
-			users = userMapper.selectByExample(userExample);
-		}
-
-		if (roles == null || users == null) {
-			return null;
-		}
-		return queryUserAllByRole(roles, users);
-	}
-
-	/**
-	 * 通过角色查询用户信息
-	 * 
-	 */
-	private Object queryUserAllByRole(List<Role> roles, List<User> users) {
-		List<Object> list = new ArrayList<>();
-		Long userId;
-		String userName;
-		String nickName;
-		String userRemark;
-		Long roleId;
-		String roleName = "";
-		for (Role role : roles) {
-			roleId = role.getId();
-			roleName = role.getName();
-			List<Object> userList = new ArrayList<>();
-			for (User user : users) {
-				Map<String, Object> userMap = new HashMap<String, Object>();
-				if ((user.getRole_id() != null) && user.getRole_id().equals(roleId)) {
-					nickName = user.getNickname();
-					userId = user.getId();
-					userName = user.getUsername();
-					userRemark = user.getRemark();
-					userMap.put("id", userId);
-					userMap.put("nickname", nickName);
-					userMap.put("username", userName);
-					userMap.put("rolename", roleName);
-					userMap.put("remark", userRemark);
-				}
-				if (!userMap.isEmpty()) {
-					userList.add(userMap);
-				}
-			}
-			if (!userList.isEmpty()) {
-				list.add(userList);
-			}
-		}
-		if (list.isEmpty()) {
-			return null;
-		}
-		return list;
-	}
-
+	// 更新用户信息
 	@Override
 	public int updateUser(JSONObject obj) {
 		User record = new User();
@@ -350,7 +158,7 @@ public class UserServiceImpl implements UserService {
 			if (exist > 1) {
 				return -2;
 			}
-		}else if (id != null) {		
+		} else if (id != null) {
 			record.setId(id);
 			record.setIsdel(0);
 			int exist = userMapper.selectCount(record);
@@ -359,32 +167,46 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 
-		String email = obj.getString("email");
-		record.setEmail(email);
-		record.setIsdel(0);
-		int exist = userMapper.selectCount(record);
-		if (exist > 1) {
-			return -2;
+		String email = obj.getString("email");		
+		// 创建example
+		Example paramsExample = new Example(User.class);
+		// 创建查询条件
+		Example.Criteria paramsCriteria = paramsExample.createCriteria();
+		// 设置查询条件 多个andEqualTo串联表示 and条件查询
+		paramsCriteria.andNotEqualTo("id", id).andEqualTo("isdel", 0).andEqualTo("email", email);
+		paramsExample.and(paramsCriteria);
+		int exist = userMapper.selectCountByExample(paramsExample);
+		if (exist >= 1) {
+			return -3;
 		}
 
 		String telephone = obj.getString("telephone");
-		record.setTelephone(telephone);
-		record.setIsdel(0);
-		exist = userMapper.selectCount(record);
-		if (exist > 1) {
-			return -2;
+		paramsExample.clear();
+		paramsCriteria.andNotEqualTo("id", id).andEqualTo("isdel", 0).andEqualTo("telephone", telephone);
+		paramsExample.and(paramsCriteria);
+
+		exist = userMapper.selectCountByExample(paramsExample);
+		if (exist >= 1) {
+			return -4;
 		}
 
-		if (exist == 0) {
-			return 0;
+		String idcard = obj.getString("idcard");
+		paramsExample.clear();
+		paramsCriteria.andNotEqualTo("id", id).andEqualTo("isdel", 0).andEqualTo("idcard", idcard);
+		paramsExample.and(paramsCriteria);
+		exist = userMapper.selectCountByExample(paramsExample);
+		if (exist >= 1) {
+			return -5;
 		}
 
 		record = JSON.parseObject(obj.toJSONString(), User.class);
 		try {
+
 			// 创建example
 			Example example = new Example(User.class);
 			// 创建查询条件
 			Example.Criteria criteria = example.createCriteria();
+
 			// 设置查询条件 多个andEqualTo串联表示 and条件查询
 			if (id != null) {
 				criteria.andEqualTo("id", id).andEqualTo("isdel", 0).andEqualTo("parent_user", parent_user);
@@ -399,38 +221,102 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
-	/**  
-	* @Title: js2UesrParam  
-	* @Description: TODO 
-	* @param @param obj
-	* @param @return   
-	* @return UserParam   
-	* @throws  
-	*/
+	/**
+	 * @Title: js2UesrParam @Description: TODO @param @param
+	 *         obj @param @return @return UserParam @throws
+	 */
 	private UserParam js2UesrParam(JSONObject obj) {
 		Integer type = obj.getInteger("type");
+		String userName = null;
+		String roleName = null;
+		if (type == 1) {
+			roleName = obj.getString("search");
+		} else if (type == 2) {
+			userName = obj.getString("search");
+		}
+
 		Long parentUser = obj.getLong("parentUser");
-		String userName = obj.getString("userName");
-		String roleName = obj.getString("search");
 		Integer page = obj.getInteger("page");
 		Integer listRows = obj.getInteger("listRows");
 		UserParam paramBean = new UserParam(type, parentUser, userName, roleName, page, listRows);
 		return paramBean;
 	}
 
+	// 处理返回结果
+	/**
+	 * @Title: queryUserResult @Description: TODO @param @param result @return
+	 *         void @throws
+	 */
+	private List<User> queryUserResult(List<User> result) {
+		for (int i = 0; i < result.size(); i++) {
+			result.get(i).setIsdel(null);
+			result.get(i).setDisused(null);
+			if (result.get(i).getAge() == null) {
+				result.get(i).setAge(0);
+			}
 
+			if (result.get(i).getSex() == null) {
+				result.get(i).setSex(0);
+			}
+
+			if (result.get(i).getName() == null) {
+				result.get(i).setName("");
+			}
+			if (result.get(i).getRoleName() == null) {
+				result.get(i).setRoleName("");
+			}
+
+			if (result.get(i).getLv() == null) {
+				result.get(i).setLv("");
+			}
+
+			if (result.get(i).getEmail() == null) {
+				result.get(i).setEmail("");
+			}
+
+			if (result.get(i).getTelephone() == null) {
+				result.get(i).setTelephone("");
+			}
+
+			if (result.get(i).getCompany() == null) {
+				result.get(i).setCompany("");
+			}
+
+			if (result.get(i).getAddress() == null) {
+				result.get(i).setAddress("");
+			}
+
+			if (result.get(i).getPosition() == null) {
+				result.get(i).setPosition("");
+			}
+
+			if (result.get(i).getIdcard() == null) {
+				result.get(i).setIdcard("");
+			}
+
+			if (result.get(i).getRemark() == null) {
+				result.get(i).setRemark("");
+			}
+
+		}
+		return result;
+	}
+
+	// 查询用户信息
 	@Override
 	public List<User> queryUser(JSONObject obj) {
 		UserParam paramBean = js2UesrParam(obj);
 		System.out.println(paramBean);
-		return userMapperMy.queryUser(paramBean);
+		List<User> userResult = userMapper.queryUser(paramBean);
+		userResult = queryUserResult(userResult);
+		return userResult;
 	}
-	
 
+	// 统计数量
 	@Override
 	public int queryUserCount(JSONObject obj) {
-		UserParam paramBean = js2UesrParam(obj);		
-		return userMapperMy.queryUserCount(paramBean);
+		UserParam paramBean = js2UesrParam(obj);
+		return userMapper.queryUserCount(paramBean);
 	}
 
 }

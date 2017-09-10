@@ -18,7 +18,7 @@ public interface UserService {
 	public int updateUser(JSONObject obj);	
 
 
-	Object queryUserByRole(JSONObject obj);
+//	Object queryUserByRole(JSONObject obj);
 
 	List<User> queryUser(JSONObject obj);
 

@@ -5,115 +5,96 @@
 package com.dazk.validator;
 
 import com.alibaba.fastjson.JSONObject;
+import com.dazk.common.errcode.ResultErr;
+import com.dazk.common.errcode.ResultStatusCode;
 import com.dazk.common.util.ParamValidator;
 import com.dazk.common.util.RegexUtil;
 import com.mysql.jdbc.Field;
 
 public class UserValidator {
-	public static boolean userVal(JSONObject json) {
+	public static ResultErr userVal(JSONObject json) {
 		String parent_user = json.getString("parent_user");
 		System.out.println("parent_user：" + parent_user);
-		// if (!isUserId(user_id,FieldLimit.USER_ID_MIN,FieldLimit.USER_ID_MAX))
-		// {
-		// return false;
-		// }
+		
 		String name = json.getString("name");
 		System.out.println("name：" + name);
-		if (RegexUtil.isNull(name)) {
-			return false;
+		if (RegexUtil.isNull(name)||!isUserName(name)) {
+			 return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "用户名错误");
 		}
-
-		if (!isUserName(name))
-			return false;
 
 		String nickname = json.getString("nickname");
 		System.out.println("nickname：" + nickname);
 
 		if (!isUserName(nickname))
-			return false;
+			 return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "昵称错误");
 
 		String username = json.getString("username");
 		System.out.println("username：" + username);
-		if (RegexUtil.isNull(username)) {
-			return false;
+		if (RegexUtil.isNull(username)||!isLogin_name(username)) {
+			 return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "登录账户错误");
 		}
-
-		if (!isLogin_name(username))
-			return false;
 
 		String password = json.getString("password");
 		System.out.println("password：" + password);
-		if (RegexUtil.isNull(password)) {
-			return false;
-		}
-
-		if (RegexUtil.isNotNull(nickname)
-				&& !ParamValidator.isStrLength(password, FieldLimit.USER_PW_MIN, FieldLimit.USER_PW_MAX)) {
-			return false;
-		}
-
+		if (RegexUtil.isNull(password)||(RegexUtil.isNotNull(nickname)
+				&& !ParamValidator.isStrLength(password, FieldLimit.USER_PW_MIN, FieldLimit.USER_PW_MAX))) {
+			 return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "密码错误");
+		}		
+		
 		String sex = json.getString("sex");
 		System.out.println("sex：" + sex);
-		if (RegexUtil.isNull(sex)) {
-			return false;
+		if (RegexUtil.isNull(sex)||(RegexUtil.isNotNull(sex) && !sex.equals("0") && sex.equals("1"))) {
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "性别错误");
 		}
 
-		if (RegexUtil.isNotNull(sex) && !sex.equals("0") && sex.equals("1"))
-			return false;
 
 		String email = json.getString("email");
 		System.out.println("email：" + email);
-		if (RegexUtil.isNull(email)) {
-			return false;
+		if (RegexUtil.isNotNull(email) && !RegexUtil.isEmail(email)) {
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "邮箱错误");
 		}
-
-		if (RegexUtil.isNotNull(email) && !RegexUtil.isEmail(email))
-			return false;
 
 		String telephone = json.getString("telephone");
 		System.out.println("telephone：" + telephone);
 		if (RegexUtil.isNotNull(telephone) && !RegexUtil.isTel(telephone))
-			return false;
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "电话号码错误");
 
 		String company = json.getString("company");
 		System.out.println("company：" + company);
 		if (RegexUtil.isNotNull(company) && !isCompany(company))
-			return false;
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "公司名错误");
 
 		String address = json.getString("address");
 		System.out.println("address：" + address);
 		if (RegexUtil.isNotNull(address) && !isAddress(address))
-			return false;
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "联系地址错误");
 
 		String position = json.getString("position");
 		System.out.println("position：" + position);
 		if (RegexUtil.isNotNull(position) && !isPosition(position))
-			return false;
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "职务错误");
 
 		String idcard = json.getString("idcard");
 		System.out.println("idcard：" + idcard);
 		if (RegexUtil.isNotNull(idcard) && !RegexUtil.isIdCardNo(idcard))
-			return false;
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "身份证号码错误");
 
 		String lv = json.getString("lv");
 		System.out.println("lv：" + lv);
 		if (RegexUtil.isNotNull(lv) && !isLv(lv))
-			return false;
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "用户级别错误");
 
-		String role_id = json.getString("role_id");
-		if (RegexUtil.isNull(role_id)) {
-			return false;
-		}
-
+		String role_id = json.getString("role_id");	
 		System.out.println("role_id：" + role_id);
 		if (!RolePermiValidator.isRoleId(role_id, FieldLimit.ROLE_ID_MIN, FieldLimit.ROLE_ID_MAX)) {
-			return false;
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "角色ID错误");
 		}
 
 		String remark = json.getString("remark");
+		System.out.println("remark：" + remark);
 
 		System.out.println("验证通过");
-		return true;
+		return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
 	}
 
 	public static boolean queryUserVal(JSONObject json) {
@@ -122,15 +103,22 @@ public class UserValidator {
 		if (RegexUtil.isNull(type))
 			return false;		
 		
-		if (RegexUtil.isNotNull(type) && !type.equals("0") && !type.equals("1")) {
+		if (RegexUtil.isNotNull(type) && !type.equals("0") && !type.equals("1") && !type.equals("2")) {
 			return false;
 		}
 
 		// 按角色名查询
 		if (type.equals("1")) {
-			String search = json.getString("search");
-			System.out.println("roleName：" + search);
-			if (!isLogin_name(search))
+			String roleName = json.getString("search");
+			System.out.println("roleName：" + roleName);
+			if (!RoleValidator.isRoleName(roleName))
+				return false;
+		}
+		
+		if (type.equals("2")) {
+			String userName = json.getString("search");
+			System.out.println("userName：" + userName);
+			if (!isLogin_name(userName))
 				return false;
 		}
 
