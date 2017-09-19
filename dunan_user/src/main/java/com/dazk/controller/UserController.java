@@ -61,14 +61,17 @@ public class UserController {
 				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
 			}
 
+			//当传入parent_user时使用当前用户的id做为parent_user
 			JSONObject parameter = JSON.parseObject(requestBody);
 			if (RegexUtil.isNull(parameter.getString("parent_user"))) {
 				parameter.put("parent_user", rsToken.getString("userid"));
 			}
 
-			if (RegexUtil.isNull(parameter.getString("role_id"))) {
-				parameter.put("role_id", rsToken.getString("role"));
-			}
+			//如果角色ID为空就传入当前用户属角色的ID-----不再自动添加角色----	
+			// if (RegexUtil.isNull(parameter.getString("role_id"))) {
+			// parameter.put("role_id", rsToken.getString("role"));
+			// }
+			
 			// 数据校验
 			ResultErr paramsVal = UserValidator.userVal(parameter);
 			if (paramsVal.getErrcode() != 10001) {
@@ -82,13 +85,17 @@ public class UserController {
 				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
 			} else if (res == -1) {
 				return new ResultErr(ResultStatusCode.REPETITION_ERR.getCode(),
-						ResultStatusCode.REPETITION_ERR.getErrmsg());
+						"账号已注册");
 			} else if (res == -3) {
-				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "邮箱已注册");
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "邮箱已注册");
 			} else if (res == -4) {
-				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "电话已注册");
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "电话已注册");
 			} else if (res == -5) {
-				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "身份证已注册");
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "身份证已注册");
+			}else if (res == -6) {
+				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "用户添加失败");
+			}else if (res == -7) {
+				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "超级管理员权限添加失败");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -168,9 +175,9 @@ public class UserController {
 
 			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
 			JSONObject parameter = JSON.parseObject(requestBody);
-			parameter.put("parent_user", rsToken.getString("userid"));
+			parameter.put("parent_user", rsToken.getString("userid"));	
 			// 数据校验
-			ResultErr paramsVal = UserValidator.userVal(parameter);
+			ResultErr paramsVal = UserValidator.updateVal(parameter);
 			if (paramsVal.getErrcode() != 10001) {
 				// 非法数据，返回错误码
 				return paramsVal;
@@ -181,7 +188,7 @@ public class UserController {
 			if (res >= 1) {
 				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
 			} else if (res == -1) {
-				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "更新时程序出错");
+				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "更新用户出错");
 			} else if (res == -2) {
 				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "用户已注册");
 			} else if (res == -3) {
@@ -191,7 +198,7 @@ public class UserController {
 			} else if (res == -5) {
 				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "身份证已注册");
 			} else if (res == 0) {
-				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "要更新的数据不存在");
+				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "用户不存在");
 			}
 			return new ResultErr(ResultStatusCode.UNKNOW_ERR.getCode(), ResultStatusCode.UNKNOW_ERR.getErrmsg());
 		} catch (Exception e) {
@@ -242,52 +249,52 @@ public class UserController {
 			return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "查询用户时出现异常");
 		}
 	}
+	
+	
+	@RequestMapping(value = "/resetPasswd", method = RequestMethod.POST, produces = PubUtil.DATA_CODE)
+	public Object resetPasswd(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
+		try {
+			System.out.println("Request=" + requestBody);
 
-	// @RequestMapping(value = "/queryUserByRole", method = RequestMethod.POST,
-	// produces = PubUtil.DATA_CODE)
-	// public Object queryUserByRole(HttpServletRequest request,
-	// HttpServletResponse response,
-	// @RequestBody String requestBody) {
-	// try {
-	// System.out.println("Request=" + requestBody);
-	//
-	// // 权限验证
-	// // post head token
-	// String token = request.getHeader("token");
-	// JSONObject rsToken = TokenValidator.getRsToken(token);
-	// if (rsToken.getInteger("status") == 0) {
-	// return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(),
-	// ResultStatusCode.TOKEN_ERR.getErrmsg());
-	// }
-	//
-	// // String uri = request.getRequestURI();
-	// // Boolean rs = rolePermiService.menuAuth(uri,
-	// // rsToken.getLong("role"));
-	// // if (!rs) {
-	// // return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(),
-	// // ResultStatusCode.PARAME_ERR.getErrmsg());
-	// // }
-	//
-	// Object resultObj = null;
-	// JSONObject parameter = JSON.parseObject(requestBody);
-	// parameter.put("parent_user", rsToken.getString("userid"));
-	// if (!UserValidator.queryUserByRoleVal(parameter)) {
-	// // 非法数据，返回错误码
-	// return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(),
-	// ResultStatusCode.PARAME_ERR.getErrmsg());
-	// }
-	//
-	// // 数据查询，成功后返回.
-	// resultObj = userService.queryUserByRole(parameter);
-	// if (resultObj == null) {
-	// return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(),
-	// ResultStatusCode.NODATA_ERR.getErrmsg());
-	// }
-	// return resultObj;
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(),
-	// "查询角色下用户时出现异常");
-	// }
-	// }
+			// 权限验证
+			// post head token
+			String token = request.getHeader("token");
+			JSONObject rsToken = TokenValidator.getRsToken(token);
+			if (rsToken.getInteger("status") == 0) {
+				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
+			}
+
+			// String uri = request.getRequestURI();
+			// Boolean rs = rolePermiService.menuAuth(uri,
+			// rsToken.getLong("role"));
+			// if (!rs) {
+			// return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(),
+			// ResultStatusCode.PARAME_ERR.getErrmsg());
+			// }
+
+			// 根据token 获取用户id，之后获取用户权限列表，再判断是否有此功能权限，若无则直接返回errocode，有则继续
+			JSONObject parameter = JSON.parseObject(requestBody);	
+			parameter.put("parent_user", rsToken.getLong("userid"));
+			ResultErr paramsVal = UserValidator.resetVal(parameter);
+			if (paramsVal.getErrcode() != 10001) {
+				// 非法数据，返回错误码
+				return paramsVal;
+			}
+
+			JSONObject resultObj = new JSONObject();
+			// 数据查询，成功后返回.
+		   int res = userService.resetPasswd(parameter);
+			if (res >= 1) {
+				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
+			} else if (res == 0) {
+				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "重置用户密码失败");
+			} 			
+			return new ResultErr(ResultStatusCode.UNKNOW_ERR.getCode(), ResultStatusCode.UNKNOW_ERR.getErrmsg());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "重置密码时出现异常");
+		}
+	}
+
+
 }

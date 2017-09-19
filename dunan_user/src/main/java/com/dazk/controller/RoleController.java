@@ -55,29 +55,33 @@ public class RoleController {
 				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
 			}
 
-//			String uri = request.getRequestURI();
-//			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
-//			if (!rs) {
-//				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
-//			}
+			// String uri = request.getRequestURI();
+			// Boolean rs = rolePermiService.menuAuth(uri,
+			// rsToken.getLong("role"));
+			// if (!rs) {
+			// return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(),
+			// ResultStatusCode.PARAME_ERR.getErrmsg());
+			// }
 
-			JSONObject parameter = JSON.parseObject(requestBody);	
-			parameter.put("user_id", rsToken.getString("userid"));	
-			// 数据校验					
-			ResultErr paramsVal =RoleValidator.roleVal(parameter);
-			if (paramsVal.getErrcode()!=10001) {
+			JSONObject parameter = JSON.parseObject(requestBody);
+			parameter.put("user_id", rsToken.getString("userid"));
+			// 数据校验
+			ResultErr paramsVal = RoleValidator.roleVal(parameter);
+			if (paramsVal.getErrcode() != 10001) {
 				// 非法数据，返回错误码
 				return paramsVal;
 			}
 
-			// 数据入库，成功后返回.			
+			// 数据入库，成功后返回.
 			int res = roleService.addRole(parameter);
 			if (res == 1) {
 				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
-			} else if (res == -1 || res == -2) {
-				return new ResultErr(ResultStatusCode.REPETITION_ERR.getCode(),
-						ResultStatusCode.REPETITION_ERR.getErrmsg());
+			} else if (res == -1) {
+				return new ResultErr(ResultStatusCode.REPETITION_ERR.getCode(), "角色名已存在!");
+			} else if (res == -2) {
+				return new ResultErr(ResultStatusCode.REPETITION_ERR.getCode(), "角色编码已存在!");
 			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), ResultStatusCode.ROUTINE_ERR.getErrmsg());
@@ -100,16 +104,17 @@ public class RoleController {
 				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
 			}
 
-//			String uri = request.getRequestURI();
-//			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
-//			if (!rs) {
-//				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
-//			}
+			// String uri = request.getRequestURI();
+			// Boolean rs = rolePermiService.menuAuth(uri,
+			// rsToken.getLong("role"));
+			// if (!rs) {
+			// return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(),
+			// ResultStatusCode.PARAME_ERR.getErrmsg());
+			// }
 
 			JSONObject parameter = JSON.parseObject(requestBody);
 			parameter.put("user_id", rsToken.getString("userid"));
-			if (!RoleValidator.isRoleCode(parameter.getString("id"), FieldLimit.ROLE_ID_MIN,
-					FieldLimit.ROLE_ID_MAX)) {
+			if (!RoleValidator.isRoleCode(parameter.getString("id"), FieldLimit.ROLE_ID_MIN, FieldLimit.ROLE_ID_MAX)) {
 				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "非法角色编号");
 			}
 			// 数据入库，成功后返回.
@@ -117,7 +122,7 @@ public class RoleController {
 			if (res >= 1) {
 				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
 			} else if (res == -1) {
-				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "删除时程序出错");
+				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "角色已被使用");
 			} else if (res == 0) {
 				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "删除数据不存在");
 			}
@@ -141,17 +146,19 @@ public class RoleController {
 				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
 			}
 
-//			String uri = request.getRequestURI();
-//			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
-//			if (!rs) {
-//				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
-//			}
+			// String uri = request.getRequestURI();
+			// Boolean rs = rolePermiService.menuAuth(uri,
+			// rsToken.getLong("role"));
+			// if (!rs) {
+			// return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(),
+			// ResultStatusCode.PARAME_ERR.getErrmsg());
+			// }
 
 			JSONObject parameter = JSON.parseObject(requestBody);
 			parameter.put("user_id", rsToken.getString("userid"));
 			// 数据校验
-			ResultErr paramsVal =RoleValidator.roleVal(parameter);
-			if (paramsVal.getErrcode()!=10001) {
+			ResultErr paramsVal = RoleValidator.roleVal(parameter);
+			if (paramsVal.getErrcode() != 10001) {
 				// 非法数据，返回错误码
 				return paramsVal;
 			}
@@ -184,11 +191,13 @@ public class RoleController {
 				return new ResultErr(ResultStatusCode.TOKEN_ERR.getCode(), ResultStatusCode.TOKEN_ERR.getErrmsg());
 			}
 
-//			String uri = request.getRequestURI();
-//			Boolean rs = rolePermiService.menuAuth(uri, rsToken.getLong("role"));
-//			if (!rs) {
-//				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
-//			}
+			// String uri = request.getRequestURI();
+			// Boolean rs = rolePermiService.menuAuth(uri,
+			// rsToken.getLong("role"));
+			// if (!rs) {
+			// return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(),
+			// ResultStatusCode.PARAME_ERR.getErrmsg());
+			// }
 
 			JSONObject resultObj = new JSONObject();
 			JSONObject parameter = JSON.parseObject(requestBody);

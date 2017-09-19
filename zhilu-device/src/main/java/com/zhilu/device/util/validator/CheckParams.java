@@ -4,6 +4,7 @@
 */
 package com.zhilu.device.util.validator;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -138,8 +139,8 @@ public class CheckParams {
 		}
 
 		// 得到Id数组
-		String[] macsArray = PubMethod.getDevids(paramsJson);
-		if (isIds(macsArray)) {
+		List<String> macsArray = PubMethod.getDevids(paramsJson);
+		if (!isIds(macsArray)) {
 			resultMsg = new ResultErr(ResultStatusCode.DEVID_EMP.getCode(), ResultStatusCode.DEVID_EMP.getErrmsg());
 		}
 
@@ -153,7 +154,8 @@ public class CheckParams {
 						ResultStatusCode.DEVID_EXISTED.getErrmsg());
 			}
 		}
-		System.out.println("参数校验PASS");
+		System.out.println("参数校验完成");
+		System.out.println("参数校验结果:" + resultMsg);
 		return resultMsg;
 	}
 
@@ -302,12 +304,13 @@ public class CheckParams {
 		return rs;
 	}
 
-	public static boolean isIds(String[] ids) {
-		boolean rs = true;
-		if ((ids == null) || (ids.length == 0)) {
-			rs = false;
+	public static boolean isIds(List<String> ids) {
+		System.out.println("-----isIds-----");
+		System.out.println(ids.size());
+		if ((ids == null) || (ids.size() == 0)) {
+			return false;
 		}
-		return rs;
+		return true;
 	}
 
 	// id mac imei为null返回true

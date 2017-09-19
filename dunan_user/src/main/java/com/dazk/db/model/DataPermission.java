@@ -8,9 +8,6 @@ import javax.persistence.Column;
 
 public class DataPermission extends BaseEntity {
 
-	// `id` int(11) NOT NULL AUTO_INCREMENT,
-	private Long id;
-	// `user_id` int(11) NOT NULL COMMENT '账号ID',
 	private Long user_id;
 	// `code` varchar(32) NOT NULL COMMENT '公司编号,热站编号，小区编号',
 	@Column(name="code_value")
@@ -21,14 +18,6 @@ public class DataPermission extends BaseEntity {
 	// `codeType` tinyint(4) NOT NULL COMMENT '1 公司编号 2 热站编号 3 小区编号',
 	@Column(name="code_type")
 	private Integer code_type;
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
 
 	public String getCode_value() {
 		return code_value;
@@ -67,8 +56,8 @@ public class DataPermission extends BaseEntity {
 	 */
 	@Override
 	public String toString() {
-		return "DataPermission [id=" + id + ", user_id=" + user_id + ", code_value=" + code_value + ", data_type="
-				+ data_type + ", code_type=" + code_type + "]";
+		return "DataPermission [user_id=" + user_id + ", code_value=" + code_value + ", data_type=" + data_type
+				+ ", code_type=" + code_type + "]";
 	}
 
 

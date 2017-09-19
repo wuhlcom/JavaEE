@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.alibaba.fastjson.JSONArray;
-import com.zhilutec.valve.bean.TblBuildingCalorimeter;
+import com.zhilutec.valve.bean.models.TblBuildingCalorimeter;
 
 public interface BuildingCalorimeterRepo
 		extends JpaRepository<TblBuildingCalorimeter, String>, JpaSpecificationExecutor<TblBuildingCalorimeter> {

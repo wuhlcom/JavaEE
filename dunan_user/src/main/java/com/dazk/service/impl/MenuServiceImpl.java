@@ -16,32 +16,41 @@ import tk.mybatis.mapper.entity.Example;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONObject;
 
 @Service
+@Transactional
 public class MenuServiceImpl implements MenuService {
 	public final static Logger logger = LoggerFactory.getLogger(MenuServiceImpl.class);
-	
+
 	@Autowired
 	private MenuMapper menuMapper;
 
-	@Autowired
+	@Resource
 	private RolePermissionService rolePermiService;
 
-	@Autowired
+	@Resource
 	private RoleService roleService;
 
+	@Transactional
 	@Override
+	// 新增菜单，新增会给当前用户所属角色配置菜单权限并给超级管理员配置菜单权限（code为GlobalParamsUtil.ADMIN_CODE是超级管理员）
 	public int addMenu(JSONObject obj) {
+		logger.debug("begin add menu........");	
 		int result = 0;
-		int codeNum=11;
+		int codeNum = 11;
 		Long roleId = obj.getLong("role_id");
 		String menuName = obj.getString("name");
+		String uri = obj.getString("uri");
+		String front_router = obj.getString("front_router");
 		Menu record = new Menu();
 		record.setIs_menu(null);
 		record.setParent_id(null);
@@ -51,9 +60,25 @@ public class MenuServiceImpl implements MenuService {
 		if (exist > 0) {
 			return -1;
 		}
+		
+		record.setIs_menu(null);
+		record.setParent_id(null);
+		record.setName(null);
+		record.setUri(uri);
+		exist = menuMapper.selectCount(record);
+		if (exist > 0) {
+			return -2;
+		}
+				
+		record.setUri(null);
+		record.setFront_router(front_router);
+		exist = menuMapper.selectCount(record);
+		if (exist > 0) {
+			return -3;
+		}
 
-		String code = PubUtil.genCode(codeNum);
-
+		String code = PubUtil.genCode(codeNum);		
+		record.setFront_router(null);
 		record.setName(null);
 		record.setIsdel(null);
 		record.setCode(code);
@@ -72,37 +97,41 @@ public class MenuServiceImpl implements MenuService {
 		record = JSON.parseObject(obj.toJSONString(), Menu.class);
 		Integer menuType = obj.getInteger("is_menu");
 		if (menuType == null) {
-			menuType = 0;
+			menuType = 1;
 		}
 		record.setIs_menu(menuType);
 		record.setCode(code);
 		record.setCreated_at(System.currentTimeMillis() / 1000);
 		result = menuMapper.insertSelective(record);
+
 		JSONObject rolePermiParams = new JSONObject();
 		JSONObject queryMenuPamams = new JSONObject();
 		JSONObject queryRolePamams = new JSONObject();
 
-		//菜单如果添加成功,给菜单分配基础权限，即给菜单所属角色和超级管理员角色分配权限
+		// 菜单如果添加成功,给菜单分配基础权限，即给菜单所属角色和超级管理员角色分配权限
 		if (result != 0) {
 			queryMenuPamams.put("name", menuName);
 			Menu menu = this.queryMenuOne(queryMenuPamams);
+
 			if (menu != null) {
 				Long menuId = menu.getId();
-                
-				//给当前用户所在角色添加菜单权限
+
+				// 给当前用户所在角色添加菜单权限
 				rolePermiParams.put("role_id", roleId);
-				rolePermiParams.put("roso_id", menuId);
-				rolePermiService.addRolePermi(rolePermiParams);
+				rolePermiParams.put("reso_id", menuId);
+				int rsRolePermi = rolePermiService.addRolePermi(rolePermiParams);
 
 				// 查询超级管理员角色是否存在
 				queryRolePamams.put("code", GlobalParamsUtil.ADMIN_CODE);
-				Role superRole =roleService.queryRoleOne(queryRolePamams);
-				//给超级管理员添加新菜单的权限
-				if (superRole!=null) {
-					Long superRoleId =superRole.getId();
+				Role superRole = roleService.queryRoleOne(queryRolePamams);
+
+				// 给超级管理员添加新菜单的权限
+				if (superRole != null) {
+					Long superRoleId = superRole.getId();
+
 					rolePermiParams.put("role_id", superRoleId);
-					rolePermiParams.put("roso_id", menuId);
-					rolePermiService.addRolePermi(rolePermiParams);
+					rolePermiParams.put("reso_id", menuId);
+					rsRolePermi = rolePermiService.addRolePermi(rolePermiParams);
 				}
 			}
 		}
@@ -118,17 +147,12 @@ public class MenuServiceImpl implements MenuService {
 		record.setParent_id(null);
 		record.setId(id);
 		record.setIsdel(1);
-
-		// 查询菜单是否已经删除
-		int exist = menuMapper.selectCount(record);
-		if (exist != 0) {
-			return 1;
-		}
+		
 
 		// 查询当前菜单是否有子菜单
 		record.setParent_id(id);
 		record.setId(null);
-		exist = menuMapper.selectCount(record);
+		int exist = menuMapper.selectCount(record);
 		if (exist != 0) {
 			return -2;
 		}
@@ -181,13 +205,23 @@ public class MenuServiceImpl implements MenuService {
 
 	private Menu queryMenuOne(JSONObject obj) {
 		String menuName = obj.getString("name");
+		Long menuId = obj.getLong("id");
 		Menu menuParams = new Menu();
-		menuParams.setName(menuName);
+		menuParams.setIs_menu(null);
+		menuParams.setParent_id(null);
+		if (menuName != null && menuName.trim() != "") {
+
+			menuParams.setName(menuName);
+		} else if (menuName != null && menuName.trim() != "") {
+			menuParams.setId(menuId);
+		} else {
+			System.out.println("参数错误");
+			return null;
+		}
 		try {
-			return  menuMapper.selectOne(menuParams);
+			return menuMapper.selectOne(menuParams);
 		} catch (Exception e) {
-			logger.debug("菜单名重复!menu name:"+menuName);
-			e.printStackTrace();
+			logger.debug("菜单名重复或找不到菜单!menu name:" + menuName);
 			return null;
 		}
 
@@ -197,7 +231,7 @@ public class MenuServiceImpl implements MenuService {
 	public List<Menu> queryMenu(JSONObject obj) {
 		JSONObject parentJs = new JSONObject();
 		JSONObject childrenJs = new JSONObject();
-		// 反回非Menu类型数据
+		// 返回非Menu类型数据
 		List rs = new ArrayList<>();
 		List rsSubMenu = new ArrayList<>();
 
@@ -229,8 +263,7 @@ public class MenuServiceImpl implements MenuService {
 				recordCriteria.andEqualTo("isdel", 0);
 			} else {
 				recordCriteria.andEqualTo("isdel", 0).andEqualTo("is_menu", menuType);
-			}
-			example.and(recordCriteria);
+			}		
 			return menuMapper.selectByExample(example);
 		} else if (type == 1) {
 			// 只查询父级菜单
@@ -239,8 +272,6 @@ public class MenuServiceImpl implements MenuService {
 			} else {
 				recordCriteria.andEqualTo("isdel", 0).andEqualTo("is_menu", menuType).andEqualTo("parent_id", 0);
 			}
-
-			example.and(recordCriteria);
 			return menuMapper.selectByExample(example);
 		} else if (type == 2) {
 			if (RegexUtil.isNull(menuTypeStr)) {
@@ -248,8 +279,7 @@ public class MenuServiceImpl implements MenuService {
 			} else {
 				recordCriteria.andEqualTo("isdel", 0).andEqualTo("is_menu", menuType).andLike("name",
 						"%" + search + "%");
-			}
-			example.and(recordCriteria);
+			}	
 			return menuMapper.selectByExample(example);
 		} else if (type == 3) {
 			// 查询子菜单
@@ -259,8 +289,7 @@ public class MenuServiceImpl implements MenuService {
 				recordCriteria.andEqualTo("id", search).andEqualTo("isdel", 0);
 			} else {
 				recordCriteria.andEqualTo("id", search).andEqualTo("is_menu", menuType).andEqualTo("isdel", 0);
-			}
-			example.and(recordCriteria);
+			}		
 			List<Menu> parentMenu = menuMapper.selectByExample(example);
 
 			// 查子菜单
@@ -271,7 +300,7 @@ public class MenuServiceImpl implements MenuService {
 			} else {
 				subCriteria.andEqualTo("parent_id", search).andEqualTo("is_menu", menuType).andEqualTo("isdel", 0);
 			}
-			example.and(subCriteria);
+		
 			List<Menu> subMenu = menuMapper.selectByExample(example);
 
 			// 解析主菜单
@@ -323,15 +352,13 @@ public class MenuServiceImpl implements MenuService {
 				recordCriteria.andEqualTo("isdel", 0);
 			} else {
 				recordCriteria.andEqualTo("isdel", 0).andEqualTo("is_menu", menuType);
-			}
-			example.and(recordCriteria);
+			}	
 		} else if (type == 1) {
 			if (RegexUtil.isNull(menuTypeStr)) {
 				recordCriteria.andEqualTo("isdel", 0).andEqualTo("parent_id", 0);
 			} else {
 				recordCriteria.andEqualTo("isdel", 0).andEqualTo("is_menu", menuType).andEqualTo("parent_id", 0);
 			}
-			example.and(recordCriteria);
 		} else if (type == 2) {
 			recordCriteria.andEqualTo("isdel", 0).andEqualTo("is_menu", menuType).andLike("name", "%" + search + "%");
 
@@ -341,7 +368,6 @@ public class MenuServiceImpl implements MenuService {
 				recordCriteria.andEqualTo("isdel", 0).andEqualTo("is_menu", menuType).andLike("name",
 						"%" + search + "%");
 			}
-			example.and(recordCriteria);
 		}
 		return menuMapper.selectCountByExample(example);
 	}

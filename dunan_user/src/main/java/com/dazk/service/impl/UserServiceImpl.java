@@ -9,24 +9,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.dazk.common.util.GlobalParamsUtil;
+import com.dazk.common.util.MD5Util;
 import com.dazk.db.dao.RoleMapper;
 import com.dazk.db.dao.UserMapper;
 import com.dazk.db.dao.UserMapperMy;
+import com.dazk.db.model.Role;
 import com.dazk.db.model.User;
 import com.dazk.db.param.UserParam;
+import com.dazk.service.DataPermissionService;
+import com.dazk.service.RoleService;
 import com.dazk.service.UserService;
 import com.github.pagehelper.PageHelper;
 import tk.mybatis.mapper.entity.Example;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
-	// Encrypt(String sSrc, String sKey)
-	final static String ENCRY_KEY = "q1w2e3r7i7o4i3uu";
+	public final static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 	@Autowired
 	private UserMapper userMapper;
 
@@ -36,16 +46,27 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private RoleMapper roleMapper;
 
+	@Resource
+	private RoleService roleService;
+
+	@Resource
+	private DataPermissionService dataPerService;
+
+	// 添加超级管理员时必须给账户加数据权限
+	// 添加超级管理员时parent_user为0
 	@Override
+	@Transactional
 	public int addUser(JSONObject obj) {
+		int rs = 0;
 		User record = new User();
 		// 用户名已存在则不添加
-		record.setUsername(obj.getString("username"));
+		String username = obj.getString("username");
+		record.setUsername(username);
 		record.setSex(null);
 		record.setIsdel(0);
 		record.setDisused(1);
 		int exist = userMapper.selectCount(record);
-		if (exist > 0) {
+		if (exist >= 1) {
 			return -1;
 		}
 
@@ -55,48 +76,90 @@ public class UserServiceImpl implements UserService {
 		record.setIsdel(0);
 		record.setDisused(1);
 		exist = userMapper.selectCount(record);
-		if (exist > 0) {
+		if (exist >= 1) {
 			return -3;
 		}
 
 		// 电话号码已存在则不添加
-		record.setUsername(null);
-		record.setEmail(null);
-		record.setTelephone(obj.getString("telephone"));
-		record.setIsdel(0);
-		record.setDisused(0);
-		exist = userMapper.selectCount(record);
-		if (exist > 0) {
-			return -4;
+		String tel = obj.getString("telephone");
+		if (tel != null && !tel.isEmpty()) {
+			record.setUsername(null);
+			record.setEmail(null);
+			record.setTelephone(tel);
+			record.setIsdel(0);
+			record.setDisused(1);
+			exist = userMapper.selectCount(record);
+			if (exist >= 1) {
+				return -4;
+			}
 		}
 
 		// 身份证已存在则不添加
-		record.setUsername(null);
-		record.setEmail(null);
-		record.setIdcard(obj.getString("idcard"));
-		record.setIsdel(0);
-		record.setDisused(0);
-		exist = userMapper.selectCount(record);
-		if (exist > 0) {
-			return -5;
+		String idcard = obj.getString("idcard");
+		if (idcard != null && !idcard.isEmpty()) {
+			record.setUsername(null);
+			record.setEmail(null);
+			record.setIdcard(idcard);
+			record.setIsdel(0);
+			record.setDisused(1);
+			exist = userMapper.selectCount(record);
+			if (exist >= 1) {
+				return -5;
+			}
 		}
 
+		// 查询角色信息，判断角色是否为超级管理员
+		Long role_id = obj.getLong("role_id");
+		JSONObject roleJson = new JSONObject();
+		roleJson.put("role_id", role_id);
+		Role role = roleService.queryRoleOne(roleJson);
+
+		String code = role.getCode();
+
 		record = JSON.parseObject(obj.toJSONString(), User.class);
+
+		// 用来修改用户的父id如果父id改为0则为超级管理员
+		// if (code == GlobalParamsUtil.ADMIN_CODE) {
+		// record.setParent_user(0L);
+		// }
+
+		record.setIsdel(0);
+		record.setDisused(1);
 		record.setCreated_at(System.currentTimeMillis() / 1000);
 
-		// // 加密
-		// String pw = record.getPassword();
-		// try {
-		// String encryPw = PubFunction.encrypt(pw, ENCRY_KEY);
-		// System.out.println("5-----------addUser-----");
-		// record.setPassword(encryPw);
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// System.out.println("6-----------addUser-----");
-		// return -1;
+		// MD5加密
+		String password = record.getPassword();
+		password = MD5Util.MD5Encode(password);
+		record.setPassword(password);
+		rs = userMapper.insertSelective(record);
+
+		// 如果用户是超级管理员角色则添加所有数据权限
+		// *****************************************
+		// *****************************************
+		// if (code == GlobalParamsUtil.ADMIN_CODE) {
+		// JSONObject userJson = new JSONObject();
+		// userJson.put("username", username);
+		// User user = queryUserOne(userJson);
+		// if (user == null) {
+		// return -6;
 		// }
-		// record.setPassword(encryPw);
-		return userMapper.insertSelective(record);
+		//
+		// Long user_id = user.getId();
+		//
+		// // 添加超级管理员数据权限
+		// JSONObject dataJson = new JSONObject();
+		// dataJson.put("user_id", user_id);
+		// dataJson.put("code_value", "");
+		// dataJson.put("data_type", 1);
+		// dataJson.put("code_type", 1);
+		// rs = dataPerService.addDataPermi(dataJson);
+		// if (rs == -1) {
+		// return -7;
+		// }
+		// }
+		// *****************************************
+		// *****************************************
+		return rs;
 	}
 
 	@Override
@@ -114,12 +177,7 @@ public class UserServiceImpl implements UserService {
 		} else if (id != null) {
 			record.setId(id);
 			record.setIsdel(1);
-		}
-		exist = userMapper.selectCount(record);
-
-		if (exist != 0) {
-			return 1;
-		}
+		}		
 
 		// 创建example
 		Example example = new Example(User.class);
@@ -131,17 +189,14 @@ public class UserServiceImpl implements UserService {
 			if (username != null) {
 				recordCriteria.andEqualTo("username", username).andEqualTo("parent_user", parent_user)
 						.andEqualTo("isdel", 0);
-				example.and(recordCriteria);
 			} else if (id != null) {
 				recordCriteria.andEqualTo("id", id).andEqualTo("parent_user", parent_user).andEqualTo("isdel", 0);
-				example.and(recordCriteria);
 			}
 			return userMapper.updateByExampleSelective(record, example);
 		} catch (Exception e) {
 			return -1;
 		}
 	}
-		
 
 	// 更新用户信息
 	@Override
@@ -150,6 +205,8 @@ public class UserServiceImpl implements UserService {
 		record.setSex(null);
 		Long parent_user = obj.getLong("parent_user");
 		String username = obj.getString("username");
+		String password = obj.getString("password");// 密码为空时不修改密码
+
 		Long id = obj.getLong("id");
 		if (username != null) {
 			record.setUsername(username);
@@ -167,36 +224,36 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 
-		String email = obj.getString("email");		
+		String email = obj.getString("email");
 		// 创建example
 		Example paramsExample = new Example(User.class);
 		// 创建查询条件
 		Example.Criteria paramsCriteria = paramsExample.createCriteria();
 		// 设置查询条件 多个andEqualTo串联表示 and条件查询
 		paramsCriteria.andNotEqualTo("id", id).andEqualTo("isdel", 0).andEqualTo("email", email);
-		paramsExample.and(paramsCriteria);
 		int exist = userMapper.selectCountByExample(paramsExample);
 		if (exist >= 1) {
 			return -3;
 		}
 
 		String telephone = obj.getString("telephone");
-		paramsExample.clear();
-		paramsCriteria.andNotEqualTo("id", id).andEqualTo("isdel", 0).andEqualTo("telephone", telephone);
-		paramsExample.and(paramsCriteria);
-
-		exist = userMapper.selectCountByExample(paramsExample);
-		if (exist >= 1) {
-			return -4;
+		if (telephone != null && !telephone.trim().isEmpty()) {
+			paramsExample.clear();
+			paramsCriteria.andNotEqualTo("id", id).andEqualTo("isdel", 0).andEqualTo("telephone", telephone);
+			exist = userMapper.selectCountByExample(paramsExample);
+			if (exist >= 1) {
+				return -4;
+			}
 		}
 
 		String idcard = obj.getString("idcard");
-		paramsExample.clear();
-		paramsCriteria.andNotEqualTo("id", id).andEqualTo("isdel", 0).andEqualTo("idcard", idcard);
-		paramsExample.and(paramsCriteria);
-		exist = userMapper.selectCountByExample(paramsExample);
-		if (exist >= 1) {
-			return -5;
+		if (idcard != null && !idcard.trim().isEmpty()) {
+			paramsExample.clear();
+			paramsCriteria.andNotEqualTo("id", id).andEqualTo("isdel", 0).andEqualTo("idcard", idcard);
+			exist = userMapper.selectCountByExample(paramsExample);
+			if (exist >= 1) {
+				return -5;
+			}
 		}
 
 		record = JSON.parseObject(obj.toJSONString(), User.class);
@@ -215,6 +272,15 @@ public class UserServiceImpl implements UserService {
 			} else {
 				return 0;
 			}
+
+			if (password == null || password.trim() == "" || password.isEmpty()) {
+				record.setPassword(null);
+			} else {
+				// MD5加密
+				password = MD5Util.MD5Encode(password);
+				record.setPassword(password);
+			}
+
 			return userMapper.updateByExampleSelective(record, example);
 		} catch (Exception e) {
 			return -1;
@@ -229,16 +295,19 @@ public class UserServiceImpl implements UserService {
 		Integer type = obj.getInteger("type");
 		String userName = null;
 		String roleName = null;
+		Long roleId = null;
 		if (type == 1) {
 			roleName = obj.getString("search");
 		} else if (type == 2) {
 			userName = obj.getString("search");
+		} else if (type == 3) {
+			roleId = obj.getLong("search");
 		}
 
-		Long parentUser = obj.getLong("parentUser");
+		Long parentUser = obj.getLong("parent_user");
 		Integer page = obj.getInteger("page");
 		Integer listRows = obj.getInteger("listRows");
-		UserParam paramBean = new UserParam(type, parentUser, userName, roleName, page, listRows);
+		UserParam paramBean = new UserParam(type, parentUser, parentUser, roleId, userName, roleName, page, listRows);
 		return paramBean;
 	}
 
@@ -302,21 +371,90 @@ public class UserServiceImpl implements UserService {
 		return result;
 	}
 
+	private User queryUserOne(JSONObject obj) {
+		String username = obj.getString("username");
+		Long userId = obj.getLong("id");
+		User user = new User();
+		user.setAge(null);
+		user.setSex(null);
+
+		if (username != null && !username.trim().isEmpty()) {
+			user.setUsername(username);
+		} else if (userId != null) {
+			user.setUsername(username);
+		} else {
+			System.out.println("参数错误!");
+			return null;
+		}
+
+		try {
+			return userMapper.selectOne(user);
+		} catch (Exception e) {
+			return null;
+		}
+
+	}
+
 	// 查询用户信息
+	// 查询当前用户及其子用户
 	@Override
 	public List<User> queryUser(JSONObject obj) {
-		UserParam paramBean = js2UesrParam(obj);
-		System.out.println(paramBean);
-		List<User> userResult = userMapper.queryUser(paramBean);
+		UserParam paramBean = js2UesrParam(obj);	
+		List<User> userResult = new ArrayList<>();
+		// type按角色名来查询
+		if (paramBean.getType() == 1) {
+			userResult = userMapper.queryUserByRole(paramBean);
+		} else {
+			userResult = userMapper.queryUser(paramBean);
+		}
+		// 处理返回结果
 		userResult = queryUserResult(userResult);
 		return userResult;
 	}
 
 	// 统计数量
 	@Override
-	public int queryUserCount(JSONObject obj) {
+	public Integer queryUserCount(JSONObject obj) {
 		UserParam paramBean = js2UesrParam(obj);
-		return userMapper.queryUserCount(paramBean);
+		Integer number = 0;
+		if (paramBean.getType() == 1) {
+			number = userMapper.queryUserCountByRole(paramBean);
+		} else {
+			number = userMapper.queryUserCount(paramBean);
+		}
+		return number;
+	}
+
+	// 将密码重置为123456
+	@Override
+	public int resetPasswd(JSONObject obj) {
+		Long user_id = obj.getLong("id");
+		Long parent_user = obj.getLong("parent_user");
+
+		// 查询该用户当前操作用户是否为超级管理员
+		// JSONObject queryUser=new JSONObject();
+		// queryUser.put("id",parent_user);
+		// this.queryUserOne(queryUser);
+
+		// 查询角色下的用户
+		Example userExample1 = new Example(User.class);
+		// 创建查询条件
+		Example.Criteria userCriteria1 = userExample1.createCriteria();
+		// 设置查询条件 多个andEqualTo串联表示 and条件查询
+		userCriteria1.andEqualTo("id", user_id).andEqualTo("isdel", 0);
+		userExample1.and(userCriteria1);
+		List<User> user = userMapper.selectByExample(userExample1);
+		if (user.size() > 0) {
+			User rsUser = user.get(0);
+			// MD5加密
+			String password = MD5Util.MD5Encode(GlobalParamsUtil.DEFAULT_PASSWD);
+			rsUser.setPassword(password);
+			// updateByExampleSelective使用null更新,因此使用updateByExample来更新
+			return userMapper.updateByExample(rsUser, userExample1);
+		} else {
+			return 0;
+		}
+
 	}
 
 }

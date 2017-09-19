@@ -34,9 +34,9 @@ public class FieldLimit {
 	public static final int USER_ID_MAX = 11;
 	
 	public static final int USER_NAME_MIN = 1;
-	public static final int USER_NAME_MAX = 64;
+	public static final int USER_NAME_MAX = 32;
 	public static final int USER_PW_MIN = 1;
-	public static final int USER_PW_MAX = 32;
+	public static final int USER_PW_MAX = 33;
 	
 	public static final int COMPANY_MIN = 1;
 	public static final int COMPANY_MAX = 64;

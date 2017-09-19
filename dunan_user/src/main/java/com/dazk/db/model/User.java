@@ -11,7 +11,7 @@ import javax.persistence.Transient;
 @Table(name = "user")
 public class User extends BaseEntity {
 	// `id` int(11) NOT NULL AUTO_INCREMENT,
-	private Long id;
+//	private Long id;
 	// `name` varchar(64) NOT NULL,
 	private String nickname;
 	// `name` varchar(32) NOT NULL,
@@ -60,13 +60,13 @@ public class User extends BaseEntity {
 		this.name = name;
 	}
 
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
+//	public Long getId() {
+//		return id;
+//	}
+//
+//	public void setId(Long id) {
+//		this.id = id;
+//	}
 
 	
 
@@ -221,9 +221,12 @@ public class User extends BaseEntity {
 	 */
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", nickname=" + nickname + ", username=" + username + ", email=" + email + "]";
+		return "User [nickname=" + nickname + ", username=" + username + ", sex=" + sex + ", age=" + age
+				+ ", email=" + email + ", company=" + company + ", address=" + address + ", telephone=" + telephone
+				+ ", created_at=" + created_at + ", isdel=" + isdel + ", password=" + password + ", lv=" + lv
+				+ ", disused=" + disused + ", remark=" + remark + ", role_id=" + role_id + ", idcard=" + idcard
+				+ ", position=" + position + ", name=" + name + ", parent_user=" + parent_user + "]";
 	}
 
-
-
+	
 }

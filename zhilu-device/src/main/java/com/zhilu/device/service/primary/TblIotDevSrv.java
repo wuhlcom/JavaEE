@@ -2,6 +2,7 @@ package com.zhilu.device.service.primary;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -72,7 +73,8 @@ public class TblIotDevSrv {
 	// 创建设备组并添加
 	// @return 返回添加成功和添加失败的,只有重复的所有的设备都不添加
 	@Transactional
-	public Map<String, List> addDevices(JSONObject paramsJson) {
+	public Map<String, List> addDevices(JSONObject paramsJson) {	
+		Map<String, List> devMacMap = new HashMap<String, List>();
 		// 通过json解析参数
 		String userid = paramsJson.getString("userid");
 		String name = paramsJson.getString("name");
@@ -80,7 +82,7 @@ public class TblIotDevSrv {
 		JSONObject type_params = paramsJson.getJSONObject("type_params");
 
 		// 得到Id数组
-		String[] macsArray = PubMethod.getDevids(paramsJson);
+	     List<String> macsArray = PubMethod.getDevids(paramsJson);
 
 		List<TblIotDevice> addDevs = new ArrayList<>();// 保存要添加的设备
 		List<TblIotDeviceBasic> addDevsBasic = new ArrayList<>();// 保存要添加的设备
@@ -139,12 +141,12 @@ public class TblIotDevSrv {
 				deviceDyn.setDeviceid(id);
 				addDevsDyn.add(deviceDyn);
 
-				//添加lora gw
+				// 添加lora gw
 				if (type == 3) {
 					addLrGw(userid, name, type_params, addLrGws, mac, strTimestamp);
 				}
 
-				//添加lora dev
+				// 添加lora dev
 				if (type == 4) {
 					addLrDev(name, type_params, addLrDevs, mac, strTimestamp);
 				}
@@ -152,8 +154,7 @@ public class TblIotDevSrv {
 				exsitedDevs.add(mac);
 			}
 		}
-
-		Map<String, List> devMacMap = new HashMap<String, List>();
+		
 		// 只要有已存在在设备就不添加任何设备
 		for (String exsitedDev : exsitedDevs) {
 			System.out.println("设备已经存在:" + exsitedDev);
@@ -202,7 +203,7 @@ public class TblIotDevSrv {
 		lora = JSON.parseObject(type_params.toJSONString(), LoraGateway.class);
 		lora.setCreatetime(strTimestamp);
 		String uuid = this.generateLrGwUuid();
-		lora.setUuid(uuid);	
+		lora.setUuid(uuid);
 		addLrGws.add(lora);
 	}
 
@@ -327,7 +328,7 @@ public class TblIotDevSrv {
 		String productId = paramsJson.get("product").toString();
 		int protocol = Integer.parseInt(paramsJson.get("protocol").toString());
 		// 得到Id数组
-		String[] macsArray = PubMethod.getDevids(paramsJson);
+	     List<String> macsArray = PubMethod.getDevids(paramsJson);
 
 		for (String mac : macsArray) {
 			TblIotDevice dev = this.findDevbyUidAndMac(userid, mac);
@@ -375,16 +376,16 @@ public class TblIotDevSrv {
 			this.tblIotDevBasicSrv.deleteById(id);
 			this.tblIotDevDynSrv.deleteById(id);
 		}
-		
-		//删除Lora gw
-		if (type==3) {
+
+		// 删除Lora gw
+		if (type == 3) {
 			this.loraGwSrv.delDevByMac(mac);
 		}
-		
-		//删除lora dev
-		if (type==4) {
+
+		// 删除lora dev
+		if (type == 4) {
 			this.loraDevSrv.delDevByEui(mac);
-		}		
+		}
 		return id;
 	}
 
@@ -410,16 +411,18 @@ public class TblIotDevSrv {
 		} else if (type == 4) {
 			num = loraDevSrv.countDev(mac);
 		}
-		if (num==0) {			
-			return new ResultDevAdd(ResultStatusCode.DEVID_NOT_EXISTED.getCode(), ResultStatusCode.DEVID_NOT_EXISTED.getErrmsg());
+		if (num == 0) {
+			return new ResultDevAdd(ResultStatusCode.DEVID_NOT_EXISTED.getCode(),
+					ResultStatusCode.DEVID_NOT_EXISTED.getErrmsg());
 		}
-		
+
 		TblIotDevice dev = getDevByMac(mac);
-		if (dev==null) {
-			return new ResultDevAdd(ResultStatusCode.DEVID_NOT_EXISTED.getCode(), ResultStatusCode.DEVID_NOT_EXISTED.getErrmsg()); 
+		if (dev == null) {
+			return new ResultDevAdd(ResultStatusCode.DEVID_NOT_EXISTED.getCode(),
+					ResultStatusCode.DEVID_NOT_EXISTED.getErrmsg());
 		}
 		String id = dev.getId();
-		resultObj.put("code",0);
+		resultObj.put("code", 0);
 		resultObj.put("id", id);
 		return resultObj;
 	}

@@ -6,9 +6,9 @@ package com.zhilutec.valve.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import com.zhilutec.valve.bean.TblLoraGlobalSetting;
+import com.zhilutec.valve.bean.models.TblLoraGlobalSetting;
 
-public interface LoraGlobalSettingRepo extends JpaRepository<TblLoraGlobalSetting, String> {
+public interface LoraGlobalSettingRepo extends JpaRepository<TblLoraGlobalSetting, Integer> {
 	
 
 }

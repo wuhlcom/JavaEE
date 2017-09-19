@@ -14,8 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.zhilutec.valve.bean.TblLoraGlobalSetting;
-import com.zhilutec.valve.bean.TblHouseHolder;
+import com.zhilutec.valve.bean.models.TblLoraGlobalSetting;
 import com.zhilutec.valve.repository.LoraGlobalSettingRepo;
 import com.zhilutec.valve.util.error.ErrorCode;
 import com.zhilutec.valve.util.error.ErrorResponeMsgBody;
@@ -30,25 +29,44 @@ public class LoraGlobalSettingService {
 	@Transactional
 	@Modifying
 	public ErrorResponeMsgBody save(String params) {
+		
 		JSONObject json = JSON.parseObject(params);
 
-		Long periodSet = json.getLong("period_setting");
-		Long timeOperate = json.getLong("timing_operate");
-		Double tempUpper = json.getDouble("temp_upper_limit");
-		Double tempLower = json.getDouble("temp_lower_limit");
-
-		TblLoraGlobalSetting lg = new TblLoraGlobalSetting();
-		lg.setId(1);
-		lg.setPeriod_setting(periodSet);
-		lg.setTiming_operate(timeOperate);
-		lg.setTemp_upper_limit(tempUpper);
-		lg.setTemp_lower_limit(tempLower);
+		Long period_setting = json.getLong("period_setting");
+		Long timing_operate = json.getLong("timing_operate");
+		Double temp_upper_limit = json.getDouble("temp_upper_limit");
+		Double temp_lower_limit = json.getDouble("temp_lower_limit");
+		Double temp_setting = json.getDouble("temp_setting");
+		Double anti_freezing_temp = json.getDouble("anti_freezing_temp");
+		
+		TblLoraGlobalSetting lg = loraGlobalSettingRepo.findOne(1);
+		if (lg == null) {
+			lg = new TblLoraGlobalSetting();
+		}
+		if (period_setting != null) {
+			lg.setPeriod_setting(period_setting);
+		}
+		if (timing_operate != null) {
+			lg.setTiming_operate(timing_operate);
+		}
+		if (temp_upper_limit != null) {
+			lg.setTemp_upper_limit(temp_upper_limit);
+		}
+		if (temp_lower_limit != null) {
+			lg.setTemp_lower_limit(temp_lower_limit);
+		}
+		if (temp_setting != null) {
+			lg.setTemp_setting(temp_setting);
+		}
+		if (anti_freezing_temp != null) {
+			lg.setAnti_freezing_temp(anti_freezing_temp);
+		}
 		//
 		// lg = JSON.parseObject(params, TblLoraGlobal.class);
-
+		
 		TblLoraGlobalSetting rs = loraGlobalSettingRepo.save(lg);
 		if (rs == null) {
-			return new ErrorResponeMsgBody(ErrorCode.DB_ERROR);
+			return new ErrorResponeMsgBody(ErrorCode.INSERT_ERR);
 		}
 		return new ErrorResponeMsgBody(ErrorCode.OK);
 	}

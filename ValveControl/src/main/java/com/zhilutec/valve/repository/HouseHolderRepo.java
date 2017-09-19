@@ -13,7 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.alibaba.fastjson.JSONArray;
-import com.zhilutec.valve.bean.TblHouseHolder;
+import com.zhilutec.valve.bean.models.TblHouseHolder;
 
 public interface HouseHolderRepo
 		extends JpaRepository<TblHouseHolder, String>, JpaSpecificationExecutor<TblHouseHolder> {
@@ -27,7 +27,7 @@ public interface HouseHolderRepo
 	// 更新一组设备上报周期
 	@Modifying
 	@Query("update TblHouseHolder hh set hh.period_setting = :period_setting where hh.comm_address in :comm_addresses")
-	int updatePeriodByEuis(@Param(value = "comm_addresses") JSONArray comm_addresses,
+	int updatePeriodByEuis(@Param(value = "comm_addresses") List<String> result,
 			@Param(value = "period_setting") Long period_setting);
 
 	// 更新单个设备供热季
@@ -44,7 +44,7 @@ public interface HouseHolderRepo
 	@Query("update TblHouseHolder hh "
 			+ "set hh.heating_season_begin = :heating_season_begin,hh.heating_season_end = :heating_season_end "
 			+ "where hh.comm_address in :comm_addresses")
-	int updateHotseansons(@Param(value = "comm_addresses") JSONArray comm_addresses,
+	int updateHotseansons(@Param(value = "comm_addresses") List<String> comm_addresses,
 			@Param(value = "heating_season_begin") String heating_season_begin,
 			@Param(value = "heating_season_end") String heating_season_end);
 
@@ -53,7 +53,7 @@ public interface HouseHolderRepo
 	@Query("update TblHouseHolder hh "
 			+ "set hh.heating_season_begin = :heating_season_begin,hh.heating_season_end = :heating_season_end, "
 			+ "hh.period_setting = :period_setting " + "where hh.comm_address in :comm_addresses")
-	int updateSeasonsPeriods(@Param(value = "comm_addresses") JSONArray comm_addresses,
+	int updateSeasonsPeriods(@Param(value = "comm_addresses") List<String> comm_addresses,
 			@Param(value = "period_setting") Long period_setting,
 			@Param(value = "heating_season_begin") String heating_season_begin,
 			@Param(value = "heating_season_end") String heating_season_end);

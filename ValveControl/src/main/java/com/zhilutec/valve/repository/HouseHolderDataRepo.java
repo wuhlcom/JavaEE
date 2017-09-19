@@ -10,128 +10,131 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import com.zhilutec.valve.bean.TblHouseHolderData;
+
+import com.zhilutec.valve.bean.models.TblHouseHolderData;
 
 public interface HouseHolderDataRepo
 		extends JpaRepository<TblHouseHolderData, String>, JpaSpecificationExecutor<TblHouseHolderData> {
 
-//	String stealingJPQL = "select new TblValveHouseHolderData(v.house_code,v.comm_address,v.collect_time,v.supply_temp,v.return_temp,v.valve_state)"
-//			+ "from TblValveHouseHolderData v "
-//			+ "where (v.collect_time >= :start_time and v.collect_time<= :end_time) "
-//			+ "and (v.supply_temp >= :wit_min and v.supply_temp <= :wit_max ) "
-//			+ "and (v.return_temp >=:wot_min and v.return_temp <=:wot_max )	"
-//			+ "and (ABS(v.return_temp-v.supply_temp)< :temdif)";
-//
-//	@Query(value = queryStealingSql)
-//	List<TblValveHouseHolderData> findStealingJPQL(@Param("start_time") Long start_time,
-//			@Param("end_time") Long end_time, @Param("wit_min") Double wit_min, @Param("wit_max") Double wit_max,
-//			@Param("wot_min") Double wot_min, @Param("wot_max") Double wot_max, @Param("temdif") Double temdif);
-
-	// String queryStealingSql = "select
-	// house_code,comm_address,collect_time,supply_temp, return_temp,
-	// valve_state from zl_householder"
-	// + "where (collect_time >= 1502939922 and collect_time<=1502939972)"
-	// + "and (supply_temp >=-10 and supply_temp <=10 )"
-	// + "and (return_temp >=20 and return_temp <=25 ) and
-	// (ABS(return_temp-supply_temp)<30)";
-	//
-	String queryStealingSql = "select house_code,comm_address,collect_time,supply_temp, return_temp, valve_state "
-			+ "from zl_householder_data " + "where (collect_time >= :start_time and collect_time<= :end_time) "
-			+ "and (supply_temp >= :wit_min and supply_temp <= :wit_max ) "
+	//可疑盗热分析
+	// and and  //时间和进水温度，回水温，瀑差
+	String queryStealingSql = "select comm_address,collect_time,supply_temp, return_temp, valve_state "
+			+ "from zl_householder_data " 
+			+ "where (collect_time >= :start_time and collect_time<= :end_time and valve_state=0) "
+			+ "and ((supply_temp >= :wit_min and supply_temp <= :wit_max ) "
 			+ "and (return_temp >=:wot_min and return_temp <=:wot_max )	"
-			+ "and (ABS(return_temp-supply_temp)< :temdif)";
+			+ "and (ABS(return_temp-supply_temp)< :temdif))";
 
 	@Query(value = queryStealingSql, nativeQuery = true)
 	List<Object[]> findStealing(@Param("start_time") Long start_time, @Param("end_time") Long end_time,
 			@Param("wit_min") Double wit_min, @Param("wit_max") Double wit_max, @Param("wot_min") Double wot_min,
 			@Param("wot_max") Double wot_max, @Param("temdif") Double temdif);
 
-	String queryStealingSql2Or = "select house_code,comm_address,collect_time,supply_temp, return_temp, valve_state "
-			+ "from zl_householder_data " + "where (collect_time >= :start_time and collect_time<= :end_time) "
-			+ "and (supply_temp >= :wit_min and supply_temp <= :wit_max ) "
+	// or or
+	String queryStealingSql2Or = "select comm_address,collect_time,supply_temp, return_temp, valve_state "
+			+ "from zl_householder_data " 
+			+ "where (collect_time >= :start_time and collect_time<= :end_time) "
+			+ "and ((supply_temp >= :wit_min and supply_temp <= :wit_max ) "
 			+ "or (return_temp >=:wot_min and return_temp <=:wot_max )	"
-			+ "or (ABS(return_temp-supply_temp)< :temdif)";
+			+ "or (ABS(return_temp-supply_temp)< :temdif))";
 
 	@Query(value = queryStealingSql2Or, nativeQuery = true)
 	List<Object[]> findStealing2Or(@Param("start_time") Long start_time, @Param("end_time") Long end_time,
 			@Param("wit_min") Double wit_min, @Param("wit_max") Double wit_max, @Param("wot_min") Double wot_min,
 			@Param("wot_max") Double wot_max, @Param("temdif") Double temdif);
 
-	String queryStealingSqlOrAnd = "select house_code,comm_address,collect_time,supply_temp, return_temp, valve_state "
-			+ "from zl_householder_data " + "where (collect_time >= :start_time and collect_time<= :end_time) "
-			+ "and (supply_temp >= :wit_min and supply_temp <= :wit_max ) "
+	// or and
+	String queryStealingSqlOrAnd = "select comm_address,collect_time,supply_temp, return_temp, valve_state "
+			+ "from zl_householder_data " 
+			+ "where (collect_time >= :start_time and collect_time<= :end_time and valve_state=0) "
+			+ "and ((supply_temp >= :wit_min and supply_temp <= :wit_max ) "
 			+ "or (return_temp >=:wot_min and return_temp <=:wot_max )	"
-			+ "and (ABS(return_temp-supply_temp)< :temdif)";
+			+ "and (ABS(return_temp-supply_temp)< :temdif))";
 
 	@Query(value = queryStealingSqlOrAnd, nativeQuery = true)
 	List<Object[]> findStealingOrAnd(@Param("start_time") Long start_time, @Param("end_time") Long end_time,
 			@Param("wit_min") Double wit_min, @Param("wit_max") Double wit_max, @Param("wot_min") Double wot_min,
 			@Param("wot_max") Double wot_max, @Param("temdif") Double temdif);
 
-	String queryStealingSqlAndOr = "select house_code,comm_address,collect_time,supply_temp, return_temp, valve_state "
-			+ "from zl_householder_data " + "where (collect_time >= :start_time and collect_time<= :end_time) "
-			+ "and (supply_temp >= :wit_min and supply_temp <= :wit_max ) "
+	// and or
+	String queryStealingSqlAndOr = "select comm_address,collect_time,supply_temp, return_temp, valve_state "
+			+ "from zl_householder_data " 
+			+ "where (collect_time >= :start_time and collect_time<= :end_time and valve_state=0) "
+			+ "and ((supply_temp >= :wit_min and supply_temp <= :wit_max ) "
 			+ "and (return_temp >=:wot_min and return_temp <=:wot_max )	"
-			+ "or (ABS(return_temp-supply_temp)< :temdif)";
+			+ "or (ABS(return_temp-supply_temp)< :temdif))";
 
-	@Query(value = queryStealingSqlOrAnd, nativeQuery = true)
+	@Query(value = queryStealingSqlAndOr, nativeQuery = true)
 	List<Object[]> findStealingAndOr(@Param("start_time") Long start_time, @Param("end_time") Long end_time,
 			@Param("wit_min") Double wit_min, @Param("wit_max") Double wit_max, @Param("wot_min") Double wot_min,
 			@Param("wot_max") Double wot_max, @Param("temdif") Double temdif);
 
-	// select comm_type,comm_address
-	// from zl_householder_data
-	// where (collect_time >= 1502939922 and collect_time<=1502949972)
-	// and (supply_temp >=-10 and supply_temp <=20 )
-	// and (return_temp >=10 and return_temp <=25 )
-	// and (ABS(return_temp-supply_temp)<30)
-	// group by comm_type,comm_address
-
-	String queryStealingGroupSql = "select comm_type,comm_address " 
-	+ "from zl_householder_data "
-			+ "where (collect_time >= :start_time and collect_time<= :end_time) "
-			+ "and (supply_temp >= :wit_min and supply_temp <= :wit_max ) "
+	// 仅按时间查询
+	String queryStealingSqlByTime = "select comm_address,collect_time,supply_temp, return_temp, valve_state "
+			+ "from zl_householder_data " 
+			+ "where (collect_time >= :start_time and collect_time<= :end_time and valve_state=0)";
+	@Query(value = queryStealingSqlByTime, nativeQuery = true)
+	List<Object[]> findStealingByTime(@Param("start_time") Long start_time, @Param("end_time") Long end_time);
+	
+		
+	//可疑盗热住户
+	//and and
+	String queryStealingGroupSql = "select comm_type,comm_address " + "from zl_householder_data "
+			+ "where (collect_time >= :start_time and collect_time<= :end_time and valve_state=0) "
+			+ "and ((supply_temp >= :wit_min and supply_temp <= :wit_max ) "
 			+ "and (return_temp >=:wot_min and return_temp <=:wot_max )	"
-			+ "and (ABS(return_temp-supply_temp)< :temdif) " + "group by comm_type,comm_address";
+			+ "and (ABS(return_temp-supply_temp)< :temdif)) " 
+			+ "group by comm_type,comm_address";
 
 	@Query(value = queryStealingGroupSql, nativeQuery = true)
-	List<Object[]> findStealingGroup(@Param("start_time") Long start_time,
-			@Param("end_time") Long end_time, @Param("wit_min") Double wit_min, @Param("wit_max") Double wit_max,
-			@Param("wot_min") Double wot_min, @Param("wot_max") Double wot_max, @Param("temdif") Double temdif);
+	List<Object[]> findStealingGroup(@Param("start_time") Long start_time, @Param("end_time") Long end_time,
+			@Param("wit_min") Double wit_min, @Param("wit_max") Double wit_max, @Param("wot_min") Double wot_min,
+			@Param("wot_max") Double wot_max, @Param("temdif") Double temdif);
 
-	String queryStealingGroupSql2Or = "select comm_type,comm_address " 
-			+ "from zl_householder_data "
-			+ "where (collect_time >= :start_time and collect_time<= :end_time) "
-			+ "and (supply_temp >= :wit_min and supply_temp <= :wit_max ) "
+	//or or
+	String queryStealingGroupSql2Or = "select comm_type,comm_address " + "from zl_householder_data "
+			+ "where (collect_time >= :start_time and collect_time<= :end_time and valve_state=0) "
+			+ "and ((supply_temp >= :wit_min and supply_temp <= :wit_max ) "
 			+ "or (return_temp >=:wot_min and return_temp <=:wot_max )	"
-			+ "or (ABS(return_temp-supply_temp)< :temdif) " + "group by comm_type,comm_address";
+			+ "or (ABS(return_temp-supply_temp)< :temdif)) " 
+			+ "group by comm_type,comm_address";
 
 	@Query(value = queryStealingGroupSql2Or, nativeQuery = true)
-	List<Object[]> findStealingGroup2Or(@Param("start_time") Long start_time,
-			@Param("end_time") Long end_time, @Param("wit_min") Double wit_min, @Param("wit_max") Double wit_max,
-			@Param("wot_min") Double wot_min, @Param("wot_max") Double wot_max, @Param("temdif") Double temdif);
+	List<Object[]> findStealingGroup2Or(@Param("start_time") Long start_time, @Param("end_time") Long end_time,
+			@Param("wit_min") Double wit_min, @Param("wit_max") Double wit_max, @Param("wot_min") Double wot_min,
+			@Param("wot_max") Double wot_max, @Param("temdif") Double temdif);
 
-	String queryStealingGroupSqlAndOr = "select comm_type,comm_address " 
-			+ "from zl_householder_data "
-			+ "where (collect_time >= :start_time and collect_time<= :end_time) "
-			+ "and (supply_temp >= :wit_min and supply_temp <= :wit_max ) "
+	//and or
+	String queryStealingGroupSqlAndOr = "select comm_type,comm_address " + "from zl_householder_data "
+			+ "where (collect_time >= :start_time and collect_time<= :end_time and valve_state=0) "
+			+ "and ((supply_temp >= :wit_min and supply_temp <= :wit_max ) "
 			+ "and (return_temp >=:wot_min and return_temp <=:wot_max )	"
-			+ "or (ABS(return_temp-supply_temp)< :temdif) " + "group by comm_type,comm_address";
+			+ "or (ABS(return_temp-supply_temp)< :temdif)) " 
+			+ "group by comm_type,comm_address";
 
 	@Query(value = queryStealingGroupSqlAndOr, nativeQuery = true)
-	List<Object[]> findStealingGroupAndOr(@Param("start_time") Long start_time,
-			@Param("end_time") Long end_time, @Param("wit_min") Double wit_min, @Param("wit_max") Double wit_max,
-			@Param("wot_min") Double wot_min, @Param("wot_max") Double wot_max, @Param("temdif") Double temdif);
+	List<Object[]> findStealingGroupAndOr(@Param("start_time") Long start_time, @Param("end_time") Long end_time,
+			@Param("wit_min") Double wit_min, @Param("wit_max") Double wit_max, @Param("wot_min") Double wot_min,
+			@Param("wot_max") Double wot_max, @Param("temdif") Double temdif);
 
-	String queryStealingGroupSqlOrAnd = "select comm_type,comm_address " 
-			+ "from zl_householder_data "
-			+ "where (collect_time >= :start_time and collect_time<= :end_time) "
-			+ "and (supply_temp >= :wit_min and supply_temp <= :wit_max ) "
+	//or and
+	String queryStealingGroupSqlOrAnd = "select comm_type,comm_address " + "from zl_householder_data "
+			+ "where (collect_time >= :start_time and collect_time<= :end_time and valve_state=0) "
+			+ "and ((supply_temp >= :wit_min and supply_temp <= :wit_max ) "
 			+ "and (return_temp >=:wot_min and return_temp <=:wot_max )	"
-			+ "and (ABS(return_temp-supply_temp)< :temdif) " + "group by comm_type,comm_address";
+			+ "and (ABS(return_temp-supply_temp)< :temdif)) " 
+			+ "group by comm_type,comm_address";
 
 	@Query(value = queryStealingGroupSqlOrAnd, nativeQuery = true)
-	List<Object[]> findStealingGroupOrAnd(@Param("start_time") Long start_time,
-			@Param("end_time") Long end_time, @Param("wit_min") Double wit_min, @Param("wit_max") Double wit_max,
-			@Param("wot_min") Double wot_min, @Param("wot_max") Double wot_max, @Param("temdif") Double temdif);
+	List<Object[]> findStealingGroupOrAnd(@Param("start_time") Long start_time, @Param("end_time") Long end_time,
+			@Param("wit_min") Double wit_min, @Param("wit_max") Double wit_max, @Param("wot_min") Double wot_min,
+			@Param("wot_max") Double wot_max, @Param("temdif") Double temdif);
+	
+	//按时间查询
+	String queryStealingGroupTime= "select comm_type,comm_address " 
+	+ "from zl_householder_data "
+	+ "where (collect_time >= :start_time and collect_time<= :end_time and valve_state=0) "
+	+ "group by comm_type,comm_address";
+	@Query(value = queryStealingGroupTime, nativeQuery = true)
+	List<Object[]> findStealingGroupByTime(@Param("start_time") Long start_time, @Param("end_time") Long end_time);
 }

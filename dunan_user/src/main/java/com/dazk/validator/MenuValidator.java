@@ -13,37 +13,40 @@ import com.dazk.common.util.RegexUtil;
 
 public class MenuValidator {
 	/**
-	 * 添加菜单时校验参数
-	 * 	
+	 * 添加菜单时校验参数 1 菜单 0按钮
 	 */
 	public static ResultErr menuVal(JSONObject json) {
 		String name = json.getString("name");
 		System.out.println("name：" + name);
-		if (RegexUtil.isNull(name)||!isMenuName(name))
-		    return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "菜单名输入错误");
-		
+		if (RegexUtil.isNull(name) || !isMenuName(name))
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "菜单名格式输入错误");
 
 		String is_menu = json.getString("is_menu");
 		System.out.println("is_menu：" + is_menu);
-		if (RegexUtil.isNull(is_menu)||(RegexUtil.isNotNull(is_menu) && !is_menu.equals("0") && !is_menu.equals("1") && !is_menu.equals("2")))
+		if (RegexUtil.isNull(is_menu) || (RegexUtil.isNotNull(is_menu) && !is_menu.equals("0") && !is_menu.equals("1")
+				&& !is_menu.equals("2")))
 			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "菜单类型错误");
-		
 
 		String parent_id = json.getString("parent_id");
 		System.out.println("parent_id：" + parent_id);
 		if (RegexUtil.isNotNull(parent_id) && !RegexUtil.isDigits(parent_id)) {
-			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "父菜单名类型ID错误");
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "父菜单ID格式错误");
 		}
 
 		String uri = json.getString("uri");
 		System.out.println("uri：" + uri);
-		if (!isUriParam(uri))
-			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "菜单Url错误");
+		if (is_menu.equals("1") || is_menu.equals("0")) {
+			if (RegexUtil.isNull(uri) || (RegexUtil.isNotNull(uri) && (uri.trim().equals("/") || !isUriParam(uri))))
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "URI格式错误");
+		}
 
 		String front_router = json.getString("front_router");
 		System.out.println("front_router：" + front_router);
-		if (!isUriParam(front_router))
-			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "前置路由Url错误");
+		if (is_menu.equals("1")) {
+			if (RegexUtil.isNull(front_router) || (RegexUtil.isNotNull(front_router)
+					&& (front_router.trim().equals("/") || !isUriParam(front_router))))
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "前端路由URI格式错误");
+		}
 
 		System.out.println("验证通过");
 		return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
@@ -52,36 +55,41 @@ public class MenuValidator {
 	public static ResultErr menuUpdateVal(JSONObject json) {
 		String id = json.getString("id");
 		System.out.println("id：" + id);
-		if (RegexUtil.isNull(id)||!isMenuId(id))
-			  return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "菜单ID错误");
+		if (RegexUtil.isNull(id) || !isMenuId(id))
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "菜单ID格式错误");
 
 		String name = json.getString("name");
 		System.out.println("name：" + name);
 		if (!isMenuName(name)) {
-			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "菜单名错误");
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "菜单名格式错误");
 		}
 
 		String is_menu = json.getString("is_menu");
 		System.out.println("is_menu：" + is_menu);
 		if (RegexUtil.isNotNull(is_menu) && !is_menu.equals("0") && !is_menu.equals("1") && !is_menu.equals("2")) {
-			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "菜单类型错误");
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "菜单类型格式错误");
 		}
 
 		String parent_id = json.getString("parent_id");
 		System.out.println("parent_id：" + parent_id);
 		if (RegexUtil.isNotNull(parent_id) && !RegexUtil.isDigits(parent_id)) {
-			  return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "父菜单ID错误");
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "父菜单ID格式错误");
 		}
 
 		String uri = json.getString("uri");
 		System.out.println("uri：" + uri);
-		if (!isUriParam(uri))
-			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "菜单Url错误");
+		if (is_menu.equals("1") || is_menu.equals("0")) {
+			if (RegexUtil.isNull(uri) || (RegexUtil.isNotNull(uri) && (uri.trim().equals("/") || !isUriParam(uri))))
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "URI格式错误");
+		}
 
 		String front_router = json.getString("front_router");
 		System.out.println("front_router：" + front_router);
-		if (!isUriParam(front_router))
-			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "前置路由Url错误");
+		if (is_menu.equals("1")) {
+			if (RegexUtil.isNull(front_router) || (RegexUtil.isNotNull(front_router)
+					&& (front_router.trim().equals("/") || !isUriParam(front_router))))
+				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "前端路由URI格式错误");
+		}
 
 		System.out.println("验证通过");
 		return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
@@ -175,7 +183,8 @@ public class MenuValidator {
 	}
 
 	public static boolean isMenuId(String id) {
-		if (RegexUtil.isNotNull(id) && (!ParamValidator.isStrLength(id, FieldLimit.MENU_ID_MIN,FieldLimit.MENU_ID_MAX) || !RegexUtil.isDigits(id))) {
+		if (RegexUtil.isNotNull(id) && (!ParamValidator.isStrLength(id, FieldLimit.MENU_ID_MIN, FieldLimit.MENU_ID_MAX)
+				|| !RegexUtil.isDigits(id))) {
 			return false;
 		}
 		return true;

@@ -5,6 +5,8 @@
 package com.dazk.validator;
 
 import com.alibaba.fastjson.JSONObject;
+import com.dazk.common.errcode.ResultErr;
+import com.dazk.common.errcode.ResultStatusCode;
 import com.dazk.common.util.ParamValidator;
 import com.dazk.common.util.RegexUtil;
 
@@ -53,25 +55,21 @@ public class DataPermiValidator {
 		return true;
 	}
 
-	public static boolean dataPermiBatchVal(JSONObject json) {
+	public static ResultErr dataPermiBatchVal(JSONObject json) {
 		String user_id = json.getString("userid");
 		System.out.println("userid：" + user_id);
-		if (RegexUtil.isNull(user_id)) {
-			return false;
-		}
-
-		if (RegexUtil.isNotNull(user_id) && !RegexUtil.isDigits(user_id)) {
-			return false;
+		if (RegexUtil.isNull(user_id)||(RegexUtil.isNotNull(user_id) && !RegexUtil.isDigits(user_id))) {
+			 return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "用户ID错误");
 		}
 
 		String data = json.getString("data");
 		System.out.println("data：" + data);
-		if (RegexUtil.isNull(data)) {
-			return false;
+		if (data==null||data=="") {
+			return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "权限列表错误");
 		}
 
 		System.out.println("验证通过");
-		return true;
+		return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
 	}
 
 	public static boolean dataPermiUpdateVal(JSONObject json) {

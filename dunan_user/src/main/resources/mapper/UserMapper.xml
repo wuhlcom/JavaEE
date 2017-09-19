@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.dazk.db.dao.UserMapper">    
+<mapper namespace="com.dazk.db.dao.UserMapper">
 	<select id="queryUser" resultType="com.dazk.db.model.User"
 		parameterType="com.dazk.db.param.UserParam">
-		select u.id,u.username,u.name,u.nickname,r.name as roleName,u.age,u.lv,u.email,u.telephone,u.sex,u.company,u.address,u.position,u.idcard,u.remark
+		select u.id,u.username,u.name,u.nickname,r.name as
+		roleName,u.age,u.lv,u.email,u.telephone,u.sex,u.company,u.address,u.position,u.idcard,u.role_id,u.remark
 		from
 		(
 		select * from user where isdel=0
 		<if test="userName != null">
 			and username like '%${userName}%'
 		</if>
-
+				
 		<if test="parentUser != null">
-			and parent_user = #{parentUser}
+			and (parent_user = #{parentUser} or id = #{userId})
 		</if>
 
+		<if test="roleId != null">
+			and role_id = #{roleId}
+		</if>
+					
 		<if test="listRows != null">
-			limit #{start,jdbcType=INTEGER},#{listRows,jdbcType=INTEGER}
+			limit
+			#{start,jdbcType=INTEGER},#{listRows,jdbcType=INTEGER}
 		</if>
 		) as u inner join
 		(
@@ -26,12 +32,13 @@
 		</if>
 		) as r on u.role_id = r.id
 	</select>
+
 	<select id="queryUserCount" resultType="java.lang.Integer"
 		parameterType="com.dazk.db.param.UserParam">
 		select count(*)
 		from
 		(
-		select * from user where isdel=0
+		select * from user where isdel=0 and disused=1
 		<if test="userName != null">
 			and username like '%${userName}%'
 		</if>
@@ -40,6 +47,67 @@
 			and parent_user = #{parentUser}
 		</if>
 
+		<if test="roleId != null">
+			and role_id = #{roleId}
+		</if>
+
+		) as u inner join
+		(
+		select * from role where 1=1
+
+		<if test="roleName != null">
+			and name like '%${roleName}%'
+		</if>
+		) as r on u.role_id = r.id
+	</select>
+
+	<select id="queryUserByRole" resultType="com.dazk.db.model.User"
+		parameterType="com.dazk.db.param.UserParam">
+		select u.id,u.username,u.name,u.nickname,r.name as
+		roleName,u.age,u.lv,u.email,u.telephone,u.sex,u.company,u.address,u.position,u.idcard,u.remark
+		from
+		(
+		select * from user where isdel=0 and disused=1
+		<if test="userName != null">
+			and username like '%${userName}%'
+		</if>
+
+		<if test="parentUser != null">
+			and parent_user = #{parentUser}
+		</if>
+
+		<if test="roleId != null">
+			and role_id = #{roleId}
+		</if>
+		) as u inner join
+		(
+		select * from role where 1=1
+		<if test="roleName != null">
+			and name like '%${roleName}%'
+		</if>
+		) as r on u.role_id = r.id
+		<if test="listRows != null">
+			limit #{start,jdbcType=INTEGER},#{listRows,jdbcType=INTEGER}
+		</if>
+	</select>
+
+	<select id="queryUserCountByRole" resultType="java.lang.Integer"
+		parameterType="com.dazk.db.param.UserParam">
+		select count(*)
+		from
+		(
+		select * from user where isdel=0 and disused=1
+		<if test="userName != null">
+			and username like '%${userName}%'
+		</if>
+
+		<if test="parentUser != null">
+			and parent_user = #{parentUser}
+		</if>
+
+		<if test="roleId != null">
+			and role_id = #{roleId}
+		</if>
 		) as u inner join
 		(
 		select * from role where 1=1
@@ -48,4 +116,7 @@
 		</if>
 		) as r on u.role_id = r.id
 	</select>
+
+
+
 </mapper>

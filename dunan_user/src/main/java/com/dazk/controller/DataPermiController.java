@@ -5,6 +5,7 @@
 package com.dazk.controller;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -30,6 +31,7 @@ import com.dazk.service.impl.MenuServiceImpl;
 import com.dazk.validator.DataPermiValidator;
 import com.dazk.validator.PubParamValidator;
 import com.dazk.validator.TokenValidator;
+import com.dazk.validator.UserValidator;
 import com.dazk.validator.DataPermiValidator;
 
 @RestController
@@ -82,7 +84,7 @@ public class DataPermiController {
 				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "添加数据失败");
 			} else if (res == -1) {
 				return new ResultErr(ResultStatusCode.REPETITION_ERR.getCode(),
-						ResultStatusCode.REPETITION_ERR.getErrmsg());
+						"数据权限重复添加");
 			}
 
 		} catch (Exception e) {
@@ -118,28 +120,23 @@ public class DataPermiController {
 			// ResultStatusCode.PARAME_ERR.getErrmsg());
 			// }
 
-			JSONObject parameter = JSON.parseObject(requestBody);
-			// String user_id = parameter.getString("userid");
-			// if (user_id == null||user_id=="") {
-			// parameter.put("user_id", rsToken.getString("userid"));
-			// }
-
-			// 数据校验
-			if (!DataPermiValidator.dataPermiBatchVal(parameter)) {
+			JSONObject parameter = JSON.parseObject(requestBody);			
+			// 数据校验	}
+			ResultErr paramsVal = DataPermiValidator.dataPermiBatchVal(parameter);
+			if (paramsVal.getErrcode() != 10001) {
 				// 非法数据，返回错误码
-				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
+				return paramsVal;
 			}
 
 			// 数据入库，成功后返回.
-			int res = dataPermiService.addDataPermiBatch(parameter);
-			System.out.println(res);
+			int res = dataPermiService.addDataPermiBatch(parameter);	
 			if (res >= 1) {
 				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
 			} else if (res == 0) {
-				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "添加数据失败");
+				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "添加数据权限失败");
 			} else if (res == -1) {
-				return new ResultErr(ResultStatusCode.REPETITION_ERR.getCode(),
-						ResultStatusCode.REPETITION_ERR.getErrmsg());
+				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(),
+						"添加数据权限出现异常");
 			}
 
 		} catch (Exception e) {
@@ -278,7 +275,7 @@ public class DataPermiController {
 				result.get(i).setPage(null);
 			}
 
-			int totalRows = dataPermiService.queryDataPermiCount(parameter);
+			int totalRows = dataPermiService.queryDataCount(parameter);
 			resultObj.put("errcode", ResultStatusCode.SUCCESS.getCode());
 			resultObj.put("totalRows", totalRows);
 			resultObj.put("result", result);
@@ -303,14 +300,15 @@ public class DataPermiController {
 			}
 
 			JSONObject resultObj = new JSONObject();
-			JSONObject parameter = JSON.parseObject(requestBody);					
+			JSONObject parameter = JSON.parseObject(requestBody);	
+			parameter.put("token", token);
 			if (!DataPermiValidator.dataPermiQueryVal(parameter)) {
 				// 非法数据，返回错误码
 				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), ResultStatusCode.PARAME_ERR.getErrmsg());
 			}
 
 			// 数据查询，成功后返回.
-			List<String> result = dataPermiService.queryDataPermi(parameter);
+			Set<String> result = dataPermiService.queryDataPermi(parameter);
 			resultObj.put("errcode", ResultStatusCode.SUCCESS.getCode());
 			resultObj.put("result", result);
 			return resultObj.toJSONString();

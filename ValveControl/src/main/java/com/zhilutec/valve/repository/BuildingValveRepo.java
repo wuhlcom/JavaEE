@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.alibaba.fastjson.JSONArray;
-import com.zhilutec.valve.bean.TblBuildingValve;
+import com.zhilutec.valve.bean.models.TblBuildingValve;
 
 public interface BuildingValveRepo extends JpaRepository<TblBuildingValve, String> {
 	@Query("select bv from TblBuildingValve bv where bv.comm_address in :comm_addresses")

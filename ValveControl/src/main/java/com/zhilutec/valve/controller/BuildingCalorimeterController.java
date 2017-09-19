@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zhilutec.valve.service.BuildingCalorimeterService;
 import com.zhilutec.valve.service.BuildingCalorimeterDataService;
@@ -28,7 +27,7 @@ import com.zhilutec.valve.util.error.ErrorCode;
 import com.zhilutec.valve.util.error.ErrorResponeMsgBody;
 
 @RestController
-@RequestMapping("valve/calorimeter")
+@RequestMapping("/valve_service/data")
 public class BuildingCalorimeterController {
 
 	@Autowired
@@ -41,7 +40,7 @@ public class BuildingCalorimeterController {
 	/*
 	 * 查询楼栋热表历史记录
 	 */
-	@RequestMapping(value = "/history/query", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	@RequestMapping(value = "/history/building_calorimeter/query", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponeMsgBody queryCalorimeterHistory(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody String requestBody) throws GlobalErrorException {
 
@@ -69,7 +68,7 @@ public class BuildingCalorimeterController {
 	/*
 	 * 楼栋数据导出
 	 */
-	@RequestMapping(value = "/data/output", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	@RequestMapping(value = "/export/building_calorimeter", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponeMsgBody exportHouseHolderData(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody String requestBody) throws GlobalErrorException {
 
@@ -81,7 +80,7 @@ public class BuildingCalorimeterController {
 			// 请求参数有效性检查，如果参数异常，抛出异常，有异常处理机制统一处理
 			// String requestMsg = requestBody;
 			MultiRecQueryCondition condition = new MultiRecQueryCondition();
-			ErrorCode errCode = condition.getMultiRecCondition(requestBody, false);
+			ErrorCode errCode = condition.getMultiRecCondition(requestBody, false,4);
 
 			// 执行查询数据库操作
 			responeMap.put("total_rows", buildingCalorimeterDataService.countAllRecords(condition));
@@ -94,7 +93,7 @@ public class BuildingCalorimeterController {
 		return new ResponeMsgBody(responeMap);
 	}
 
-	@RequestMapping(value = "batch/query", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	@RequestMapping(value = "/batch/building_calorimeter/query", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public String batchQuery(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody String requestBody) {
 		logger.debug("begin to  batchQuery");

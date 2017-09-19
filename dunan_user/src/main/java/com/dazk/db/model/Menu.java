@@ -22,7 +22,7 @@ public class Menu extends BaseEntity implements Comparable<Menu> {
 	// `uri` varchar(45) NOT NULL COMMENT 'uri地址',
 	private String uri;
 	// `is_menu` tinyint(4) DEFAULT NULL,
-	private Integer is_menu=0;
+	private Integer is_menu=1;
 	// `lv` int(11) DEFAULT NULL,
 	private Long lv;
 	private Long role_id;
@@ -31,10 +31,12 @@ public class Menu extends BaseEntity implements Comparable<Menu> {
 	// `created_at` bigint(20) NOT NULL,
 	private Long created_at;
 	// `isdel` tinyint(4) NOT NULL DEFAULT '0',
-	private Integer isdel;
+	private Integer isdel;	
+
+	// parent
+	private Long parent_id=0L;
 	
-	
-	
+	private String front_router;
 	/**
 	 * 
 	 */
@@ -83,11 +85,6 @@ public class Menu extends BaseEntity implements Comparable<Menu> {
 	            return -1;
 	        }
 	    }
-
-	// parent
-	private Long parent_id=0L;
-	
-	private String front_router;
 
 	public Long getId() {
 		return id;
@@ -186,11 +183,17 @@ public class Menu extends BaseEntity implements Comparable<Menu> {
 		this.front_router = front_router;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
-		return "Menu [id=" + id + ", name=" + name + ", is_menu=" + is_menu + ", include_url=" + include_url
-				+ ", parent_id=" + parent_id + "]";
+		return "Menu [id=" + id + ", name=" + name + ", code=" + code + ", uri=" + uri + ", is_menu=" + is_menu
+				+ ", lv=" + lv + ", role_id=" + role_id + ", include_url=" + include_url + ", created_at=" + created_at
+				+ ", isdel=" + isdel + ", parent_id=" + parent_id + ", front_router=" + front_router + "]";
 	}
+
+
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -202,6 +205,7 @@ public class Menu extends BaseEntity implements Comparable<Menu> {
 		result = prime * result + ((code == null) ? 0 : code.hashCode());
 		result = prime * result + ((created_at == null) ? 0 : created_at.hashCode());
 		result = prime * result + ((front_router == null) ? 0 : front_router.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((include_url == null) ? 0 : include_url.hashCode());
 		result = prime * result + ((is_menu == null) ? 0 : is_menu.hashCode());
 		result = prime * result + ((isdel == null) ? 0 : isdel.hashCode());
@@ -212,6 +216,8 @@ public class Menu extends BaseEntity implements Comparable<Menu> {
 		result = prime * result + ((uri == null) ? 0 : uri.hashCode());
 		return result;
 	}
+
+
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
@@ -239,6 +245,11 @@ public class Menu extends BaseEntity implements Comparable<Menu> {
 			if (other.front_router != null)
 				return false;
 		} else if (!front_router.equals(other.front_router))
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
 			return false;
 		if (include_url == null) {
 			if (other.include_url != null)
@@ -282,7 +293,6 @@ public class Menu extends BaseEntity implements Comparable<Menu> {
 			return false;
 		return true;
 	}
-	
 	
 
 }

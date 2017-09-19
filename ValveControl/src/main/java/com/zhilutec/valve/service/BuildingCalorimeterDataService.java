@@ -12,8 +12,7 @@ import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zhilutec.valve.bean.TblBuidingCalorimeterData;
-import com.zhilutec.valve.bean.TblHouseHolderHistory;
+import com.zhilutec.valve.bean.models.TblBuidingCalorimeterData;
 import com.zhilutec.valve.repository.BuildingCalorimeterDataRepo;
 
 import com.zhilutec.valve.util.MultiRecQueryCondition;
@@ -33,11 +32,22 @@ public class BuildingCalorimeterDataService {
 		
 		List<TblBuidingCalorimeterData> historyDbList = new ArrayList<TblBuidingCalorimeterData>();
 		try {
-			historyDbList = buildingCalorimeterDataRepo.getPageDataById(condition.getCommAddress(), 
-													  condition.getStartTime(),
-													  condition.getEndTime(),
-													  condition.getPageIndex() - 1,
-													  condition.getListRows());
+			int pageIndex = condition.getPageIndex() - 1;
+			int listRows = condition.getListRows();
+			if (condition.getStartTime() == 0 || condition.getEndTime() == 0) {
+				historyDbList = buildingCalorimeterDataRepo.getPageDataById(
+						  condition.getCommAddress(), 
+						  pageIndex * listRows,
+						  listRows);
+			} else {
+				historyDbList = buildingCalorimeterDataRepo.getPageDataByIdAndTimeRange(
+						  condition.getCommAddress(), 
+						  condition.getStartTime(),
+						  condition.getEndTime(),
+						  pageIndex * listRows,
+						  listRows);
+			}
+
 		} catch (Exception e) {
 			logger.error("failed to get records by condition", e);
 			throw new GlobalErrorException(ErrorCode.DB_ERROR);
@@ -67,9 +77,16 @@ public class BuildingCalorimeterDataService {
 		
 		int count = 0;
 		try {
-			count = buildingCalorimeterDataRepo.countRecByDevId(condition.getCommAddress(), 
-											  condition.getStartTime(),
-											  condition.getEndTime());
+			if (condition.getStartTime() == 0 || condition.getEndTime() == 0) {
+				count = buildingCalorimeterDataRepo.countRecByDevId(
+						  condition.getCommAddress());
+			} else {
+				count = buildingCalorimeterDataRepo.countRecByDevIdAndTimeRange(
+						  condition.getCommAddress(), 
+						  condition.getStartTime(),
+						  condition.getEndTime());
+			}
+
 		} catch (Exception e) {
 			logger.error("failed to count householder history.", e);
 			throw new GlobalErrorException(ErrorCode.DB_ERROR);

@@ -23,7 +23,9 @@ public class StealingCondition {
 	private Double wot_max;
 	private String condition2 = "and";
 	private Double temdif;
-
+	//o开1关
+	private Integer valve_state=0;	
+	
 	public final static Logger logger = LoggerFactory.getLogger(HouseHolderHistoryService.class);
 	
 	public StealingCondition(){}
@@ -40,7 +42,7 @@ public class StealingCondition {
 		this.wot_min = object.getDouble("wot_min");
 		this.wot_max = object.getDouble("wot_max");
 		this.condition2 = object.getString("condition2");
-		this.temdif = object.getDouble("temdif");;
+		this.temdif = object.getDouble("temdif");		
 	}
 	
 	public StealingCondition(JSONObject object) {
@@ -53,7 +55,7 @@ public class StealingCondition {
 		this.wot_min = object.getDouble("wot_min");
 		this.wot_max = object.getDouble("wot_max");
 		this.condition2 = object.getString("condition2");
-		this.temdif = object.getDouble("temdif");;
+		this.temdif = object.getDouble("temdif");
 	}
 
 	/**
@@ -80,8 +82,6 @@ public class StealingCondition {
 		this.condition2 = condition2;
 		this.temdif = temdif;
 	}
-
-
 
 	public ErrorCode getCondition(JSONObject object) {
 		try {
@@ -186,6 +186,16 @@ public class StealingCondition {
 
 
 
+	public Integer getValve_state() {
+		return valve_state;
+	}
+
+
+	public void setValve_state(Integer valve_state) {
+		this.valve_state = valve_state;
+	}
+
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -193,9 +203,8 @@ public class StealingCondition {
 	public String toString() {
 		return "StealingCondition [start_time=" + start_time + ", end_time=" + end_time + ", wit_min=" + wit_min
 				+ ", wit_max=" + wit_max + ", condition1=" + condition1 + ", wot_min=" + wot_min + ", wot_max="
-				+ wot_max + ", condition2=" + condition2 + ", temdif=" + temdif + "]";
+				+ wot_max + ", condition2=" + condition2 + ", temdif=" + temdif + ", valve_state=" + valve_state + "]";
 	}
 
 	
-
 }

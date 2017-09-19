@@ -523,7 +523,7 @@ public class RegexUtil {
     * @throws
      */
     public static boolean isLoginName(String loginName){
-    	return match(loginName, "^[A-Za-z][A-Za-z1-9_-]+$");
+    	return match(loginName, "^[a-zA-Z]{1}[a-zA-Z0-9_]{5,30}$");
     }
 
 

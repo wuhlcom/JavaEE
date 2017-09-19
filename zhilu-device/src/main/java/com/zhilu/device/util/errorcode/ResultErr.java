@@ -5,41 +5,43 @@
 package com.zhilu.device.util.errorcode;
 
 public class ResultErr implements Result {
-	private int code;
+	private int errcode;
 	private String err_msg;
-
 	/**
-	 * @param code
+	 * 
+	 */
+	public ResultErr() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	/**
+	 * @param errcode
 	 * @param err_msg
 	 */
-	public ResultErr(int code, String err_msg) {
+	public ResultErr(int errcode, String err_msg) {
 		super();
-		this.code = code;
+		this.errcode = errcode;
 		this.err_msg = err_msg;
 	}
-
-	public int getCode() {
-		return code;
+	public int getErrcode() {
+		return errcode;
 	}
-
-	public void setCode(int code) {
-		this.code = code;
+	public void setErrcode(int errcode) {
+		this.errcode = errcode;
 	}
-
 	public String getErr_msg() {
 		return err_msg;
 	}
-
 	public void setErr_msg(String err_msg) {
 		this.err_msg = err_msg;
 	}
-
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "ResultErr [code=" + code + ", err_msg=" + err_msg + "]";
+		return "ResultErr [errcode=" + errcode + ", err_msg=" + err_msg + "]";
 	}
 
+	
 }

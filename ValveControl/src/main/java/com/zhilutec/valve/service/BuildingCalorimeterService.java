@@ -15,8 +15,8 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.zhilutec.valve.bean.TblBuildingCalorimeter;
-import com.zhilutec.valve.bean.TblHouseHolder;
+import com.zhilutec.valve.bean.models.TblBuildingCalorimeter;
+import com.zhilutec.valve.bean.models.TblHouseHolder;
 import com.zhilutec.valve.repository.BuildingCalorimeterRepo;
 
 @Service
@@ -24,7 +24,7 @@ public class BuildingCalorimeterService {
 	@Autowired
 	private BuildingCalorimeterRepo buildingCaloriRepo;
 
-	public final static Logger logger = LoggerFactory.getLogger(BuildingValveService.class);
+	public final static Logger logger = LoggerFactory.getLogger(BuildingValveDataService.class);
 
 	// id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增ID',
 	// `period_setting` int(11) DEFAULT '-1' COMMENT '上报周期',
@@ -39,11 +39,9 @@ public class BuildingCalorimeterService {
 		// 判断设备是否添加
 		List<TblBuildingCalorimeter> devs = buildingCaloriRepo.getCalorimeters(deveuis);
 		for (int i = 0; i < devs.size(); i++) {
-			TblBuildingCalorimeter dev = devs.get(i);
-			dev.setId(null);
+			TblBuildingCalorimeter dev = devs.get(i);			
 			dev.setPeriod_setting(null);
 			dev.setComm_status(null);
-			dev.setIfpush(null);
 		}
 		return devs;
 	}

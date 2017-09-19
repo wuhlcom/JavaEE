@@ -7,6 +7,8 @@ package com.dazk.db.param;
 public class UserParam {
 	private Integer type;
 	private Long parentUser;
+	private Long userId;
+	private Long roleId;
 	private String userName;
 	private String roleName;
 	private Integer page = 1;
@@ -22,10 +24,12 @@ public class UserParam {
 	 * @param start
 	 * @param listRows
 	 */
-	public UserParam(Integer type, Long parentUser, String userName, String roleName, Integer page, Integer listRows) {
+	public UserParam(Integer type, Long parentUser,Long userId,Long roleId, String userName, String roleName, Integer page, Integer listRows) {
 		super();
 		this.type = type;
 		this.parentUser = parentUser;
+		this.userId = userId;
+		this.roleId = roleId;
 		this.userName = userName;
 		this.roleName = roleName;
 		this.page = page;	
@@ -34,7 +38,16 @@ public class UserParam {
 			start = (this.page - 1) * this.listRows;
 		}
 	}
-
+	
+	public UserParam(Long userId,Integer page, Integer listRows) {
+		super();
+		this.userId = userId;		
+		this.page = page;	
+		this.listRows = listRows;
+		if (this.listRows != null) {
+			start = (this.page - 1) * this.listRows;
+		}
+	}
 	
 	public Integer getPage() {
 		return page;
@@ -75,6 +88,27 @@ public class UserParam {
 		this.parentUser = parentUser;
 	}
 
+	
+
+	public Long getUserId() {
+		return userId;
+	}
+
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+
+	public Long getRoleId() {
+		return roleId;
+	}
+
+
+	public void setRoleId(Long roleId) {
+		this.roleId = roleId;
+	}
+
 
 	public String getUserName() {
 		return userName;
@@ -109,10 +143,10 @@ public class UserParam {
 	 */
 	@Override
 	public String toString() {
-		return "UserParam [type=" + type + ", parentUser=" + parentUser + ", userName=" + userName + ", roleName="
-				+ roleName + ", page=" + page + ", start=" + start + ", listRows=" + listRows + "]";
+		return "UserParam [type=" + type + ", parentUser=" + parentUser + ", userId=" + userId + ", roleId=" + roleId
+				+ ", userName=" + userName + ", roleName=" + roleName + ", page=" + page + ", start=" + start
+				+ ", listRows=" + listRows + "]";
 	}
-	
 	
 
 }

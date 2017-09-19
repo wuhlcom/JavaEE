@@ -5,6 +5,7 @@
 package com.dazk.controller;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -36,7 +37,7 @@ import com.dazk.validator.TokenValidator;
 @RequestMapping("/role")
 public class RolePermiController {
 	public final static Logger logger = LoggerFactory.getLogger(RolePermiController.class);
-	
+
 	@Resource
 	private RolePermissionService rolePermiService;
 
@@ -77,11 +78,13 @@ public class RolePermiController {
 			int res = rolePermiService.addRolePermi(parameter);
 			if (res == 1) {
 				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
-			} else if (res == -1) {
-				return new ResultErr(ResultStatusCode.REPETITION_ERR.getCode(),
-						ResultStatusCode.REPETITION_ERR.getErrmsg());
+			} else if (res == 0) {
+				return new ResultErr(ResultStatusCode.REPETITION_ERR.getCode(), "添加角色权限失败!");
 			} else if (res == -2) {
-				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), ResultStatusCode.NODATA_ERR.getErrmsg());
+				return new ResultErr(ResultStatusCode.ROLE_NOT_EXIST.getCode(),
+						ResultStatusCode.ROLE_NOT_EXIST.getErrmsg());
+			} else if (res == -3) {
+				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "找不到菜单!");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -126,9 +129,9 @@ public class RolePermiController {
 			if (res >= 1) {
 				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
 			} else if (res == -1) {
-				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "删除时程序出错");
+				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "删除角色出错");
 			} else if (res == 0) {
-				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "删除数据不存在");
+				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "角色不存在");
 			}
 			return new ResultErr(ResultStatusCode.UNKNOW_ERR.getCode(), ResultStatusCode.UNKNOW_ERR.getErrmsg());
 		} catch (Exception e) {
@@ -174,9 +177,9 @@ public class RolePermiController {
 			if (res >= 1) {
 				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
 			} else if (res == -1) {
-				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "更新时程序出错");
+				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "更新角色信息出错");
 			} else if (res == 0) {
-				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "要更新的数据不存在");
+				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "角色不存在");
 			}
 			return new ResultErr(ResultStatusCode.UNKNOW_ERR.getCode(), ResultStatusCode.UNKNOW_ERR.getErrmsg());
 		} catch (Exception e) {
@@ -271,7 +274,7 @@ public class RolePermiController {
 				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
 			} else if (res == -1) {
 				return new ResultErr(ResultStatusCode.REPETITION_ERR.getCode(),
-						ResultStatusCode.REPETITION_ERR.getErrmsg());
+						"请勿添加重复角色");
 			} else if (res == -2) {
 				return new ResultErr(ResultStatusCode.PARAME_ERR.getCode(), "角色添加失败");
 			}
@@ -312,7 +315,7 @@ public class RolePermiController {
 			} else if (res == -1) {
 				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "删除时程序出错");
 			} else if (res == 0) {
-				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "要删除的数据不存在");
+				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "角色不存在");
 			}
 			return new ResultErr(ResultStatusCode.UNKNOW_ERR.getCode(), ResultStatusCode.UNKNOW_ERR.getErrmsg());
 		} catch (Exception e) {
@@ -358,7 +361,7 @@ public class RolePermiController {
 			if (res >= 1) {
 				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
 			} else if (res == 0) {
-				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "要更新的数据不存在");
+				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "角色不存在或角色更新失败");
 			}
 			return new ResultErr(ResultStatusCode.UNKNOW_ERR.getCode(), ResultStatusCode.UNKNOW_ERR.getErrmsg());
 		} catch (Exception e) {
@@ -400,11 +403,11 @@ public class RolePermiController {
 
 			if (result == null) {
 				return new ResultErr(ResultStatusCode.ROLE_NOT_EXIST.getCode(),
-						ResultStatusCode.ROLE_NOT_EXIST.getErrmsg());
+						"角色不存在");
 			}
 			resultObj.put("errcode", ResultStatusCode.SUCCESS.getCode());
 			resultObj.put("result", result);
-			return resultObj;
+			return resultObj.toJSONString();
 
 		} catch (Exception e) {
 			e.printStackTrace();

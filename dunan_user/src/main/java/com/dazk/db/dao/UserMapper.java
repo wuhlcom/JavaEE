@@ -12,6 +12,8 @@ import com.dazk.db.param.UserParam;
 
 public interface UserMapper extends UserUtilMapper<User> {
 	List<User> queryUser(UserParam obj);
-
-	int queryUserCount(UserParam obj);
+	Integer queryUserCount(UserParam obj);
+	
+	List<User> queryUserByRole(UserParam obj);
+	Integer queryUserCountByRole(UserParam obj);
 }

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.zhilutec.valve.service.BuildingValveDataService;
 import com.zhilutec.valve.service.BuildingValveService;
 import com.zhilutec.valve.util.MultiRecQueryCondition;
 import com.zhilutec.valve.util.ResponeMsgBody;
@@ -26,8 +27,11 @@ import com.zhilutec.valve.util.error.ErrorCode;
 import com.zhilutec.valve.util.error.ErrorResponeMsgBody;
 
 @RestController
-@RequestMapping("valve/buidingvalve")
+@RequestMapping("/valve_service/data")
 public class BuildingValveController {
+	@Autowired
+	private BuildingValveDataService buildingValveDataService;
+	
 	@Autowired
 	private BuildingValveService buildingValveService;
 
@@ -36,7 +40,7 @@ public class BuildingValveController {
 	/*
 	 * 查询楼栋热表历史记录
 	 */
-	@RequestMapping(value = "/history/query", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	@RequestMapping(value = "/history/building_valve/query", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponeMsgBody queryBuildingValveHistory(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody String requestBody) throws GlobalErrorException {
 
@@ -51,8 +55,8 @@ public class BuildingValveController {
 			ErrorCode errCode = condition.getMultiRecCondition(requestBody, true);
 
 			// 执行查询数据库操作
-			responeMap.put("total_rows", buildingValveService.countRecByDevId(condition));
-			responeMap.put("records", buildingValveService.findByDevId(condition));
+			responeMap.put("total_rows", buildingValveDataService.countRecByDevId(condition));
+			responeMap.put("records", buildingValveDataService.findByDevId(condition));
 
 		} catch (GlobalErrorException exception) {
 			throw exception;
@@ -61,7 +65,7 @@ public class BuildingValveController {
 		return new ResponeMsgBody(responeMap);
 	}
 
-	@RequestMapping(value = "batch/query", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	@RequestMapping(value = "/batch/building_valve/query", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public String batchQuery(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody String requestBody) {
 		logger.debug("begin to batchQuery");

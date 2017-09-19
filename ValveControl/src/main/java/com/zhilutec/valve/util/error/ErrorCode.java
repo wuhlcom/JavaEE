@@ -9,7 +9,8 @@ public enum ErrorCode {
 	PARAM_INCOMPLETE(1003, "参数不完整"),
 	DEV_NOTFOUND(1004, "找不到该设备"),
 	UNKNOW_ERR(1005, "未知错误"),
-    
+	NODATA_ERR(1006,"找不到要更新的记录"),    
+	INSERT_ERR(1007,"添加数据失败"),    
 	DB_ERROR(2001, "数据库错误");
 	
 	

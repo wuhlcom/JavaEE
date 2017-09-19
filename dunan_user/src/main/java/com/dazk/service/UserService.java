@@ -22,5 +22,7 @@ public interface UserService {
 
 	List<User> queryUser(JSONObject obj);
 
-	int queryUserCount(JSONObject obj);
+	Integer queryUserCount(JSONObject obj);
+
+	int resetPasswd(JSONObject obj);
 }

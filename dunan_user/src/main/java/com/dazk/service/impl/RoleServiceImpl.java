@@ -6,6 +6,9 @@ package com.dazk.service.impl;
 
 import java.util.List;
 
+import javax.annotation.Resource;
+import javax.management.RuntimeErrorException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +26,12 @@ import com.dazk.db.model.Role;
 import com.dazk.db.model.RolePermission;
 import com.dazk.db.model.User;
 import com.dazk.service.RoleService;
+import com.dazk.service.UserService;
 import com.github.pagehelper.PageHelper;
 import tk.mybatis.mapper.entity.Example;
 
 @Service
+@Transactional
 public class RoleServiceImpl implements RoleService {
 	public final static Logger logger = LoggerFactory.getLogger(RoleServiceImpl.class);
 
@@ -39,9 +44,12 @@ public class RoleServiceImpl implements RoleService {
 	@Autowired
 	private UserMapper userMapper;
 
+	@Resource
+	private UserService userService;
+
 	@Override
 	public int addRole(JSONObject obj) {
-		int codeNum=11;
+		int codeNum = 11;
 		Role record = new Role();
 		String roleName = obj.getString("name");
 		record.setName(roleName);
@@ -73,29 +81,29 @@ public class RoleServiceImpl implements RoleService {
 		record.setCreated_at(System.currentTimeMillis() / 1000);
 		return roleMapper.insertSelective(record);
 	}
-	
+
 	@Override
-	public int addSuperRole(JSONObject obj){
-			Role record = new Role();
-			String roleName = obj.getString("name");	
-			record.setName(roleName);
-			record.setIsdel(0);
-			int exist = roleMapper.selectCount(record);
-			if (exist > 0) {
-				return -1;
-			}
-			
-			Role record2 = new Role();
-			record2.setCode(GlobalParamsUtil.ADMIN_CODE);
-			exist = roleMapper.selectCount(record2);
-			if (exist>0) {
-				return -2;
-			}
-				
-			record.setDisused(1);
-			record.setCode(GlobalParamsUtil.ADMIN_CODE);
-			record.setCreated_at(System.currentTimeMillis() / 1000);
-			return roleMapper.insertSelective(record);
+	public int addSuperRole(JSONObject obj) {
+		Role record = new Role();
+		String roleName = obj.getString("name");
+		record.setName(roleName);
+		record.setIsdel(0);
+		int exist = roleMapper.selectCount(record);
+		if (exist > 0) {
+			return -1;
+		}
+
+		Role record2 = new Role();
+		record2.setCode(GlobalParamsUtil.ADMIN_CODE);
+		exist = roleMapper.selectCount(record2);
+		if (exist > 0) {
+			return -2;
+		}
+
+		record.setDisused(1);
+		record.setCode(GlobalParamsUtil.ADMIN_CODE);
+		record.setCreated_at(System.currentTimeMillis() / 1000);
+		return roleMapper.insertSelective(record);
 	}
 
 	@Override
@@ -106,9 +114,13 @@ public class RoleServiceImpl implements RoleService {
 		record.setId(role_id);
 		record.setIsdel(1);
 
-		int exist = roleMapper.selectCount(record);
-		if (exist == 1) {
-			return 1;
+		JSONObject userParams = new JSONObject();
+		userParams.put("type", 3);
+		userParams.put("search", role_id);
+		// 角色下有用户时不允许删除
+		List<User> users = userService.queryUser(userParams);
+		if (users.size() > 0) {
+			return -1;
 		}
 
 		// 删除角色菜单权限
@@ -122,16 +134,23 @@ public class RoleServiceImpl implements RoleService {
 		permiCriteria.andEqualTo("role_id", role_id).andEqualTo("disused", 1);
 		int rs = rolePermiMapper.updateByExampleSelective(permiRecord, permiExample);
 
-		// 删除用户角色
-		Example userExample = new Example(User.class);
+		// 查询角色下的用户
+		Example userExample1 = new Example(User.class);
 		// 创建查询条件
-		Example.Criteria userCriteria = userExample.createCriteria();
+		Example.Criteria userCriteria1 = userExample1.createCriteria();
 		// 设置查询条件 多个andEqualTo串联表示 and条件查询
-		User userRecord = new User();
-		userRecord.setRole_id(null);
-		userCriteria.andEqualTo("role_id", role_id).andEqualTo("isdel", 0);
-		userExample.and(userCriteria);
-		rs = userMapper.updateByExampleSelective(userRecord, userExample);
+		userCriteria1.andEqualTo("role_id", role_id).andEqualTo("isdel", 0);
+		userExample1.and(userCriteria1);
+		List<User> roleUsers = userMapper.selectByExample(userExample1);
+	
+		if (roleUsers.size() > 0) {
+			for (User user : roleUsers) {
+				// 修改User实例的中Role_id为null
+				user.setRole_id(null);
+				// updateByExampleSelective使用null更新,因此使用updateByExample来更新
+				rs = userMapper.updateByExample(user, userExample1);
+			}
+		}
 
 		// 删除角色
 		// 创建example
@@ -142,8 +161,9 @@ public class RoleServiceImpl implements RoleService {
 		criteria.andEqualTo("id", role_id).andEqualTo("isdel", 0);
 		rs = roleMapper.updateByExampleSelective(record, example);
 		if (rs == 0) {
-			throw new NumberFormatException();
+			throw new RuntimeErrorException(null, "删除角色失败");
 		}
+
 		return rs;
 	}
 
@@ -169,8 +189,7 @@ public class RoleServiceImpl implements RoleService {
 			// 创建查询条件
 			Example.Criteria criteria = example.createCriteria();
 			// 设置查询条件 多个andEqualTo串联表示 and条件查询
-			criteria.andEqualTo("id", id).andEqualTo("isdel", 0);
-			example.and(criteria);
+			criteria.andEqualTo("id", id).andEqualTo("isdel", 0);		
 			return roleMapper.updateByExampleSelective(record, example);
 		} catch (Exception e) {
 			return -1;
@@ -179,20 +198,29 @@ public class RoleServiceImpl implements RoleService {
 
 	// 查询单个角色信息
 	@Override
-	public Role queryRoleOne(JSONObject obj) {
-		// String roleName = obj.getString("name");
-		// String roleId = obj.getString("role_id");
+	public Role queryRoleOne(JSONObject obj) {	
+		String roleName = obj.getString("roleName");
+		Long roleId = obj.getLong("role_id");
 		String roleCode = obj.getString("role_code");
+        		
 		Role roleParams = new Role();
-		roleParams.setCode(roleCode);
-		try {
-			return roleMapper.selectOne(roleParams);
-		} catch (Exception e) {
-			logger.debug("角色名称重复! role code:"+roleCode);
-			e.printStackTrace();
+		if (roleName != null && roleName.trim() != "") {
+			roleParams.setName(roleName);
+		} else if (roleId != null) {
+			roleParams.setId(roleId);
+		} else if (roleCode != null && roleCode.trim() != "") {
+			roleParams.setCode(roleCode);
+		}else{
+			System.out.println("参数错误");
 			return null;
 		}
-		
+
+		try {
+			return roleMapper.selectOne(roleParams);
+		} catch (Exception e) {		
+			return null;
+		}
+
 	}
 
 	@Override
@@ -215,16 +243,13 @@ public class RoleServiceImpl implements RoleService {
 		Example.Criteria recordCriteria = example.createCriteria();
 		if (type == 0) {
 			// 设置查询条件 多个andEqualTo串联表示 and条件查询
-			recordCriteria.andEqualTo("isdel", 0);
-			example.and(recordCriteria);
+			recordCriteria.andEqualTo("isdel", 0);			
 		} else if (type == 1) {
 			// 设置查询条件 多个andEqualTo串联表示 and条件查询
-			recordCriteria.andLike("name", "%" + search + "%").andEqualTo("isdel", 0);
-			example.and(recordCriteria);
+			recordCriteria.andLike("name", "%" + search + "%").andEqualTo("isdel", 0);		
 		} else if (type == 2) {
 			// 设置查询条件 多个andEqualTo串联表示 and条件查询
-			recordCriteria.andEqualTo("user_id", search).andEqualTo("isdel", 0);
-			example.and(recordCriteria);
+			recordCriteria.andEqualTo("user_id", search).andEqualTo("isdel", 0);	
 		}
 		return roleMapper.selectByExample(example);
 	}
@@ -235,16 +260,13 @@ public class RoleServiceImpl implements RoleService {
 		Example example = new Example(Role.class);
 		Example.Criteria recordCriteria = example.createCriteria();
 		if (type.equals("0")) {
-			recordCriteria.andEqualTo("isdel", 0);
-			example.and(recordCriteria);
+			recordCriteria.andEqualTo("isdel", 0);			
 		} else if (type.equals("1")) {
 			String search = obj.getString("search");
-			recordCriteria.andLike("name", "%" + search + "%").andEqualTo("isdel", 0);
-			example.and(recordCriteria);
+			recordCriteria.andLike("name", "%" + search + "%").andEqualTo("isdel", 0);		
 		} else if (type.equals("2")) {
 			Long search = obj.getLong("search");
-			recordCriteria.andEqualTo("user_id", search).andEqualTo("isdel", 0);
-			example.and(recordCriteria);
+			recordCriteria.andEqualTo("user_id", search).andEqualTo("isdel", 0);		
 		}
 		return roleMapper.selectCountByExample(example);
 	}

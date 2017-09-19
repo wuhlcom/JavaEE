@@ -76,7 +76,13 @@ public class MenuController {
 				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
 			} else if (res == -1) {
 				return new ResultErr(ResultStatusCode.REPETITION_ERR.getCode(),
-						ResultStatusCode.REPETITION_ERR.getErrmsg());
+						"菜单已经存在!");
+			}else if (res == -2) {
+				return new ResultErr(ResultStatusCode.REPETITION_ERR.getCode(),
+						"URI已经存在!");
+			}else if (res == -3) {
+				return new ResultErr(ResultStatusCode.REPETITION_ERR.getCode(),
+						"菜单前端路由已经存在!");
 			}
 
 		} catch (Exception e) {
@@ -118,9 +124,9 @@ public class MenuController {
 			if (res >= 1) {
 				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
 			} else if (res == -1) {
-				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "删除时程序出错");
+				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "删除菜单出错");
 			} else if (res == 0) {
-				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "删除数据不存在");
+				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "删除的菜单不存在");
 			} else if (res ==-2){
 				return new ResultErr(ResultStatusCode.REPETITION_ERR.getCode(), "当前菜单有子菜单无法直接删除");
 			}
@@ -164,9 +170,9 @@ public class MenuController {
 			if (res >= 1) {
 				return new ResultErr(ResultStatusCode.SUCCESS.getCode(), ResultStatusCode.SUCCESS.getErrmsg());
 			} else if (res == -1) {
-				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "更新时程序出错");
+				return new ResultErr(ResultStatusCode.ROUTINE_ERR.getCode(), "更新菜单出错");
 			} else if (res == 0) {
-				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "要更新的数据不存在");
+				return new ResultErr(ResultStatusCode.NODATA_ERR.getCode(), "要更新的菜单不存在");
 			}
 			return new ResultErr(ResultStatusCode.UNKNOW_ERR.getCode(), ResultStatusCode.UNKNOW_ERR.getErrmsg());
 		} catch (Exception e) {

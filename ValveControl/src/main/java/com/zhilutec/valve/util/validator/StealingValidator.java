@@ -9,10 +9,11 @@ public class StealingValidator {
 
 	public final static Logger logger = LoggerFactory.getLogger(HouseHolderDataService.class);
 
-	public static boolean queryStealValidator(JSONObject object) {
+	public static boolean queryStealValidator(JSONObject object) {		
 		String start_time = object.getString("start_time");
+		Double start = object.getDouble("start_time");
 		System.out.println("start_time:" + start_time);
-		if (start_time == null) {
+		if (RegexUtil.isNull(start_time)) {
 			return false;
 		}
 
@@ -21,32 +22,37 @@ public class StealingValidator {
 		}
 
 		String end_time = object.getString("end_time");
+		Double end = object.getDouble("end_time");
 		System.out.println("end_time:" + end_time);
-		if (end_time == null) {
+		if (RegexUtil.isNull(end_time)) {
 			return false;
 		}
 
-		if (RegexUtil.isNotNull(start_time) && (!RegexUtil.isDigits(start_time) || start_time.length() != 10)) {
+		if (RegexUtil.isNotNull(end_time) && (!RegexUtil.isDigits(end_time) || end_time.length() != 10)) {
 			return false;
 		}
-
+		
+		if (RegexUtil.isNotNull(start_time)&&RegexUtil.isNotNull(end_time) && (start> end)) {
+			return false;
+		}		
+		
 		String wit_min = object.getString("wit_min");
-		System.out.println("wit_min:" + wit_min);
-		if (wit_min == null) {
-			return false;
-		}
+		Double witMin = object.getDouble("wit_min");
+		System.out.println("wit_min:" + wit_min);		
 
 		if (RegexUtil.isNotNull(wit_min) && !RegexUtil.isDouble(wit_min)) {
 			return false;
 		}
 		
 		String wit_max = object.getString("wit_max");
-		System.out.println("wit_max:" + wit_max);
-		if (wit_max == null) {
-			return false;
-		}
+		Double witMax = object.getDouble("wit_max");
+		System.out.println("wit_max:" + wit_max);	
 
 		if (RegexUtil.isNotNull(wit_max) && !RegexUtil.isDouble(wit_max)) {
+			return false;
+		}
+		
+		if (RegexUtil.isNotNull(wit_max) && RegexUtil.isNotNull(wit_min) && (witMin> witMax)) {
 			return false;
 		}
 		
@@ -57,22 +63,21 @@ public class StealingValidator {
 		}
 
 		String wot_min = object.getString("wot_min");
-		System.out.println("wot_min:" + wot_min);
-		if (wot_min == null) {
-			return false;
-		}
+		Double wotMin = object.getDouble("wot_min");
+		System.out.println("wot_min:" + wot_min);	
 
 		if (RegexUtil.isNotNull(wot_min) && !RegexUtil.isDouble(wot_min)) {
 			return false;
 		}
 		
 		String wot_max = object.getString("wot_max");
+		Double wotMax = object.getDouble("wot_max");
 		System.out.println("wot_max:" + wot_max);
-		if (wot_max == null) {
+		if (RegexUtil.isNotNull(wot_max) && !RegexUtil.isDouble(wot_max)) {
 			return false;
 		}
-
-		if (RegexUtil.isNotNull(wot_max) && !RegexUtil.isDouble(wot_max)) {
+		
+		if (RegexUtil.isNotNull(wot_max) && RegexUtil.isNotNull(wot_min) && (wotMin> wotMax)) {
 			return false;
 		}
 		
@@ -81,14 +86,9 @@ public class StealingValidator {
 		if (RegexUtil.isNotNull(condition2) && !RegexUtil.isCondition(condition2)) {
 			return false;
 		}
-
 		
 		String temdif = object.getString("temdif");
-		System.out.println("temdif:" + temdif);
-		if (temdif == null) {
-			return false;
-		}
-		
+		System.out.println("temdif:" + temdif);	
 		if (RegexUtil.isNotNull(temdif) && !RegexUtil.isDouble(temdif)) {
 			return false;
 		}

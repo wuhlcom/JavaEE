@@ -5,6 +5,7 @@
 package com.zhilutec.valve.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.zhilutec.valve.bean.TblHouseHolder;
+import com.zhilutec.valve.bean.models.TblHouseHolder;
 import com.zhilutec.valve.repository.HouseHolderRepo;
 import com.zhilutec.valve.util.error.ErrorCode;
 import com.zhilutec.valve.util.error.ErrorResponeMsgBody;
@@ -26,7 +27,7 @@ import com.zhilutec.valve.util.validator.RegexUtil;
 public class HouseHolderService {
 	@Autowired
 	private HouseHolderRepo houseHolderRepo;
-
+	
 	// 设置上报周期
 	@Transactional
 	@Modifying
@@ -50,9 +51,9 @@ public class HouseHolderService {
 		}
 
 		// 批量更新设备信息
-		int rs = houseHolderRepo.updatePeriodByEuis(deveuis, period);
+		int rs = houseHolderRepo.updatePeriodByEuis(euiList, period);
 		if (rs == 0) {
-			return new ErrorResponeMsgBody(ErrorCode.DB_ERROR);
+			return new ErrorResponeMsgBody(ErrorCode.NODATA_ERR);
 		}
 
 		return new ErrorResponeMsgBody(ErrorCode.OK);
@@ -86,9 +87,9 @@ public class HouseHolderService {
 		}
 
 		// 批量更新设备信息
-		int rs = houseHolderRepo.updateHotseansons(deveuis, hSeasonBegin, hSeasonEnd);
+		int rs = houseHolderRepo.updateHotseansons(euiList, hSeasonBegin, hSeasonEnd);
 		if (rs == 0) {
-			return new ErrorResponeMsgBody(ErrorCode.DB_ERROR);
+			return new ErrorResponeMsgBody(ErrorCode.NODATA_ERR);
 		}
 
 		return new ErrorResponeMsgBody(ErrorCode.OK);
@@ -100,20 +101,51 @@ public class HouseHolderService {
 	public ErrorResponeMsgBody updateSeasonsAndPeriods(String params) {
 		JSONObject json = JSON.parseObject(params);
 		// JSONObject hSeasonJson = json.getJSONObject("heating_season");
-		Long period = json.getLong("period_setting");
-		String hSeasonBegin = json.getString("heating_season_begin");
-		String hSeasonEnd = json.getString("heating_season_end");
+		Long period_setting = json.getLong("period_setting");
+		String heating_season_begin = json.getString("heating_season_begin");
+		String heating_season_end = json.getString("heating_season_end");
 		JSONArray deveuis = json.getJSONArray("comm_addresses");
+		
+		// 若设备记录不存在，则需要插入一条
+		List<String> result = new ArrayList<String>();
+		
+		List<String> listBeans = JSON.parseArray(deveuis.toString(), String.class);
+		for (String comm_address : listBeans) {
+			if (comm_address.length() > 16) {
+				continue;
+			}
+//			System.out.println("comm_address:" + comm_address);		
+			TblHouseHolder obj = houseHolderRepo.findOne(comm_address);
+			if (obj == null) {
+				obj = new TblHouseHolder();
+				obj.setComm_address(comm_address);
+				obj.setComm_type(0); // lora
+				obj.setCollect_time((long) (new Date().getTime()/1000));
+				obj.setPeriod_setting(period_setting);
+				obj.setHeating_season_begin(heating_season_begin);
+				obj.setHeating_season_end(heating_season_end);
+				houseHolderRepo.save(obj);
+			}
+			else
+			{
+				result.add(comm_address);
+			}
+		}
+		
+		if (result.isEmpty()) {
+			return new ErrorResponeMsgBody(ErrorCode.DEV_NOTFOUND);
+		}
+		
 		int rs = 0;
-		if (period == null && RegexUtil.isNotNull(hSeasonBegin) && RegexUtil.isNotNull(hSeasonEnd)) {
-			rs = houseHolderRepo.updateHotseansons(deveuis, hSeasonBegin, hSeasonEnd);
-		} else if (period != null && (RegexUtil.isNull(hSeasonBegin) && RegexUtil.isNull(hSeasonEnd))) {
-			rs = houseHolderRepo.updatePeriodByEuis(deveuis, period);
-		} else if (period != null && (RegexUtil.isNotNull(hSeasonBegin) && RegexUtil.isNotNull(hSeasonEnd))) {
-			rs = houseHolderRepo.updateSeasonsPeriods(deveuis, period, hSeasonBegin, hSeasonEnd);
+		if (period_setting == null && RegexUtil.isNotNull(heating_season_begin) && RegexUtil.isNotNull(heating_season_end)) {
+			rs = houseHolderRepo.updateHotseansons(result, heating_season_begin, heating_season_end);
+		} else if (period_setting != null && (RegexUtil.isNull(heating_season_begin) && RegexUtil.isNull(heating_season_end))) {
+			rs = houseHolderRepo.updatePeriodByEuis(result, period_setting);
+		} else if (period_setting != null && (RegexUtil.isNotNull(heating_season_begin) && RegexUtil.isNotNull(heating_season_end))) {
+			rs = houseHolderRepo.updateSeasonsPeriods(result, period_setting, heating_season_begin, heating_season_end);
 		}
 		if (rs == 0) {
-			return new ErrorResponeMsgBody(ErrorCode.DB_ERROR);
+			return new ErrorResponeMsgBody(ErrorCode.NODATA_ERR);
 		}
 
 		return new ErrorResponeMsgBody(ErrorCode.OK);
@@ -183,11 +215,9 @@ public class HouseHolderService {
 		List<TblHouseHolder> devs = houseHolderRepo.getValves(deveuis);
 		for (int i = 0; i < devs.size(); i++) {
 			TblHouseHolder dev = devs.get(i);
-			dev.setId(null);
 			dev.setPeriod_setting(null);
 			dev.setHeating_season_begin(null);
-			dev.setHeating_season_end(null);
-			dev.setIfpush(null);
+			dev.setHeating_season_end(null);	
 		}
 		return devs;
 	}
