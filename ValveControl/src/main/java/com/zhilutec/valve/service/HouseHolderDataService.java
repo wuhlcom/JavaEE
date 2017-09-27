@@ -123,11 +123,11 @@ public class HouseHolderDataService {
 			houseHolderData.setComm_status(null);
 			houseHolderData.setComm_type(null);
 			houseHolderData.setDtu_code(null);
-			houseHolderData.setOpen_ratio(null);
-			houseHolderData.setOpening(null);
+			houseHolderData.setOpen_ratio(null);		
 			houseHolderData.setSet_temper(null);
 			houseHolderData.setOpen_time(null);
 			houseHolderData.setSharing_heat(null);
+			houseHolderData.setValve_state(null);
 		}
 		return rs;
 	}
@@ -136,10 +136,10 @@ public class HouseHolderDataService {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<TblHouseHolderData> getStealing(String requestBody) throws GlobalErrorException {
 		HouseHolderDataParams params = new HouseHolderDataParams();
-		JSONObject paramJson = JSON.parseObject(requestBody);
-		if (!StealingValidator.queryStealValidator(paramJson)) {
-			return null;
-		}
+		 JSONObject paramJson = JSON.parseObject(requestBody);
+		 if (!StealingValidator.queryStealValidator(paramJson)) {
+		 return null;
+		 }
 		params = JSON.parseObject(requestBody, HouseHolderDataParams.class);
 		List rs = new ArrayList();
 		Specification<TblHouseHolderData> conditions = HouseHolderDataParamSpec.conditions(params, 0);
@@ -234,7 +234,6 @@ public class HouseHolderDataService {
 			houseHolderData.setComm_status(null);
 			houseHolderData.setDtu_code(null);
 			houseHolderData.setOpen_ratio(null);
-			houseHolderData.setOpening(null);
 			houseHolderData.setSet_temper(null);
 			houseHolderData.setReturn_temp(null);
 			houseHolderData.setSharing_heat(null);

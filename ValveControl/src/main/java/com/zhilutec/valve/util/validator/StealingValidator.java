@@ -9,7 +9,8 @@ public class StealingValidator {
 
 	public final static Logger logger = LoggerFactory.getLogger(HouseHolderDataService.class);
 
-	public static boolean queryStealValidator(JSONObject object) {		
+	public static boolean queryStealValidator(JSONObject object) {	
+		System.out.println("参数检查开始");
 		String start_time = object.getString("start_time");
 		Double start = object.getDouble("start_time");
 		System.out.println("start_time:" + start_time);

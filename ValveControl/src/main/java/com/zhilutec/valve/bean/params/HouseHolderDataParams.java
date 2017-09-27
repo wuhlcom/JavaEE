@@ -43,7 +43,7 @@ public class HouseHolderDataParams {
 	//o开1关
 	private Integer valve_state=0;	
 	
-	
+	private Short opening=0;
 	/**
 	 * 
 	 */
@@ -76,8 +76,7 @@ public class HouseHolderDataParams {
 		this.wot_min = wot_min;
 		this.wot_max = wot_max;
 		this.condition2 = condition2;
-		this.temdif = temdif;
-		this.valve_state=0;
+		this.temdif = temdif;		
 	}
 
 	public Long getStart_time() {
@@ -142,6 +141,16 @@ public class HouseHolderDataParams {
 	}
 
 
+	public Short getOpening() {
+		return opening;
+	}
+
+
+	public void setOpening(Short opening) {
+		this.opening = opening;
+	}
+
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -149,7 +158,8 @@ public class HouseHolderDataParams {
 	public String toString() {
 		return "HouseHolderDataParams [start_time=" + start_time + ", end_time=" + end_time + ", wit_min=" + wit_min
 				+ ", wit_max=" + wit_max + ", condition1=" + condition1 + ", wot_min=" + wot_min + ", wot_max="
-				+ wot_max + ", condition2=" + condition2 + ", temdif=" + temdif + ", valve_state=" + valve_state + "]";
+				+ wot_max + ", condition2=" + condition2 + ", temdif=" + temdif + ", valve_state=" + valve_state
+				+ ", opening=" + opening + "]";
 	}	
 	
 	

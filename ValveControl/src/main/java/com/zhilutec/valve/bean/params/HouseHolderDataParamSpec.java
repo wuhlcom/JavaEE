@@ -66,18 +66,18 @@ public class HouseHolderDataParamSpec {
 				Path<Long> collect_time = root.get("collect_time");
 				Path<Double> supply_temp = root.get("supply_temp");
 				Path<Double> return_temp = root.get("return_temp");
-				Path<Integer> valve_state = root.get("valve_state");
+				// Path<Integer> opening = root.get("opening");
 
 				Long start_time = params.getStart_time();
 				Long end_time = params.getEnd_time();
-				Double temdif = Math.abs(params.getTemdif());
+				Double temdif = params.getTemdif();
 				String con1 = params.getCondition1();
 				String con2 = params.getCondition2();
 				Double wit_min = params.getWit_min();
 				Double wit_max = params.getWit_max();
 				Double wot_min = params.getWot_min();
 				Double wot_max = params.getWot_max();
-				Integer valve_status = params.getValve_state();
+				// Short opening_status = params.getOpening();
 
 				// System.out.println("--------------");
 				// System.out.println(start_time);
@@ -98,11 +98,12 @@ public class HouseHolderDataParamSpec {
 				Predicate predicate = null;
 
 				// 修改返回结果为指定的类
-				cb.construct(HouseHolderDataResult.class, comm_address, collect_time, valve_state, supply_temp,
-						return_temp);
+				// cb.construct(HouseHolderDataResult.class, comm_address,
+				// collect_time, supply_temp,
+				// return_temp);
 
-				// 阀门状态 0 开1 关
-				Predicate valveStatePre = cb.equal(valve_state, valve_status);
+				// 阀门状态 100 开0 关 ,不考虑开关状态
+				// Predicate openingPre = cb.equal(opening, opening_status);
 
 				// 采集时间范围,必选
 				Predicate timeStart = cb.greaterThanOrEqualTo(collect_time, start_time);
@@ -115,7 +116,7 @@ public class HouseHolderDataParamSpec {
 
 				// 两列差值小于
 				if (temdif != null) {
-					temdifPre = cb.le(cb.abs(cb.diff(supplyTem, returnTem)), temdif);
+					temdifPre = cb.le(cb.diff(supplyTem, returnTem), temdif);
 				}
 
 				// 入水温度范围
@@ -132,7 +133,7 @@ public class HouseHolderDataParamSpec {
 					returnTempPre = cb.and(wotMinPre, wotMaxPre);
 				}
 
-				// 三组参数都有值
+				// ------------------- 三组参数都有值--------------------------
 				if (supplyTempPre != null && returnTempPre != null && temdifPre != null) {
 					// and or
 					if (con1 != null && con1.toLowerCase().equals("and") && con2 != null
@@ -154,12 +155,14 @@ public class HouseHolderDataParamSpec {
 						Predicate temPre = cb.and(supplyTempPre, returnTempPre);
 						predicate = cb.and(temdifPre, (temPre));
 					}
-				} else if (supplyTempPre != null && returnTempPre != null && temdifPre == null) {// 两组参数有值
+					// ------------------------------------
+					// 两组参数有值-------------------
+				} else if (supplyTempPre != null && returnTempPre != null && temdifPre == null) {
 					// 只有supplyTempPre和returnTempPre
 					// or
 					if (con1 != null && con1.toLowerCase().equals("or")) {
 						predicate = cb.or(supplyTempPre, returnTempPre);
-					// and
+						// and
 					} else {
 						predicate = cb.and(supplyTempPre, returnTempPre);
 					}
@@ -168,7 +171,7 @@ public class HouseHolderDataParamSpec {
 					// or
 					if (con2 != null && con2.toLowerCase().equals("or")) {
 						predicate = cb.or(supplyTempPre, temdifPre);
-					// and
+						// and
 					} else {
 						predicate = cb.and(supplyTempPre, temdifPre);
 					}
@@ -177,54 +180,29 @@ public class HouseHolderDataParamSpec {
 					// or
 					if (con2 != null && con2.toLowerCase().equals("or")) {
 						predicate = cb.or(returnTempPre, temdifPre);
-					// and
+						// and
 					} else {
 						predicate = cb.and(returnTempPre, temdifPre);
 					}
+					// ---------------------------一组参数有值----只取and---------------
 				} else if (supplyTempPre != null && returnTempPre == null && temdifPre == null) {
 					// 只有supplyTempPre
 					predicate = supplyTempPre;
 				} else if (supplyTempPre == null && returnTempPre != null && temdifPre == null) {
-					// 有returnTempPre 与前面or
-					if (con1 != null && con1.toLowerCase().equals("or")) {
-						predicate = cb.or(returnTempPre, timeRangePre);
-						predicate = cb.and(predicate, valveStatePre);
-
-						if (type == 1) {
-							query.groupBy(comm_address, comm_type);
-							return query.where(predicate).getRestriction();
-						} else {
-							return predicate;
-						}
-					// and
-					} else {
-						predicate = returnTempPre;
-					}
+					// 有returnTempPre 与前面
+					predicate = returnTempPre;
 				} else if (supplyTempPre == null && returnTempPre == null && temdifPre != null) {
-					// 只有temdifPre 与or
-					if (con2 != null && con2.toLowerCase().equals("or")) {
-						predicate = cb.or(temdifPre, timeRangePre);
-						predicate = cb.and(predicate, valveStatePre);
-
-						if (type == 1) {
-							query.groupBy(comm_address, comm_type);
-							return query.where(predicate).getRestriction();
-						} else {
-							return predicate;
-						}
-					} else {
-						predicate = temdifPre;
-					}
+					predicate = temdifPre;
 				}
 
 				if (predicate != null) {
 					predicate = cb.and(predicate, timeRangePre);
-					predicate = cb.and(predicate, valveStatePre);
 				} else {
-					predicate = cb.and(valveStatePre, timeRangePre);
+					System.out.println("only timeRangePre");
+					predicate = cb.and(timeRangePre);
 				}
 
-//				System.out.println(predicate);
+				// System.out.println(predicate);
 				if (type == 1) {
 					query.groupBy(comm_address, comm_type);
 					return query.where(predicate).getRestriction();

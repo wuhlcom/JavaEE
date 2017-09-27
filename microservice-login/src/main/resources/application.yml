@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: microservice-login
+server:
+  port: 9990
+  
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://user:password123@localhost:8761/eureka
+#      
+#  instance:
+#    prefer-ip-address: true   

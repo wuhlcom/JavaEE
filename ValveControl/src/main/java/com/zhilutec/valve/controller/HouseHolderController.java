@@ -144,11 +144,11 @@ public class HouseHolderController {
 
 		try {
 			// 请求参数有效性检查，如果参数异常，抛出异常，有异常处理机制统一处理
-			StealingCondition condition = new StealingCondition(requestBody);
-			ErrorCode errCode = condition.getCondition(requestBody);
-			if (0 != errCode.getCode()) {
-				throw new GlobalErrorException(errCode);
-			}
+			// StealingCondition condition = new StealingCondition(requestBody);
+			// ErrorCode errCode = condition.getCondition(requestBody);
+			// if (0 != errCode.getCode()) {
+			// throw new GlobalErrorException(errCode);
+			// }
 			// 执行查询数据库操作
 			responseRs = houseHolderDataService.getStealing(requestBody);
 			if (responseRs == null) {
