@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 
 @SpringBootApplication
 @MapperScan(basePackages = "com.dazk.db.dao")
-//@EnableEurekaClient
+@EnableEurekaClient
 public class DunanUserApplication {
 
 	public static void main(String[] args) {
