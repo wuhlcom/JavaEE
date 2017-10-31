@@ -40,6 +40,12 @@
 		</encoder>
 	</appender>
 
+  <logger name="com.permission" level="debug" additivity="false">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILELOG" />
+		<appender-ref ref="ROLLINGFILE" />
+	</logger>
+	
 	<logger name="com.apache.ibatis" level="TRACE"/>
 	
 	<logger name="java.sql" level="DEBUG" additivity="false">

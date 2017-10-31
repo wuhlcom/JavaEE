@@ -16,34 +16,29 @@ import java.util.Map;
  * @since 2014-11-21
  * 
  */
-public class HouseHolderDataParams {
-	// start_time Long 否 开始时间 unix时间戳（秒）
-	// end_time Long 否 开始时间 unix时间戳（秒）
-	// wit_min double 是 进水温度下限
-	// wit_max double 是 进水温度上限
-	// condition1 string 否 and/or 默认为and
-	// wot_min double 是 回水温度下限
-	// wot_max double 是 回水温度上限
-	// condition2 string 否 and/or 默认为and
-	// temdif double 是 温差范围
-	private Long start_time;
-	private Long end_time;
+public class HouseHolderDataParams {	
+
+	private Long start_time; //开始时间 unix时间戳（秒）
+	private Long end_time;  //结束时间 unix时间戳（秒）
 	
-	private Double wit_min;
-	private Double wit_max;
+	private Double wit_min; //进水温度下限
+	private Double wit_max; //进水温度上限
 	
-	private String condition1;
+	private String condition1; //否 and/or 默认为and 与wot_win wot_max构成一组参数
 	
-	private Double wot_min;
-	private Double wot_max;
+	private Double wot_min; //回水温度下限
+	private Double wot_max; //回水温度上限
 	
-	private String condition2;
-	
-	private Double temdif;
+	private String condition2; //and/or 默认为and 与temdif构成一组条件	
+	private Double temdif; //temdif
 	//o开1关
 	private Integer valve_state=0;	
 	
+	//开度 阀门开关状态
 	private Short opening=0;
+	
+	//通信地址
+	private List<String> comm_addresses;
 	/**
 	 * 
 	 */
@@ -64,9 +59,12 @@ public class HouseHolderDataParams {
 	 * @param condition2
 	 * @param temdif
 	 * @param valve_state
+	 * @param opening
+	 * @param comm_addresses
 	 */
 	public HouseHolderDataParams(Long start_time, Long end_time, Double wit_min, Double wit_max, String condition1,
-			Double wot_min, Double wot_max, String condition2, Double temdif) {
+			Double wot_min, Double wot_max, String condition2, Double temdif, Integer valve_state, Short opening,
+			List<String> comm_addresses) {
 		super();
 		this.start_time = start_time;
 		this.end_time = end_time;
@@ -76,8 +74,12 @@ public class HouseHolderDataParams {
 		this.wot_min = wot_min;
 		this.wot_max = wot_max;
 		this.condition2 = condition2;
-		this.temdif = temdif;		
+		this.temdif = temdif;
+		this.valve_state = valve_state;
+		this.opening = opening;
+		this.comm_addresses = comm_addresses;
 	}
+
 
 	public Long getStart_time() {
 		return start_time;
@@ -150,6 +152,17 @@ public class HouseHolderDataParams {
 		this.opening = opening;
 	}
 
+	
+
+	public List<String> getComm_addresses() {
+		return comm_addresses;
+	}
+
+
+	public void setComm_addresses(List<String> comm_addresses) {
+		this.comm_addresses = comm_addresses;
+	}
+
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -159,7 +172,7 @@ public class HouseHolderDataParams {
 		return "HouseHolderDataParams [start_time=" + start_time + ", end_time=" + end_time + ", wit_min=" + wit_min
 				+ ", wit_max=" + wit_max + ", condition1=" + condition1 + ", wot_min=" + wot_min + ", wot_max="
 				+ wot_max + ", condition2=" + condition2 + ", temdif=" + temdif + ", valve_state=" + valve_state
-				+ ", opening=" + opening + "]";
+				+ ", opening=" + opening + ", comm_addresses=" + comm_addresses + "]";
 	}	
 	
 	

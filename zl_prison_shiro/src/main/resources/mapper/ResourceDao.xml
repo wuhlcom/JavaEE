@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.prison.db.dao.ResourceDao">
+
+	<select id="queryObject" resultType="com.prison.db.dao.ResourceEntity">
+		select * from pr_resources where id = #{value}
+	</select>
+	
+	<insert id="save" parameterType="com.prison.db.dao.ResourceEntity">
+		insert into pr_resources
+		(
+			`parent_id`, 
+			`resource_name`, 
+			`resource_url`, 
+			`permission`, 
+			`type`, 
+			`icon`, 
+			`order_num`
+		)
+		values
+		(	
+			#{parentId}, 
+			#{resourceName}, 
+			#{resourceUrl}, 
+			#{permission}, 
+			#{type}, 
+			#{icon}, 
+			#{orderNum}
+		)
+	</insert>
+	
+	<select id="queryListParentId" resultType="com.prison.db.dao.ResourceEntity">
+		select * from pr_resources where parent_id = #{parentId} order by order_num asc 
+	</select>
+	
+	<select id="queryNotButtonList" resultType="com.prison.db.dao.ResourceEntity">
+		select * from pr_resources where type != 2 order by order_num asc 
+	</select>
+	
+	<select id="queryList" resultType="com.prison.db.dao.ResourceEntity">
+		select m.*,(select p.resource_name from pr_resources p where p.id = r.parent_id) as parentName 
+			from pr_resources r
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by r.${sidx} ${order}
+			</when>
+			<otherwise>
+				order by r.order_num asc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询用户的权限列表 --> 
+	<select id="queryUserList" resultType="com.prison.db.dao.ResourceEntity">
+		select distinct m.*,(select p.resource_name from pr_resources p where p.id = m.parent_id) as parentName
+			from pr_role_user ru 
+			LEFT JOIN pr_role_resource rr on ru.role_id = rr.role_id 
+			LEFT JOIN pr_resources r on rr.resource_id = r.id 
+		where ru.user_id = #{userId} order by r.order_num asc
+	</select>
+	
+	<select id="queryTotal" resultType="int">
+		select count(*) from pr_resources
+	</select>
+	 
+	<update id="update" parameterType="com.prison.db.dao.ResourceEntity">
+		update pr_resources 
+		<set> 
+			<if test="parentId != null">`parent_id` = #{parentId}, </if>
+			<if test="resourceName != null">`resource_name` = #{resourceName}, </if>
+			<if test="resourceUrl != null">`resource_url` = #{resourceUrl}, </if>
+			<if test="permission != null">`permission` = #{permission}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="icon != null">`icon` = #{icon}, </if>
+			<if test="orderNum != null">`order_num` = #{orderNum}</if>
+		</set>
+		where id = #{resourceId}
+	</update>
+	
+	<delete id="deleteBatch">
+		delete from pr_resources where id in 
+		<foreach item="menuId" collection="array" open="(" separator="," close=")">
+			#{menuId}
+		</foreach>
+		;
+		delete from sys_role_menu where resource_id in 
+		<foreach item="menuId" collection="array" open="(" separator="," close=")">
+			#{menuId}
+		</foreach>
+	</delete>
+	
+</mapper>

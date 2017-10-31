@@ -1,0 +1,11 @@
+E:\java_code\JavaEE\learning_udp-master\src\main\java\com\example\demo\LearningUdpApplication.java
+E:\java_code\JavaEE\learning_udp-master\src\main\java\com\example\demo\init\SysConfig.java
+E:\java_code\JavaEE\learning_udp-master\src\main\java\com\example\demo\handle\UdpServerHandler.java
+E:\java_code\JavaEE\learning_udp-master\src\main\java\com\example\demo\thread\TaskExecutePool.java
+E:\java_code\JavaEE\learning_udp-master\src\main\java\com\example\demo\mod\UdpRecord.java
+E:\java_code\JavaEE\learning_udp-master\src\main\java\com\example\demo\repository\mysql\UdpRepository.java
+E:\java_code\JavaEE\learning_udp-master\src\main\java\com\example\demo\client\QuoteOfTheMomentClient.java
+E:\java_code\JavaEE\learning_udp-master\src\main\java\com\example\demo\client\QuoteOfTheMomentClientHandler.java
+E:\java_code\JavaEE\learning_udp-master\src\main\java\com\example\demo\init\StartupEvent.java
+E:\java_code\JavaEE\learning_udp-master\src\main\java\com\example\demo\repository\redis\RedisRepository.java
+E:\java_code\JavaEE\learning_udp-master\src\main\java\com\example\demo\init\UdpServer.java

@@ -216,7 +216,7 @@ public class MenuServiceImpl implements MenuService {
 		menuParams.setIsdel(0);
 
 		if (menuName != null && !menuName.trim().isEmpty()) {
-			menuParams.setName(menuName);		
+			menuParams.setName(menuName);
 		} else if (menuId != null) {
 			menuParams.setId(menuId);
 		} else {
@@ -232,11 +232,14 @@ public class MenuServiceImpl implements MenuService {
 
 	}
 
-	// 查询所有有效菜单并分组
-	public List queryMenus() {
+	// 查询所有有效菜单并分组{name:parentMenu,isdel:0 children:[{},{}]}
+	public List queryMenus(List<Menu> menus) {
 		Map resultMap = new HashMap();
 		// 保存返回值
 		List<JSONObject> parentLs = new ArrayList<JSONObject>();
+		if (menus==null||menus.isEmpty()||menus.size()==0) {
+			return parentLs;
+		}
 		// 保存父子级菜单
 		JSONObject parentJson = new JSONObject();
 
@@ -244,9 +247,9 @@ public class MenuServiceImpl implements MenuService {
 		Set<Menu> topMenus = new TreeSet<Menu>();
 		Set<Menu> subMenus = new TreeSet<Menu>();
 
-		JSONObject menuParams = new JSONObject();
-		menuParams.put("type", 0);
-		List<Menu> menus = this.queryMenu(menuParams);
+//		JSONObject menuParams = new JSONObject();
+//		menuParams.put("type", 0);
+//		List<Menu> menus = this.queryMenu(menuParams);
 		for (Menu menu : menus) {
 			Long pid = menu.getParent_id();
 			if (pid == 0) {
@@ -312,6 +315,193 @@ public class MenuServiceImpl implements MenuService {
 	// 3：按菜单ID查询]，按ID查询时，查询该菜单下所有下级子菜单
 	@Override
 	public List<Menu> queryMenu(JSONObject obj) {
+		JSONObject parentJs = new JSONObject();
+		JSONObject childrenJs = new JSONObject();
+		// 返回非Menu类型数据
+		List rs = new ArrayList<>();
+		List rsSubMenu = new ArrayList<>();
+
+		Integer type = obj.getInteger("type");
+		String search = obj.getString("search");
+
+		Menu record = new Menu();
+		record = JSON.parseObject(obj.toJSONString(), Menu.class);
+		if (record.getPage() != null && record.getListRows() != null) {
+			PageHelper.startPage(record.getPage(), record.getListRows());
+		} else if (record.getPage() == null && record.getListRows() != null) {
+			PageHelper.startPage(1, record.getListRows());
+		} else if (record.getListRows() == null) {
+			PageHelper.startPage(1, 0);
+		}
+
+		Example example = new Example(Menu.class);
+		Example.Criteria recordCriteria = example.createCriteria();
+		example.setOrderByClause("id asc");
+		// 按名称过滤或完全不过滤显示所有菜单
+		String menuTypeStr = obj.getString("menuType");
+		Integer menuType = obj.getInteger("menuType");
+		if (type == 0) {
+			// 所有类型菜单
+			if (RegexUtil.isNull(menuTypeStr)) {
+				recordCriteria.andEqualTo("isdel", 0);
+			} else {
+				// 按指定类型查询
+				recordCriteria.andEqualTo("isdel", 0).andEqualTo("is_menu", menuType);
+			}		
+			return menuMapper.selectByExample(example);					
+		} else if (type == 1) {
+			// 只查询父级菜单
+			// 所有类型菜单
+			if (RegexUtil.isNull(menuTypeStr)) {
+				recordCriteria.andEqualTo("isdel", 0).andEqualTo("parent_id", 0);
+			} else {
+				// 按指定类型查询
+				recordCriteria.andEqualTo("isdel", 0).andEqualTo("is_menu", menuType).andEqualTo("parent_id", 0);
+			}		
+			
+			List<Menu> parentMenus = menuMapper.selectByExample(example);
+			for (Menu menu : parentMenus) {
+				parentJs = new JSONObject();
+				parentJs.put("id", menu.getId());
+				parentJs.put("name", menu.getName());
+				parentJs.put("uri", menu.getUri());
+				if (menu.getFront_router() == null || menu.getFront_router().isEmpty()) {
+					parentJs.put("front_router", "");
+				} else {
+					parentJs.put("front_router", menu.getFront_router());
+				}
+				parentJs.put("parent_id", menu.getParent_id());
+				parentJs.put("is_menu", menu.getIs_menu());
+				parentJs.put("menuicon", menu.getMenuicon());
+
+				if (menu.getMenuicon() == null || menu.getMenuicon().isEmpty()) {
+					parentJs.put("menuicon", "");
+				} else {
+					parentJs.put("menuicon", menu.getMenuicon());
+				}				
+				
+				Long pid =menu.getId();
+				
+				Example subExample = new Example(Menu.class);
+				Example.Criteria subCriteria = subExample.createCriteria();
+				if (RegexUtil.isNull(menuTypeStr)) {
+					subCriteria.andEqualTo("isdel", 0).andEqualTo("parent_id", pid);
+				} else {
+					// 按指定类型查询
+					subCriteria.andEqualTo("isdel", 0).andEqualTo("is_menu", menuType).andEqualTo("parent_id", pid);
+				}
+				subExample.setOrderByClause("id asc");				
+				//查询子菜单
+				List<Menu> subMenus = menuMapper.selectByExample(subExample);					
+				Set<Menu> children = new TreeSet<>(new CompareUtil());
+				
+				//处理子菜单中不需要返回的列值
+				for (Menu subMenu : subMenus) {					
+						subMenu.setCode(null);
+						subMenu.setLv(null);
+						subMenu.setInclude_url(null);
+						subMenu.setCreated_at(null);
+						subMenu.setInclude_url(null);
+						if (subMenu.getFront_router() == null || subMenu.getFront_router().isEmpty()) {
+							subMenu.setFront_router("");
+						}
+						if (subMenu.getMenuicon() == null || subMenu.getMenuicon().isEmpty()) {
+							subMenu.setMenuicon("");
+						}
+						children.add(subMenu);			
+				}
+				parentJs.put("children", children);
+				rs.add(parentJs);
+			}			
+			return rs;			
+		} else if (type == 2) {
+			if (RegexUtil.isNull(menuTypeStr)) {
+				recordCriteria.andEqualTo("isdel", 0).andLike("name", "%" + search + "%");
+			} else {
+				// 按指定类型查询
+				recordCriteria.andEqualTo("isdel", 0).andEqualTo("is_menu", menuType).andLike("name",
+						"%" + search + "%");
+			}
+			return menuMapper.selectByExample(example);
+		} else if (type == 3) {
+			// 查询包涵指定id的菜单及子菜单
+			if (RegexUtil.isNull(menuTypeStr)) {
+				recordCriteria.andEqualTo("id", search).andEqualTo("isdel", 0);
+			} else {
+				recordCriteria.andEqualTo("id", search).andEqualTo("is_menu", menuType).andEqualTo("isdel", 0);
+			}
+			List<Menu> parentMenu = menuMapper.selectByExample(example);
+
+			// 查子菜单
+			example.clear();
+
+			Example subExample = new Example(Menu.class);
+			// 创建查询条件
+			Example.Criteria subCriteria = subExample.createCriteria();
+			if (RegexUtil.isNull(menuTypeStr)) {
+				subCriteria.andEqualTo("parent_id", search).andEqualTo("isdel", 0);
+			} else {
+				subCriteria.andEqualTo("parent_id", search).andEqualTo("is_menu", menuType).andEqualTo("isdel", 0);
+			}
+
+			List<Menu> subMenu = menuMapper.selectByExample(subExample);
+
+			// 解析主菜单
+			if (parentMenu.isEmpty()) {
+				return parentMenu;
+			} else {
+				for (Menu menu : parentMenu) {
+					parentJs.put("id", menu.getId());
+					parentJs.put("name", menu.getName());
+					parentJs.put("uri", menu.getUri());
+					if (menu.getFront_router() == null || menu.getFront_router().isEmpty()) {
+						parentJs.put("front_router", "");
+					} else {
+						parentJs.put("front_router", menu.getFront_router());
+					}
+					parentJs.put("parent_id", menu.getParent_id());
+					parentJs.put("is_menu", menu.getIs_menu());
+					parentJs.put("menuicon", menu.getMenuicon());
+
+					if (menu.getMenuicon() == null || menu.getMenuicon().isEmpty()) {
+						parentJs.put("menuicon", "");
+					} else {
+						parentJs.put("menuicon", menu.getMenuicon());
+					}
+				}
+			}
+
+			// 解析子菜单
+			for (Menu menu : subMenu) {
+				childrenJs.put("id", menu.getId());
+				childrenJs.put("name", menu.getName());
+				childrenJs.put("uri", menu.getUri());
+				if (menu.getFront_router() == null || menu.getFront_router().isEmpty()) {
+					childrenJs.put("front_router", "");
+				} else {
+					childrenJs.put("front_router", menu.getFront_router());
+				}
+				childrenJs.put("parent_id", menu.getParent_id());
+				childrenJs.put("is_menu", menu.getIs_menu());
+				if (menu.getMenuicon() == null || menu.getMenuicon().isEmpty()) {
+					childrenJs.put("menuicon", "");
+				} else {
+					childrenJs.put("menuicon", menu.getMenuicon());
+				}
+				rsSubMenu.add(childrenJs);
+			}
+			// 插入子菜单信息
+			parentJs.put("children", rsSubMenu);
+			rs.add(parentJs);
+			return rs;
+		}
+		return rs;
+	}
+
+	// 查询类型，取值范围：[0：查询全部，1: 查询所有父级菜单
+	// 2 按菜单名从所有菜单中过滤菜单
+	// 3：按菜单ID查询]，按ID查询时，查询该菜单下所有下级子菜单
+	public List<Menu> queryMenuOld(JSONObject obj) {
 		JSONObject parentJs = new JSONObject();
 		JSONObject childrenJs = new JSONObject();
 		// 返回非Menu类型数据

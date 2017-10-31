@@ -1,0 +1,37 @@
+{
+  "hints": [],
+  "groups": [
+    {
+      "sourceType": "com.enviroment.netty.init.SysConfig",
+      "name": "sysfig",
+      "type": "com.enviroment.netty.init.SysConfig"
+    }
+  ],
+  "properties": [
+    {
+      "sourceType": "com.enviroment.netty.init.SysConfig",
+      "name": "sysfig.core-pool-size",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.enviroment.netty.init.SysConfig",
+      "name": "sysfig.keep-alive-seconds",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.enviroment.netty.init.SysConfig",
+      "name": "sysfig.max-pool-size",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.enviroment.netty.init.SysConfig",
+      "name": "sysfig.queue-capacity",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.enviroment.netty.init.SysConfig",
+      "name": "sysfig.udp-receive-port",
+      "type": "java.lang.Integer"
+    }
+  ]
+}

@@ -187,7 +187,7 @@ public class MenuController {
 
 			// 数据查询，成功后返回.
 			Integer type = parameter.getInteger("type");
-			if (type == 0 || type == 1 || type == 2) {
+			if (type == 0 || type == 2) {
 				List<Menu> result = menuService.queryMenu(parameter);
 				for (int i = 0; i < result.size(); i++) {
 					Menu menu =result.get(i);

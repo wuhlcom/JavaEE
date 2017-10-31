@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fish.yu.dao.GroupMapper">
+
+	
+	
+	<!--分组和角色集合 -->
+	<resultMap id="GroupsAndRolesMap" type="fish.yu.entity.GroupAndRoles">
+			<result column="gid" property="gid" />
+			<result column="gname" property="gname" />
+			<result column="gtype" property="gtype" />
+			<!-- 关系属性-->
+			<collection property="roles"  ofType="fish.yu.entity.Role">
+				<!-- 主属性 -->
+				<id column="rid"  property="id"/>
+				<!-- 普通属性 -->
+				<result column="rname"  property="name"/>
+				<result column="rtype"  property="type"/>
+			</collection>
+	</resultMap>
+	
+	
+	<!-- 通过GroupId查询角色集合 -->
+	<select  id="selectRolesByGroupId"   resultMap="GroupsAndRolesMap"  >
+		   SELECT ggr.id AS gid,ggr.name AS gname ,ggr.type AS gtype,tr.id AS rid,tr.name AS rname,tr.type AS rtype FROM 
+  		      (SELECT  tg.id,tg.name,tg.type,gr.group_id,gr.role_id  FROM t_group tg LEFT JOIN t_group_role  gr ON tg.id=gr.group_id)ggr
+   		      LEFT  JOIN  t_role tr ON ggr.role_id=tr.id  WHERE  ggr.group_id =#{id}  
+   		      
+	</select>
+	
+	  <!-- 通过GroupIds查询角色集合 -->
+	<select  id="selectRolesByGroupIds"   resultMap="GroupsAndRolesMap"  >
+		   SELECT ggr.id AS gid,ggr.name AS gname ,ggr.type AS gtype,tr.id AS rid,tr.name AS rname,tr.type AS rtype FROM 
+  		      (SELECT  tg.id,tg.name,tg.type,gr.group_id,gr.role_id  FROM t_group tg LEFT JOIN t_group_role  gr ON tg.id=gr.group_id)ggr
+   		      LEFT  JOIN  t_role tr ON ggr.role_id=tr.id  WHERE  ggr.group_id IN
+   		      <foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+       			   #{item}  
+   			 </foreach>  
+	</select>
+	
+
+</mapper>

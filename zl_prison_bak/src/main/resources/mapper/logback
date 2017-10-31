@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration xmlns="http://ch.qos.logback/xml/ns/logback"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://ch.qos.logback/xml/ns/logback
+               http://ch.qos.logback/xml/ns/logback/logback.xsd
+               http://ch.qos.logback/xml/ns/logback "
+	scan="true" scanPeriod="60 seconds" debug="false" packagingData="true">
+	<property name="APP_Name" value="zl_login" />
+	<timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss" />
+	<contextName>${APP_Name}</contextName>
+
+	<property name="USER_HOME" value="/tmp/log/prison" />
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<!-- 阈值过滤，就是log行为级别过滤，debug及debug以上的信息会被打印出来 -->
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>debug</level>
+		</filter>
+		<encoder>
+			<pattern>%d{yyyyMMddHHmmss}|%-5level| %logger{0}.%M | %msg | %thread
+				%n</pattern>
+			<charset>UTF-8</charset>
+		</encoder>
+	</appender>
+
+	<appender name="FILELOG"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${catalina.home}/logs/app.%d{yyyyMMdd}.log
+			</fileNamePattern>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{yyMMddHHmmss.SSS}|%-5level| %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<!-- 滚动日志文件 -->
+	<appender name="ROLLINGFILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<prudent>true</prudent>
+		<!-- 按天新建log日志 -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${USER_HOME}/base-%d{yyyyMMdd}_%i.log
+			</fileNamePattern>
+			<!-- 保留30天的历史日志 -->
+			<maxHistory>30</maxHistory>
+			<!-- 基于大小和时间，这个可以有，可以没有 -->
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<!-- 当一个日志大小大于10KB，则换一个新的日志。日志名的%i从0开始，自动递增 -->
+				<maxFileSize>1024MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<encoder>
+			<!-- %ex就是指抛出的异常，full是显示全部，如果在{}中写入数字，则表示展示多少行 -->
+			<pattern>%-4d [%thread] %-5level %logger.%method - %msg%n%ex{full,
+				DISPLAY_EX_EVAL}</pattern>
+			<charset>UTF-8</charset>
+		</encoder>
+	</appender>
+
+	<appender name="RUNLOG"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${catalina.home}/logs/run.%d{yyyyMMdd}.log
+			</fileNamePattern>
+			<maxHistory>7</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{yyMMddHHmmss.SSS}|%-5level| %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="com.prison" level="debug" additivity="false">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILELOG" />
+		<appender-ref ref="ROLLINGFILE" />
+	</logger>
+	
+	<logger name="java.sql" level="DEBUG" additivity="false">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="ROLLINGFILE" />
+	</logger>
+
+	<logger name="com.apache.ibatis" level="TRACE" />
+
+	<root level="debug">
+		<appender-ref ref="STDOUT" />
+	</root>
+</configuration>

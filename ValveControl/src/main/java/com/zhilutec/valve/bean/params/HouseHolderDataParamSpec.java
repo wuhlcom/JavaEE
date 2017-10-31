@@ -77,24 +77,26 @@ public class HouseHolderDataParamSpec {
 				Double wit_max = params.getWit_max();
 				Double wot_min = params.getWot_min();
 				Double wot_max = params.getWot_max();
+				List<String> comm_addresses = params.getComm_addresses();
+			
 				// Short opening_status = params.getOpening();
-
-				// System.out.println("--------------");
-				// System.out.println(start_time);
-				// System.out.println(end_time);
-				// System.out.println(temdif);
-				// System.out.println(con1);
-				// System.out.println(con2);
-				// System.out.println(wit_min);
-				// System.out.println(wit_max);
-				// System.out.println(wot_min);
-				// System.out.println(wot_max);
-				// System.out.println(valve_status);
-				// System.out.println("--------------");
+//				 System.out.println("--------------");
+//				 System.out.println(start_time);
+//				 System.out.println(end_time);
+//				 System.out.println(temdif);
+//				 System.out.println(con1);
+//				 System.out.println(con2);
+//				 System.out.println(wit_min);
+//				 System.out.println(wit_max);
+//				 System.out.println(wot_min);
+//				 System.out.println(wot_max);
+//				 System.out.println(comm_addresses);
+//				 System.out.println("--------------");
 
 				Predicate supplyTempPre = null;
 				Predicate returnTempPre = null;
 				Predicate temdifPre = null;
+				Predicate commAddressesPre = null;
 				Predicate predicate = null;
 
 				// 修改返回结果为指定的类
@@ -131,6 +133,12 @@ public class HouseHolderDataParamSpec {
 					Predicate wotMinPre = cb.greaterThanOrEqualTo(return_temp, wot_min);
 					Predicate wotMaxPre = cb.lessThanOrEqualTo(return_temp, wot_max);
 					returnTempPre = cb.and(wotMinPre, wotMaxPre);
+				}
+				
+				// 限定查询范围
+				if (comm_addresses != null && !comm_addresses.isEmpty()&& comm_addresses.size() !=0) {						
+					Expression<String> exp = root.get("comm_address");
+					commAddressesPre = exp.in(comm_addresses);							
 				}
 
 				// ------------------- 三组参数都有值--------------------------
@@ -196,14 +204,22 @@ public class HouseHolderDataParamSpec {
 				}
 
 				if (predicate != null) {
-					predicate = cb.and(predicate, timeRangePre);
-				} else {
-					System.out.println("only timeRangePre");
-					predicate = cb.and(timeRangePre);
+					if (commAddressesPre!=null) {
+						predicate = cb.and(predicate, timeRangePre);
+						predicate = cb.and(predicate, commAddressesPre);
+					} else {
+						predicate = cb.and(predicate, timeRangePre);
+					}					
+				} else {					
+					if (commAddressesPre!=null) {				
+						predicate = cb.and(timeRangePre, commAddressesPre);
+					} else {
+						predicate = cb.and(timeRangePre);
+					}	
 				}
 
 				// System.out.println(predicate);
-				if (type == 1) {
+				if (type == 1) {					
 					query.groupBy(comm_address, comm_type);
 					return query.where(predicate).getRestriction();
 				} else {

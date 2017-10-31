@@ -1,13 +1,16 @@
 spring:
   application:
-    name: microservice-login
+    name: login
 server:
   port: 9990
   
-#eureka:
-#  client:
-#    service-url:
-#      defaultZone: http://user:password123@localhost:8761/eureka
-#      
-#  instance:
-#    prefer-ip-address: true   
+eureka:
+  client:
+    service-url:
+      defaultZone: http://172.16.140.79:9437/eureka/
+      
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ipAddress}:${spring.application.name}:${server.port}
+    lease-expiration-duration-in-seconds: 30
+    lease-renewal-interval-in-seconds: 10

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.prison.db.dao.UserDao">
+	<select id="queryObject" resultType="com.prison.db.entity.UserEntity">
+		select * from pr_users where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.prison.db.entity.UserEntity">
+		select * from pr_users
+		<where>
+			<if test="parentUser != null">
+				and `parent_user` = #{parentUser}
+			</if>
+			<if test="account != null and account.trim() != ''">
+				and `account` like concat('%',#{account},'%')
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order}
+			</when>
+			<otherwise>
+				order by id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="java.util.Integer">
+		select count(*) from pr_users
+		<where>
+			<if test="parentUser != null">
+				and `parent_user` = #{parentUser}
+			</if>
+			<if test="account != null and account.trim() != ''">
+				and `account` like concat('%',#{account},'%')
+			</if>
+		</where>
+	</select>
+
+	<!-- 查询用户的所有权限 -->
+	<select id="queryAllPerms" resultType="String">
+		select r.permission from pr_role_user ru
+		LEFT JOIN pr_role_resource rr on ru.role_id = rr.role_id
+		LEFT JOIN pr_resources r on rr.resource_id = r.id
+		where ru.user_id = #{userId}
+	</select>
+
+	<!-- 查询用户的所有菜单ID -->
+	<select id="queryAllMenuId" resultType="java.util.Long">
+		select distinct	rr.resource_id from pr_role_user ru
+		LEFT JOIN pr_role_resource rr on ru.role_id = rr.role_id
+		where ru.user_id = #{userId}
+	</select>
+
+	<select id="queryByAccount" resultType="com.prison.db.entity.UserEntity">
+		select * from pr_users
+		where account = #{account}
+	</select>
+
+	<insert id="save" parameterType="com.prison.db.entity.UserEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into pr_users
+		(
+		`account`
+		`password`
+		`username`
+		`idcard`
+		`user_number`
+		`sex`
+		`birth`
+		`role_id`
+		`user_discription`
+		`position`
+		`isdel`
+		`created_at`
+		`available`
+		`telephone`
+		`address`
+		`email`
+		)
+		values
+		(
+		#{account}
+		#{password},
+		#{username},
+		#{idcard},
+		#{userNumber},
+		#{sex},
+		#{birth},
+		#{roleId},
+		#{userDiscription},
+		#{position},
+		#{isdel},
+		#{createdAt},
+		#{available},
+		#{telephone},
+		#{address},
+		#{email}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.prison.db.entity.UserEntity">
+		update pr_users
+		<set>
+			<if test="account != null">`account` = #{account}, </if>
+			<if test="password != null">`password` = #{password}, </if>
+			<if test="email != null">`email` = #{email}, </if>
+			<if test="telephone != null">`telephone` = #{telephone}, </if>
+			<if test="available != null">`available` = #{available}, </if>
+		</set>
+		where id = #{userId}
+		<if test="parentUser != null">
+				and `parent_user` = #{parentUser}
+		</if>
+	</update>
+
+	<update id="updatePassword" parameterType="java.util.Map">
+		update pr_users set
+		`password` = #{newPassword}
+		where id = #{userId} and password = #{password}
+	</update>
+
+	<delete id="deleteBatch">
+		delete from pr_users where id in
+		<foreach item="userId" collection="array" open="(" separator=","
+			close=")">
+			#{userId}
+		</foreach>
+		;
+		delete from pr_role_user where user_id in
+		<foreach item="userId" collection="array" open="(" separator=","
+			close=")">
+			#{userId}
+		</foreach>
+	</delete>
+
+</mapper>

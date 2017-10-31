@@ -4,6 +4,7 @@ package com.dunan.login.controller;
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -56,13 +57,10 @@ public class LoginController {
 	
 	@RequestMapping(value="/dologin", method = {RequestMethod.POST })
 	public Map<String, Object> index(HttpServletRequest request, HttpServletResponse response, @RequestBody Object requestBody) {
-		//String username = request.getParameter("username");
-		//String password = request.getParameter("password");
-		//JSONObject jsonObj=JSONObject.fromObject(requestBody);
-		//System.out.println(requestBody.toString());
 		Map<String, Object> backjson = new HashMap<String, Object>();
 		try {
 			JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(requestBody));
+			String finger = request.getHeader("finger");
 			//System.out.println(jsonObject);
 			String username = jsonObject.getString("username");
 			String password = jsonObject.getString("password");
@@ -71,8 +69,6 @@ public class LoginController {
 			//User user = userService.findByUsername(username.trim());
 			//User user = userService.findByUsernameAndDisused(username.trim(), 1);
 			User user = userService.findByUsernameAndIsdel(username.trim(), 0);
-			
-			
 			
 			//System.out.println(user);
 			boolean iscorrect = password.trim().equals(user.getPassword().trim());
@@ -85,16 +81,19 @@ public class LoginController {
 				sendLog(userId, "login");
 				String token = JwtHelper.createJWT(name, userId, role, "www.dunan.com", "dunan", -1, "dunanSecurity");
 				try {
-					String key = MD5Util.string2MD5(token);
-					this.hashOperations.put("loginhash", key, token);
-					String url = "http://118.31.102.18:8012/role/queryRoleMenu";
+					
+					String key = MD5Util.string2MD5(token+finger);
+					//this.hashOperations.put("loginhash", key, token);
+					this.hashOperations.put("loginhash", name, key);
+					this.valueOperations.set(key, token, 1800, TimeUnit.SECONDS);
+					String url = "http://172.16.140.79:8012/permission/role/queryRoleMenu";
 					JSONObject postData = new JSONObject();
 //					postData.put("token", token);
 //					System.out.println(postData);					
 //					JSONObject menus = restTemplate.postForEntity(url, postData, JSONObject.class).getBody();
 					
 					HttpHeaders headers = new HttpHeaders();
-					headers.add("token", token);
+					headers.add("token", token+finger);
 					HttpEntity<String> entity = new HttpEntity<String>(postData.toJSONString(), headers);
 					String menus = restTemplate.postForObject(url, entity, String.class);
 					JSONObject menuObject = JSONObject.parseObject(menus);
@@ -103,7 +102,7 @@ public class LoginController {
 					backjson.put("menus", menuObject.getString("result"));
 					backjson.put("username", user.getUsername());
 					backjson.put("status", "1");
-					backjson.put("token", token);
+					backjson.put("token", token+finger);
 					return backjson;
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -129,27 +128,37 @@ public class LoginController {
 		
 		JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(requestBody));
 		String token = jsonObject.getString("token");
+		//String finger = request.getHeader("finger");
+		//System.out.println(userAgent);
 		//String token = request.getParameter("token");
 		Map<String, Object> backjson = new HashMap<String, Object>();
 		
 		try {
-			String key = MD5Util.string2MD5(token);
 			//Boolean hasKey = this.redisTemplate.hasKey("loginhash");
-			String jwtString = String.valueOf(this.hashOperations.get("loginhash", key));
-			boolean iscorrect = token.trim().equals(jwtString.trim());
-			if (iscorrect) {
-				Claims claims = JwtHelper.parseJWT(token, "dunanSecurity");
+			//String jwtString = String.valueOf(this.hashOperations.get("loginhash", key));
+			String key = MD5Util.string2MD5(token);
+			String jwtString = String.valueOf(this.valueOperations.get(key));
+			//boolean iscorrect = token.trim().equals(jwtString.trim());
+			if ( jwtString == null || jwtString.length() <= 0) {
+				backjson.put("status", 0);
+			} else {
+				Claims claims = JwtHelper.parseJWT(jwtString, "dunanSecurity");
 				String username = String.valueOf(claims.get("unique_name"));
 				String userid = String.valueOf(claims.get("userid"));
 				String role = String.valueOf(claims.get("role"));
-				
+				User user = userService.findByUsernameAndIsdel(username.trim(), 0);
+				if (null == user) {
+					backjson.put("status", 0);
+				} else {
+					//this.valueOperations.set(key, token, 1800, TimeUnit.SECONDS);
+					this.redisTemplate.expire(key, 1800, TimeUnit.SECONDS);
+					backjson.put("name", username);
+					backjson.put("userid", userid);
+					backjson.put("role", role);
+					backjson.put("status", 1);
+				}
 				//System.out.println(claims);
-				backjson.put("name", username);
-				backjson.put("userid", userid);
-				backjson.put("role", role);
-				backjson.put("status", 1);
-			} else {
-				backjson.put("status", 0);
+				
 			}
 			
 		} catch (Exception e) {
@@ -166,14 +175,15 @@ public class LoginController {
 			JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(requestBody));
 			String token = jsonObject.getString("token");
 			String key = MD5Util.string2MD5(token);
-			String jwtString = String.valueOf(this.hashOperations.get("loginhash", key));
-			boolean iscorrect = token.trim().equals(jwtString.trim());
-			System.out.println(jwtString.trim());
-			System.out.println(token);
-			if (iscorrect) {
-				Claims claims = JwtHelper.parseJWT(token, "dunanSecurity");
+			//String jwtString = String.valueOf(this.hashOperations.get("loginhash", key));
+			String jwtString = String.valueOf(this.valueOperations.get(key));
+			//boolean iscorrect = token.trim().equals(jwtString.trim());
+
+			if (jwtString != null && jwtString.length() > 0) {
+				Claims claims = JwtHelper.parseJWT(jwtString, "dunanSecurity");
 				String userid = String.valueOf(claims.get("userid"));
 				//this.hashOperations.delete("loginhash", key);
+				this.redisTemplate.delete(key);
 				sendLog(userid, "exit");
 			}
 		} catch (Exception e) {
@@ -182,7 +192,7 @@ public class LoginController {
 	}
 	
 	public static void sendLog(String userid, String operation) {
-		String url = "http://118.31.102.18:8084/systemlog/add";
+		String url = "http://172.16.140.79:8084/systemlog/add";
 		JSONObject postData = new JSONObject();
 		postData.put("EmployId", userid);
 		postData.put("operation", operation);
@@ -193,16 +203,19 @@ public class LoginController {
 	
 	@RequestMapping("/test")
 	public String test(HttpServletRequest request){
-		User user = userService.findByUsernameAndDisused("zhangsan1", 1);
-		System.out.println(user.getUsername()+"====="+user.getDisused());
-		try {
-			String token = request.getParameter("token");
-			Claims claims = JwtHelper.parseJWT(token, "dunanSecurity");
-			System.out.println(claims);
-			System.out.println(claims.get("unique_name"));
-		} catch (Exception e) {
-			System.out.println("faile");
-		}
+		User user1 = userService.findByUsername("sssdddxxxx");
+		if (null == user1) System.out.println("okkkkkk");
+		System.out.println(user1);
+//		User user = userService.findByUsernameAndDisused("zhangsan1", 1);
+//		System.out.println(user.getUsername()+"====="+user.getDisused());
+//		try {
+//			String token = request.getParameter("token");
+//			Claims claims = JwtHelper.parseJWT(token, "dunanSecurity");
+//			System.out.println(claims);
+//			System.out.println(claims.get("unique_name"));
+//		} catch (Exception e) {
+//			System.out.println("faile");
+//		}
 		
 		return "String test";
 	}

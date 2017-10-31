@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fish.yu.dao.RoleMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="fish.yu.entity.Role">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+	</resultMap>
+	
+	<!--角色集合和资源集合 -->
+	<resultMap id="RolesAndPermissionsMap" type="fish.yu.entity.RolesAndPermissions">
+			<result column="rid" property="rid" />
+			<result column="rname" property="rname" />
+			<result column="rtype" property="rtype" />
+			<result column="pid" property="pid" />
+			<result column="pname" property="pname" />
+			<result column="purl" property="purl" />
+	</resultMap>
+	
+	
+	  <!-- 通过roleIds查询集合 -->
+	<select  id="selectPermissionsByRoleIds"   resultMap="RolesAndPermissionsMap"  >
+		   SELECT rrp.id as rid,rrp.name AS rname ,rrp.type AS rtype,tp.id As pid,tp.name AS pname,tp.url AS purl FROM 
+  		      (SELECT  tr.id,tr.name,tr.type,rp.role_id,rp.permission_id  FROM t_role tr LEFT JOIN t_role_permission  rp ON tr.id=rp.role_id)rrp
+   		      LEFT  JOIN  t_permission tp ON rrp.permission_id=tp.id  WHERE  rrp.role_id IN
+   		      <foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+       			   #{item}  
+   			 </foreach>  
+	</select>
+	
+
+</mapper>

@@ -258,7 +258,6 @@ public class UserServiceImpl implements UserService {
 
 		record = JSON.parseObject(obj.toJSONString(), User.class);
 		try {
-
 			// 创建example
 			Example example = new Example(User.class);
 			// 创建查询条件
